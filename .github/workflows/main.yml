@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:      
       - name: FTP Deploy
-        uses: SamKirkland/FTP-Deploy-Action@4.00
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
