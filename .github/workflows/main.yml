@@ -1,0 +1,17 @@
+on: 
+  workflow_dispatch:
+  push:
+    branches: 
+      - master
+name: FTP-Deploy
+jobs:
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
+    runs-on: ubuntu-latest
+    steps:      
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@4.00
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
