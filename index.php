@@ -3,11 +3,11 @@ function clean($str)
 {
     return (str_replace('_', ' ', $str) . ': ');
 }
-$datafile=$DB->query('DESCRIBE grave_data');
-$columns=[];
-while($data=$datafile->fetch_array()){
-    if($data['Field']!=='i'){
-        array_push($columns,$data['Field']);
+$datafile = $DB->query('DESCRIBE grave_data');
+$columns = [];
+while ($data = $datafile->fetch_array()) {
+    if ($data['Field'] !== 'i') {
+        array_push($columns, $data['Field']);
     }
 }
 $formquestions = []; //array of: arrays (echos select),string (echos text input),and integers (echos that element of $specialformquestions)
@@ -23,25 +23,25 @@ for ($i = 0; $i < count($columns); $i++) {
     }
 }
 $specialformquestions = [
-    [array_search('Birthyear', $formquestions)+1, '
+    [array_search('Birthyear', $formquestions) + 1, '
         <label>Born After: <input type="date" name="bornafter"></label>
         <label>Born Before: <input type="date" name="bornbefore"></label>
     '],
-    [array_search('Deathyear', $formquestions)+1, '
+    [array_search('Deathyear', $formquestions) + 1, '
         <label>Died After: <input type="date" name="diedafter"></label>
         <label>Died Before: <input type="date" name="diedbefore"></label>
     '],
-    [array_search('Entry_Year', $formquestions)+1, '
+    [array_search('Entry_Year', $formquestions) + 1, '
         <label>Entered After: <input type="date" name="enteredafter"></label>
         <label>Entered Before: <input type="date" name="enteredbefore"></label>
     '],
-    [array_search('Exit_Year', $formquestions)+1, '
+    [array_search('Exit_Year', $formquestions) + 1, '
         <label>Exited After: <input type="date" name="exitedafter"></label>
         <label>Exited Before: <input type="date" name="exitedbefore"></label>
     ']
 ];
-for($i=0;$i<$specialformquestions;$i++){
-    $formquestions=array_splice($formquestions,$specialformquestions[$i][0],0,$i);
+for ($i = 0; $i < $specialformquestions; $i++) {
+    $formquestions = array_splice($formquestions, $specialformquestions[$i][0], 0, $i);
 }
 ?>
 <!DOCTYPE html>
@@ -50,22 +50,22 @@ for($i=0;$i<$specialformquestions;$i++){
 <head>
     <title>Search Middleborough Cemeteries</title>
     <script>
+        function isDoubleArray(arr) {
+            if (!arr.isArray()) {
+                return false;
+            }
+            arr.forEach(v => {
+                if (!v.isArray()) {
+                    return false;
+                }
+            })
+        }
+
         function search() {
             const xhr = new XMLHttpRequest();
-            xhr.onload(() => {
-                let isdoublearray = (arr) => {
-                    if (!arr.isArray()) {
-                        return false;
-                    }
-                    arr.forEach(v => {
-                        if (!v.isArray()) {
-                            return false;
-                        }
-                    })
-
-                }
-                document.getElementById('results').innerHTML = isdoublearray(xhr.responseText) ? xhr.responseText.map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : xhr.responseText;
-            })
+            xhr.onload = (e) => {
+                document.getElementById('results').innerHTML = isDoubleArray(xhr.responseText) ? xhr.responseText.map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : xhr.responseText;
+            }
             xhr.open('post', './query.php');
             xhr.send(new FormData(document.getElementById('queryform')));
         }
@@ -110,16 +110,14 @@ for($i=0;$i<$specialformquestions;$i++){
             <legend>Data to Retrieve</legend>
             <?php
             foreach ($columns as $column) {
-                echo '<label><input type="checkbox" checked name="select[]" value="' . $column . '"/>' . substr(clean($column),0,-2) . '</label>';
+                echo '<label><input type="checkbox" checked name="select[]" value="' . $column . '"/>' . substr(clean($column), 0, -2) . '</label>';
             }
             ?>
         </fieldset>
-        <button type="submit" onclick="search()" />Go!<button>
+        <button type="submit" onclick="search()">Go!<button>
     </form>
     <hr />
     <table id="results">
-        <?php
-        ?>
     </table>
 </body>
 
