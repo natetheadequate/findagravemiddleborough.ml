@@ -40,7 +40,7 @@ $specialformquestions = [
         <label>Exited Before: <input type="date" name="exitedbefore"></label>
     ']
 ];
-for ($i = 0; $i < $specialformquestions; $i++) {
+for ($i = 0; $i < count($specialformquestions); $i++) {
     $formquestions = array_splice($formquestions, $specialformquestions[$i][0], 0, $i);
 }
 ?>
