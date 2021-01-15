@@ -13,7 +13,7 @@ while($data=$datafile->fetch_array()){
 $formquestions = []; //array of: arrays (echos select),string (echos text input),and integers (echos that element of $specialformquestions)
 for ($i = 0; $i < count($columns); $i++) {
     $possibleoptions = [];
-    for ($j = 0; $v = ($DB->query('SELECT DISTINCT ' . $columns[$i] . ' FROM grave_data'))->fetch_array(), $j < 11; $j++) {
+    for ($j = 0; $v = ($DB->query('SELECT DISTINCT `' . $columns[$i] . '` FROM grave_data'))->fetch_array(), $j < 11; $j++) {
         $possibleoptions[$j] = $v;
     }
     if ($j < 10) {
@@ -110,7 +110,7 @@ for($i=0;$i<$specialformquestions;$i++){
             <legend>Data to Retrieve</legend>
             <?php
             foreach ($columns as $column) {
-                echo '<label><input type="checkbox" checked name="select[]" value="' . $column . '"/>' . $column . '</label>';
+                echo '<label><input type="checkbox" checked name="select[]" value="' . $column . '"/>' . substr(clean($column),0,-2) . '</label>';
             }
             ?>
         </fieldset>
