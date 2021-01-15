@@ -41,7 +41,7 @@ $specialformquestions = [
     ']
 ];
 for ($i = 0; $i < count($specialformquestions); $i++) {
-    $formquestions = array_splice($formquestions, $specialformquestions[$i][0], 0, $i);
+    $array_splice($formquestions, $specialformquestions[$i][0], 0, $i);
 }
 ?>
 <!DOCTYPE html>
@@ -86,7 +86,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
                         echo '<option value="' . $formquestion[$i] . '">' . clean($formquestion[$i]) . '</option>';
                     }
                 } elseif (is_numeric($formquestion)) {
-                    echo $specialformquestions[$formquestion];
+                    echo $specialformquestions[$formquestion][1];
                 } else {
                     echo '<label>' . clean($formquestion) . '<input type="text" name="' . $formquestion . '"></label>';
                 }
@@ -114,7 +114,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             }
             ?>
         </fieldset>
-        <button type="submit" onclick="search()">Go!<button>
+        <button type="submit" onclick="search()">Go!/<button>
     </form>
     <hr />
     <table id="results">
