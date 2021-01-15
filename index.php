@@ -99,11 +99,11 @@ for ($i = 0; $i < $specialformquestions; $i++) {
             <select name="sortby">
                 <?php
                 foreach ($columns as $column) {
-                    echo '<option value="' . $column . '>' . $column . '</option>';
+                    echo '<option value="' . $column . '>' . substr(clean($column), 0, -2) . '</option>';
                 }
                 ?>
             </select>
-            <label><input type="radio" name="sortorder" value="ASC">Ascending</label>
+            <label><input type="radio" name="sortorder" checked value="ASC">Ascending</label>
             <label><input type="radio" name="sortorder" value="DESC">Descending</label>
         </fieldset>
         <fieldset>
