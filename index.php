@@ -3,11 +3,17 @@ function clean($str)
 {
     return (str_replace('_', ' ', $str) . ': ');
 }
-$columns = array_diff((($DB->query('SELECT * FROM INFORMATION_SCHEMA.COLUMNS'))->fetch_all()), ['i']);
+$datafile=$DB->query('DESCRIBE grave_data');
+$columns=[];
+while($data=$datafile->fetch_array()){
+    if($data['Field']!=='i'){
+        array_push($columns,$data['Field']);
+    }
+}
 $formquestions = []; //array of: arrays (echos select),string (echos text input),and integers (echos that element of $specialformquestions)
 for ($i = 0; $i < count($columns); $i++) {
     $possibleoptions = [];
-    for ($j = 0; $v = ($DB->query('SELECT DISTINCT ' . $column . ' FROM grave_data'))->fetch_array(), $j < 11; $j++) {
+    for ($j = 0; $v = ($DB->query('SELECT DISTINCT ' . $columns[$i] . ' FROM grave_data'))->fetch_array(), $j < 11; $j++) {
         $possibleoptions[$j] = $v;
     }
     if ($j < 10) {
