@@ -70,7 +70,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             xhr.onload = (e) => {
                 document.getElementById('results').innerHTML = isDoubleArray(xhr.responseText) ? xhr.responseText.map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : xhr.responseText;
             }
-            xhr.open("POST", "https://findagravemiddleborough.ml/query.php");
+            xhr.open("POST", "query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
         }
         function toggle(bool){
@@ -123,7 +123,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             <label>Toggle All<input type="checkbox" checked id="toggler" onclick="toggle(document.getElementById('toggler').checked)"></label>
             <?php
             foreach ($columns as $column) {
-                echo '<label>' . clean($column) . '<input type="checkbox" checked name="select[]" value="' . $column . '"/></label><br>';
+                echo '<label>' . clean($column) . '<input type="checkbox" checked name="select[]" value="' . strip_tags($column) . '"/></label><br>';
             }
             ?>
         </fieldset>
