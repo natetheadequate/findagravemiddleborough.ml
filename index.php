@@ -55,7 +55,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
     <title>Search Middleborough Cemeteries</title>
     <script>
         function isDoubleArray(arr) {
-            if (!arr.isArray()) {
+            if (!Array.isArray(arr)) {
                 return false;
             }
             arr.forEach(v => {
@@ -86,7 +86,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
 <body>
     <h1>Search the database of Friends of Middleborough Cemeteries</h1>
 
-    <form id='queryform'>
+    <form id='queryform' onsubmit="e=>e.preventDefault()">
         <fieldset style="column-width:300px">
             <legend style="column-span:all">Search and Filter</legend>
             <?php
@@ -127,7 +127,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             }
             ?>
         </fieldset>
-        <button aria-type="submit" onclick="search()">Go!</button>
+        <button aria-type="submit" type="button" onclick="search()">Go!</button>
     </form>
     <hr />
     <table id="results">
