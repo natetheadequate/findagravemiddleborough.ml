@@ -59,7 +59,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
                 return false;
             }
             arr.forEach(v => {
-                if (!v.isArray()) {
+                if (!Array.isArray(v)) {
                     return false;
                 }
             })
