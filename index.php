@@ -123,7 +123,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             <label>Toggle All<input type="checkbox" checked id="toggler" onclick="toggle(document.getElementById('toggler').checked)"></label>
             <?php
             foreach ($columns as $column) {
-                echo '<label>' . substr(clean($column), 0, -2) . '<input type="checkbox" checked name="select[]" value="' . $column . '"/></label><br>';
+                echo '<label>' . clean($column) . '<input type="checkbox" checked name="select[]" value="' . $column . '"/></label><br>';
             }
             ?>
         </fieldset>
