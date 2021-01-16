@@ -66,7 +66,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             xhr.onload = (e) => {
                 document.getElementById('results').innerHTML = isDoubleArray(xhr.responseText) ? xhr.responseText.map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : xhr.responseText;
             }
-            xhr.open('POST', './query.php', true);
+            xhr.open("POST", "./query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
         }
         function toggle(){
@@ -78,7 +78,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
 <body>
     <h1>Search the database of Friends of Middleborough Cemeteries</h1>
 
-    <form id='queryform' onchange="search()">
+    <form id='queryform'>
         <fieldset style="column-width:300px">
             <legend style="column-span:all">Search and Filter</legend>
             <?php
