@@ -25,19 +25,19 @@ for ($i = 0; $i < count($columns); $i++) {
 $specialformquestions = [
     [array_search('Birthyear', $formquestions) + 1, '
         <label>Born After: <input type="date" name="bornafter"></label><br>
-        <label>Born Before: <input type="date" name="bornbefore"></label><br>
+        <label>Born Before: <input type="date" name="bornbefore"></label>
     '],
     [array_search('Deathyear', $formquestions) + 1, '
         <label>Died After: <input type="date" name="diedafter"></label><br>
-        <label>Died Before: <input type="date" name="diedbefore"></label><br>
+        <label>Died Before: <input type="date" name="diedbefore"></label>
     '],
     [array_search('Entry_Year', $formquestions) + 1, '
         <label>Entered After: <input type="date" name="enteredafter"></label><br>
-        <label>Entered Before: <input type="date" name="enteredbefore"></label><br>
+        <label>Entered Before: <input type="date" name="enteredbefore"></label>
     '],
     [array_search('Exit_Year', $formquestions) + 1, '
         <label>Exited After: <input type="date" name="exitedafter"></label><br>
-        <label>Exited Before: <input type="date" name="exitedbefore"></label><br>
+        <label>Exited Before: <input type="date" name="exitedbefore"></label>
     ']
 ];
 for ($i = 0; $i < count($specialformquestions); $i++) {
@@ -70,7 +70,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             xhr.send(new FormData(document.getElementById('queryform')));
         }
         function toggle(bool){
-            bool?document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.setAttribute('checked','')):document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.removeAttribute('checked')):
+            bool?document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.setAttribute('checked','')):document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.removeAttribute('checked'));
         }
     </script>
 </head>
