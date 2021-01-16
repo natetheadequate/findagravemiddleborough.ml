@@ -16,7 +16,7 @@ for ($i = 0; $i < count($columns); $i++) {
     for ($j = 0; $v = ($DB->query('SELECT DISTINCT `' . $columns[$i] . '` FROM grave_data'))->fetch_array(), $j < 11; $j++) {
         $possibleoptions[$j] = $v;
     }
-    if ($j < 10) {
+    if (count($possibleoptions) < 10) {
         array_push($formquestions, [$columns[$i], ...$possibleoptions]);
     } else {
         array_push($formquestions, $columns[$i]);
@@ -41,7 +41,7 @@ $specialformquestions = [
     ']
 ];
 for ($i = 0; $i < count($specialformquestions); $i++) {
-    $array_splice($formquestions, $specialformquestions[$i][0], 0, $i);
+    array_splice($formquestions, $specialformquestions[$i][0], 0, $i);
 }
 ?>
 <!DOCTYPE html>
@@ -66,7 +66,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             xhr.onload = (e) => {
                 document.getElementById('results').innerHTML = isDoubleArray(xhr.responseText) ? xhr.responseText.map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : xhr.responseText;
             }
-            xhr.open('post', './query.php');
+            xhr.open('POST', './query.php', true);
             xhr.send(new FormData(document.getElementById('queryform')));
         }
     </script>
@@ -76,8 +76,8 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
     <h1>Search the database of Friends of Middleborough Cemeteries</h1>
 
     <form id='queryform' onchange="search()">
-        <fieldset>
-            <legend>Search and Filter</legend>
+        <fieldset style="column-width:300px">
+            <legend style="column-span:all">Search and Filter</legend>
             <?php
             foreach ($formquestions as $formquestion) {
                 if (is_array($formquestion)) {
@@ -85,12 +85,13 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
                     for ($i = 1; $i < count($formquestion); $i++) {
                         echo '<option value="' . $formquestion[$i] . '">' . clean($formquestion[$i]) . '</option>';
                     }
+                    echo '</select></label>';
                 } elseif (is_numeric($formquestion)) {
                     echo $specialformquestions[$formquestion][1];
                 } else {
                     echo '<label>' . clean($formquestion) . '<input type="text" name="' . $formquestion . '"></label>';
                 }
-                echo '</select></label>';
+                echo '<br>';
             }
             ?>
         </fieldset>
@@ -106,15 +107,16 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             <label><input type="radio" name="sortorder" checked value="ASC">Ascending</label>
             <label><input type="radio" name="sortorder" value="DESC">Descending</label>
         </fieldset>
-        <fieldset>
-            <legend>Data to Retrieve</legend>
+        <fieldset style="column-width:140px">
+            <legend style="column-span:all">Data to Retrieve</legend>
+            <label>Toggle All<input type="checkbox" checked onclick="document.querySelectorAll(\"[name=select[]]\").forEach(node=>node.toggle('checked'))"></label>
             <?php
             foreach ($columns as $column) {
-                echo '<label><input type="checkbox" checked name="select[]" value="' . $column . '"/>' . substr(clean($column), 0, -2) . '</label>';
+                echo '<label>' . substr(clean($column), 0, -2) . '<input type="checkbox" checked name="select[]" value="' . $column . '"/></label><br>';
             }
             ?>
         </fieldset>
-        <button type="submit" onclick="search()">Go!/<button>
+        <button type="submit" onclick="search()">Go!</button>
     </form>
     <hr />
     <table id="results">
