@@ -24,20 +24,20 @@ for ($i = 0; $i < count($columns); $i++) {
 }
 $specialformquestions = [
     [array_search('Birthyear', $formquestions) + 1, '
-        <label>Born After: <input type="date" name="bornafter"></label>
-        <label>Born Before: <input type="date" name="bornbefore"></label>
+        <label>Born After: <input type="date" name="bornafter"></label><br>
+        <label>Born Before: <input type="date" name="bornbefore"></label><br>
     '],
     [array_search('Deathyear', $formquestions) + 1, '
-        <label>Died After: <input type="date" name="diedafter"></label>
-        <label>Died Before: <input type="date" name="diedbefore"></label>
+        <label>Died After: <input type="date" name="diedafter"></label><br>
+        <label>Died Before: <input type="date" name="diedbefore"></label><br>
     '],
     [array_search('Entry_Year', $formquestions) + 1, '
-        <label>Entered After: <input type="date" name="enteredafter"></label>
-        <label>Entered Before: <input type="date" name="enteredbefore"></label>
+        <label>Entered After: <input type="date" name="enteredafter"></label><br>
+        <label>Entered Before: <input type="date" name="enteredbefore"></label><br>
     '],
     [array_search('Exit_Year', $formquestions) + 1, '
-        <label>Exited After: <input type="date" name="exitedafter"></label>
-        <label>Exited Before: <input type="date" name="exitedbefore"></label>
+        <label>Exited After: <input type="date" name="exitedafter"></label><br>
+        <label>Exited Before: <input type="date" name="exitedbefore"></label><br>
     ']
 ];
 for ($i = 0; $i < count($specialformquestions); $i++) {
@@ -66,7 +66,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             xhr.onload = (e) => {
                 document.getElementById('results').innerHTML = isDoubleArray(xhr.responseText) ? xhr.responseText.map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : xhr.responseText;
             }
-            xhr.open("POST", "./query.php");
+            xhr.open("POST", "https://findagravemiddleborough.ml/query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
         }
         function toggle(bool){
@@ -103,7 +103,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             <select name="sortby">
                 <?php
                 foreach ($columns as $column) {
-                    echo '<option value="' . $column . '>' . substr(clean($column), 0, -2) . '</option>';
+                    echo '<option value="' . $column . '">' . substr(clean($column), 0, -2) . '</option>';
                 }
                 ?>
             </select>
