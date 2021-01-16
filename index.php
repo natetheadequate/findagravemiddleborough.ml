@@ -69,8 +69,8 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             xhr.open("POST", "./query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
         }
-        function toggle(){
-            document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.toggleAttribute('checked'));
+        function toggle(bool){
+            bool?document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.setAttribute('checked','')):document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.removeAttribute('checked')):
         }
     </script>
 </head>
@@ -112,7 +112,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
         </fieldset>
         <fieldset style="column-width:140px">
             <legend style="column-span:all">Data to Retrieve</legend>
-            <label>Toggle All<input type="checkbox" checked onclick="toggle()"></label>
+            <label>Toggle All<input type="checkbox" checked id="toggler" onclick="toggle(document.getElementById('toggler').hasAttribute('checked'))"></label>
             <?php
             foreach ($columns as $column) {
                 echo '<label>' . substr(clean($column), 0, -2) . '<input type="checkbox" checked name="select[]" value="' . $column . '"/></label><br>';
