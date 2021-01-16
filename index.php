@@ -70,7 +70,11 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             xhr.send(new FormData(document.getElementById('queryform')));
         }
         function toggle(bool){
-            bool?document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.setAttribute('checked','')):document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.removeAttribute('checked'));
+            if(bool){
+                document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.setAttribute('checked',''));
+            }else{
+                document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.removeAttribute('checked'));
+            }
         }
     </script>
 </head>
