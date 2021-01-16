@@ -70,7 +70,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             xhr.send(new FormData(document.getElementById('queryform')));
         }
         function toggle(){
-            document.querySelectorAll("[name=select[]]").forEach(node=>node.toggleAttribute('checked'));
+            document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.toggleAttribute('checked'));
         }
     </script>
 </head>
