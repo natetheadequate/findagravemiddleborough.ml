@@ -1,7 +1,7 @@
 <?php include 'DB.php';
 function clean($str)
 {
-    return (str_replace('_', ' ', $str) . ': ');
+    return (str_replace('_', ' ', $str));
 }
 $datafile = $DB->query('DESCRIBE grave_data');
 $columns = [];
@@ -13,8 +13,12 @@ while ($data = $datafile->fetch_array()) {
 $formquestions = []; //array of: arrays (echos select),string (echos text input),and integers (echos that element of $specialformquestions)
 for ($i = 0; $i < count($columns); $i++) {
     $possibleoptions = [];
-    for ($j = 0; $v = ($DB->query('SELECT DISTINCT `' . $columns[$i] . '` FROM grave_data'))->fetch_array(), $j < 11; $j++) {
+    $datafile=$DB->query('SELECT DISTINCT `' . $columns[$i] . '` FROM grave_data WHERE `'.$columns[$i].'` IS NOT NULL AND NOT `'.$columns[$i].'`=""');
+    for($j = 0;$j < 11; $j++) {
+        $v=($datafile->fetch_array()[0]);
+        if(null!==$v){
         $possibleoptions[$j] = $v;
+        }else{break;}
     }
     if (count($possibleoptions) < 10) {
         array_push($formquestions, [$columns[$i], ...$possibleoptions]);
@@ -71,9 +75,9 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
         }
         function toggle(bool){
             if(bool){
-                document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.setAttribute('checked',''));
+                document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.checked=true);
             }else{
-                document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.removeAttribute('checked'));
+                document.querySelectorAll('[name="select\[\]"]').forEach(node=>node.checked=false);
             }
         }
     </script>
@@ -90,13 +94,13 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
                 if (is_array($formquestion)) {
                     echo '<label>' . clean($formquestion[0]) . '<select name="' . $formquestion[0] . '"><option value=""></option>';
                     for ($i = 1; $i < count($formquestion); $i++) {
-                        echo '<option value="' . $formquestion[$i] . '">' . clean($formquestion[$i]) . '</option>';
+                        echo '<option value=' . strip_tags($formquestion[$i]) . '>' . clean($formquestion[$i]) . '</option>';
                     }
                     echo '</select></label>';
                 } elseif (is_numeric($formquestion)) {
                     echo $specialformquestions[$formquestion][1];
                 } else {
-                    echo '<label>' . clean($formquestion) . '<input type="text" name="' . $formquestion . '"></label>';
+                    echo '<label>' . clean($formquestion) . ': <input type="text" name="' . strip_tags($formquestion) . '"></label>';
                 }
                 echo '<br>';
             }
@@ -107,7 +111,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             <select name="sortby">
                 <?php
                 foreach ($columns as $column) {
-                    echo '<option value="' . $column . '">' . substr(clean($column), 0, -2) . '</option>';
+                    echo '<option value="' . strip_tags($column) . '">' . clean($column) . '</option>';
                 }
                 ?>
             </select>
@@ -116,14 +120,14 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
         </fieldset>
         <fieldset style="column-width:140px">
             <legend style="column-span:all">Data to Retrieve</legend>
-            <label>Toggle All<input type="checkbox" checked id="toggler" onclick="toggle(document.getElementById('toggler').hasAttribute('checked'))"></label>
+            <label>Toggle All<input type="checkbox" checked id="toggler" onclick="toggle(document.getElementById('toggler').checked)"></label>
             <?php
             foreach ($columns as $column) {
                 echo '<label>' . substr(clean($column), 0, -2) . '<input type="checkbox" checked name="select[]" value="' . $column . '"/></label><br>';
             }
             ?>
         </fieldset>
-        <button type="submit" onclick="search()">Go!</button>
+        <button aria-type="submit" onclick="search()">Go!</button>
     </form>
     <hr />
     <table id="results">
