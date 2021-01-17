@@ -68,7 +68,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
         function search() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                document.getElementById('results').innerHTML = isDoubleArray(xhr.responseText) ? xhr.responseText.map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : xhr.responseText;
+                document.getElementById('results').innerHTML = isDoubleArray(JSON.parse(xhr.responseText)) ? JSON.parse(xhr.responseText).map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : JSON.parse(xhr.responseText)[0];
             }
             xhr.open("POST", "query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
