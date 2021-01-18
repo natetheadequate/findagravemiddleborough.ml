@@ -3,17 +3,11 @@ function clean($str)
 {
     return (str_replace('_', ' ', $str));
 }
-$datafile = $DB->query('DESCRIBE grave_data');
-$columns = [];
-while ($data = $datafile->fetch_array()) {
-    if ($data['Field'] !== 'i') {
-        array_push($columns, $data['Field']);
-    }
-}
+include 'columns.php';
 $formquestions = []; //array of: arrays (echos select),string (echos text input),and integers (echos that element of $specialformquestions)
 for ($i = 0; $i < count($columns); $i++) {
     $possibleoptions = [];
-    $datafile=$DB->query('SELECT DISTINCT `' . $columns[$i] . '` FROM grave_data WHERE `'.$columns[$i].'` IS NOT NULL AND NOT `'.$columns[$i].'`=""');
+    $datafile=$DB->query("SELECT DISTINCT `notags" . $columns[$i] . "` FROM grave_data WHERE `notags".$columns[$i]."` IS NOT NULL AND NOT `notags".$columns[$i]."`=\"\"");
     for($j = 0;$j < 11; $j++) {
         $v=($datafile->fetch_array()[0]);
         if(null!==$v){

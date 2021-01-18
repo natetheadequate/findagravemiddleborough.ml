@@ -4,11 +4,7 @@
         echo json_encode(["Nothing selected"]);
         exit;
     }
-    $columnsfile=$DB->query('DESCRIBE `grave_data`');
-    $columns=[];
-    while($data=$columnsfile->fetch_array()){
-        array_push($columns,$data["Field"]);
-    }
+    include 'columns.php';// this imports Last_Name but not notagsLast_Name. The notags is used in where, the raw is used for select
     $selectvaluearr=[];
     foreach($_POST['select'] as $prospectiveselect){
         if(array_search($prospectiveselect,$columns)){
@@ -22,7 +18,7 @@
     $sortorder="ASC";
     foreach($_POST as $key=>$value){
         if(array_search($key,$columns) && strlen($value)>0){
-            $v='`'.$key.'` LIKE ?';
+            $v='`notags'.$key.'` LIKE ?';
             array_push($wherearr,$v);
             array_push($wherevaluearr,'%'.$value.'%');
         }elseif($key=='sortby' && array_search($value,$columns)){
@@ -42,4 +38,3 @@
     $query->bind_param(str_repeat('s',count($selectvaluearr)+count($wherevaluearr)+1),...$params);
     $query->execute();
     echo json_encode(($query->get_result())->fetch_all());
-?>
