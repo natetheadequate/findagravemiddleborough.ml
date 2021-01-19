@@ -7,7 +7,7 @@
     include 'columns.php';// this imports Last_Name but not notagsLast_Name. The notags is used in where, the raw is used for select
     $selectvaluearr=[];
     foreach($_POST['select'] as $prospectiveselect){
-        if(array_search($prospectiveselect,$columns)){
+        if(array_search($prospectiveselect,$columns)!==false){
             array_push($selectvaluearr,$prospectiveselect);
         }
     }
