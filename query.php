@@ -31,8 +31,8 @@
             }
         }
     }
-    $wherestring=implode(' AND ',$wherearr);
-    $querystring='SELECT '.$selectstring.' FROM `grave_data` WHERE '.$wherestring.' ORDER BY ?'; 
+    $wherestring=(count($wherearr)>0)?(" ".implode(' AND ',$wherearr)):'';
+    $querystring='SELECT '.$selectstring.' FROM `grave_data` WHERE'.$wherestring.' ORDER BY ?'; 
     $query=$DB->prepare($querystring);
     $params=array_merge($selectvaluearr,$wherevaluearr,[$sortby." ".$sortorder]);
     $query->bind_param(str_repeat('s',count($selectvaluearr)+count($wherevaluearr)+1),...$params);
@@ -42,7 +42,7 @@
         $realresultsarray[$i]=&$resultsarray[$i];
     }
     call_user_func_array([$query,'bind_result'],$realresultsarray);
-    while($query->fetch_array()){
+    while($query->fetch()){
         echo $resultsarray;
         echo json_encode($resultsarray);
     }
