@@ -37,10 +37,12 @@
     $params=array_merge($selectvaluearr,$wherevaluearr,[$sortby." ".$sortorder]);
     $query->bind_param(str_repeat('s',count($selectvaluearr)+count($wherevaluearr)+1),...$params);
     $query->execute();
-    $resultsarray=[];
-    array_fill(0,count($selectvaluearr),"Pending");
-    call_user_func_array([$query,'bind_result'],array(&$selectvaluearr)[0]);
-    while($query->fetch_assoc()){
+    $resultsarray=array_fill(0,count($selectvaluearr),"Pending");
+    for($i=0;$i<count($resultsarray);$i++){
+        $realresultsarray[$i]=&$resultsarray[$i];
+    }
+    call_user_func_array([$query,'bind_result'],$realresultsarray);
+    while($query->fetch_array()){
         echo $resultsarray;
         echo json_encode($resultsarray);
     }
