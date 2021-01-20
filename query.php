@@ -31,8 +31,8 @@
             }
         }
     }
-    $wherestring=(count($wherearr)>0)?(" ".implode(' AND ',$wherearr)):'';
-    $querystring='SELECT '.$selectstring.' FROM `grave_data` WHERE'.$wherestring.' ORDER BY ?'; 
+    $wherestring=(count($wherearr)>0)?(" WHERE ".implode(' AND ',$wherearr)):'';
+    $querystring='SELECT '.$selectstring.' FROM `grave_data`'.$wherestring.' ORDER BY ?'; 
     $query=$DB->prepare($querystring);
     $params=array_merge($selectvaluearr,$wherevaluearr,[$sortby." ".$sortorder]);
     $query->bind_param(str_repeat('s',count($selectvaluearr)+count($wherevaluearr)+1),...$params);
