@@ -17,13 +17,13 @@
     $sortby='i';
     $sortorder="ASC";
     foreach($_POST as $key=>$value){
-        if(array_search($key,$columns) && strlen($value)>0){
+        if(false!==array_search($key,$columns) && strlen($value)>0){
             $v='`notags'.$key.'` LIKE ?';
             array_push($wherearr,$v);
             array_push($wherevaluearr,'%'.$value.'%');
-        }elseif($key=='sortby' && array_search($value,$columns)){
+        }elseif($key=='sortby' && false!==array_search($value,$columns)){
             $sortby=$value;
-        }elseif($key='sortorder'){
+        }elseif($key=='sortorder'){
             if($value=="ASC"){
                 $sortorder="ASC";
             }elseif($value=="DESC"){
@@ -38,9 +38,7 @@
     $query->bind_param(str_repeat('s',count($selectvaluearr)+count($wherevaluearr)+1),...$params);
     $query->execute();
     $resultsarray=[];
-    for($i=0;$i<count($selectvaluearr);$i++){
-        $resultsarray[$selectvaluearr]='Pending';
-    }
+    array_fill(0,count($selectvaluearr),"Pending");
     call_user_func_array([$query,'bind_result'],$selectvaluearr);
     while($query->fetch_assoc()){
         echo $resultsarray;
