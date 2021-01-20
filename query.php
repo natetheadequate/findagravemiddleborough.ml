@@ -39,7 +39,7 @@
     $query->execute();
     $resultsarray=[];
     array_fill(0,count($selectvaluearr),"Pending");
-    call_user_func_array([$query,'bind_result'],$selectvaluearr);
+    call_user_func_array([$query,'bind_result'],array(&$selectvaluearr)[0]);
     while($query->fetch_assoc()){
         echo $resultsarray;
         echo json_encode($resultsarray);
