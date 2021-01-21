@@ -42,7 +42,9 @@
     }
     call_user_func_array([$query,'bind_result'],$realresultsarray);
     $results=[];
-    while($query->fetch()){
-        array_push($results,array($resultsarray)[0]);
+    for($i=0;$query->fetch();$i++){//each time fetch is called, $resultsarray populates with a row
+        for($j=0;$j<count($resultsarray);$j++){
+            $results[$i][$j]=$resultsarray[$j];//this makes it a copy not ref
+        }
     }
     echo json_encode($results);
