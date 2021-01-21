@@ -1,7 +1,7 @@
 <?php
     include 'DB.php';
     if(!isset($_POST['select']) || count($_POST['select'])<1){
-        echo json_encode(["Nothing selected"]);
+        echo json_encode([["Nothing selected"]]);
         exit;
     }
     include 'columns.php';// this imports Last_Name but not notagsLast_Name. The notags is used in where, the raw is used for select
@@ -48,4 +48,4 @@
         }
     }
    if(count($results)>0){echo json_encode($results);}
-   else{echo json_encode(['Nothing found']);}
+   else{echo json_encode([['Nothing found']]);}
