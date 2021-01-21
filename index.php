@@ -51,7 +51,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
         function search() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                document.getElementById('results').innerHTML = JSON.parse(xhr.responseText).map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')).join('');
+                document.getElementById('results').innerHTML = JSON.parse(xhr.responseText).map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')).join('') + '</tr>')).join('');
             }
             xhr.open("POST", "query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
