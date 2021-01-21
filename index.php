@@ -47,6 +47,14 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
 
 <head>
     <title>Search Middleborough Cemeteries</title>
+    <style type="text/css">
+        table,tr,td{
+            border:1px dotted black;
+        }
+        td{
+            max-width:100px;
+        }
+    </style>
     <script>
         function search() {
             const xhr = new XMLHttpRequest();
