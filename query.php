@@ -43,6 +43,7 @@
     call_user_func_array([$query,'bind_result'],$realresultsarray);
     $results=[];
     while($query->fetch()){
-        array_push($results,$resultsarray);
+        $tempresultsarray=$resultsarray;
+        array_push($results,$tempresultsarray);
     }
     echo json_encode($results);
