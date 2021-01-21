@@ -47,4 +47,5 @@
             $results[$i][$j]=$resultsarray[$j];//this makes it a copy not ref
         }
     }
-    echo json_encode($results);
+   if(count($results)>0){echo json_encode($results);}
+   else{echo json_encode(['Nothing found']);}
