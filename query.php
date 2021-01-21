@@ -41,7 +41,7 @@
         $realresultsarray[$i]=&$resultsarray[$i];
     }
     call_user_func_array([$query,'bind_result'],$realresultsarray);
-    $results=[$selectvaluearr];
+    $results=[array_map(function($v){return str_replace('`','',str_replace('_',' ',$v));},$selectvaluearr)];
     for($i=1;$query->fetch();$i++){//each time fetch is called, $resultsarray populates with a row
         for($j=0;$j<count($resultsarray);$j++){
             $results[$i][$j]=$resultsarray[$j];//this makes it a copy not ref

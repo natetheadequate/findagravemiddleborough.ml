@@ -48,10 +48,10 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
 <head>
     <title>Search Middleborough Cemeteries</title>
     <style type="text/css">
-        table,tr,td{
+        table,tr,td,th{
             border:1px dotted black;
         }
-        td{
+        td,th{
             max-width:100px;
         }
     </style>
@@ -59,7 +59,11 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
         function search() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                document.getElementById('results').innerHTML = JSON.parse(xhr.responseText).map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')).join('') + '</tr>')).join('');
+                document.getElementById('results').innerHTML = JSON.parse(xhr.responseText).map(
+                    (v,i)=>{
+                        if(i==0){return (('<tr>' + v.map(v => ('<th>' + v + '</th>')).join('') + '</tr>').join(''));}
+                        else{return (('<tr>' + v.map(v => ('<td>' + v + '</td>')).join('') + '</tr>').join(''));}
+                    }
             }
             xhr.open("POST", "query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
