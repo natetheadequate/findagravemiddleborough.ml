@@ -8,10 +8,10 @@
     $selectvaluearr=[];
     foreach($_POST['select'] as $prospectiveselect){
         if(array_search($prospectiveselect,$columns)!==false){
-            array_push($selectvaluearr,$prospectiveselect);
+            array_push($selectvaluearr,'`'.$prospectiveselect.'`');
         }
     }
-    $selectstring=join(',',array_fill(0,count($selectvaluearr),'?'));
+    $selectstring=join(',',$selectvaluearr);
     $wherearr=[];
     $wherevaluearr=[];
     $sortby='i';
