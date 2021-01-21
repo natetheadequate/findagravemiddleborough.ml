@@ -1,6 +1,6 @@
 <?php
     include 'DB.php';
-    if(count($_POST['select'])<1){
+    if(!isset($_POST['select']) || count($_POST['select'])<1){
         echo json_encode(["Nothing selected"]);
         exit;
     }
@@ -43,7 +43,6 @@
     call_user_func_array([$query,'bind_result'],$realresultsarray);
     $results=[];
     while($query->fetch()){
-        $tempresultsarray=$resultsarray;
-        array_push($results,$tempresultsarray);
+        array_push($results,array($resultsarray)[0]);
     }
     echo json_encode($results);
