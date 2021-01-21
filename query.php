@@ -18,7 +18,7 @@
     $sortorder="ASC";
     foreach($_POST as $key=>$value){
         if(false!==array_search($key,$columns) && strlen($value)>0){
-            $v='`notags'.$key.'` LIKE ?';
+            $v='(`notags'.$key.'` LIKE ? OR `notags'.$key.'` LIKE "" OR `notags'.$key.'` IS NULL)';
             array_push($wherearr,$v);
             array_push($wherevaluearr,'%'.$value.'%');
         }elseif($key=='sortby' && false!==array_search($value,$columns)){
@@ -41,8 +41,8 @@
         $realresultsarray[$i]=&$resultsarray[$i];
     }
     call_user_func_array([$query,'bind_result'],$realresultsarray);
-    $results=[];
-    for($i=0;$query->fetch();$i++){//each time fetch is called, $resultsarray populates with a row
+    $results=[$selectvaluearr];
+    for($i=1;$query->fetch();$i++){//each time fetch is called, $resultsarray populates with a row
         for($j=0;$j<count($resultsarray);$j++){
             $results[$i][$j]=$resultsarray[$j];//this makes it a copy not ref
         }
