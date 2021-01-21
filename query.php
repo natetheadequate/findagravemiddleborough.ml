@@ -22,7 +22,7 @@
             array_push($wherearr,$v);
             array_push($wherevaluearr,'%'.$value.'%');
         }elseif($key=='sortby' && false!==array_search($value,$columns)){
-            $sortby=$value;
+            $sortby='`'.$value.'`';
         }elseif($key=='sortorder'){
             if($value=="ASC"){
                 $sortorder="ASC";
@@ -32,17 +32,17 @@
         }
     }
     $wherestring=(count($wherearr)>0)?(" WHERE ".implode(' AND ',$wherearr)):'';
-    $querystring='SELECT '.$selectstring.' FROM `grave_data`'.$wherestring.' ORDER BY ?'; 
+    $querystring='SELECT '.$selectstring.' FROM `grave_data`'.$wherestring.' ORDER BY '.$sortby.' '.$sortorder; 
     $query=$DB->prepare($querystring);
-    $params=array_merge($selectvaluearr,$wherevaluearr,[$sortby." ".$sortorder]);
-    $query->bind_param(str_repeat('s',count($selectvaluearr)+count($wherevaluearr)+1),...$params);
+    if(count($wherevaluearr)>0){$query->bind_param(str_repeat('s',count($wherevaluearr)),...$wherevaluearr);}
     $query->execute();
     $resultsarray=array_fill(0,count($selectvaluearr),"Pending");
     for($i=0;$i<count($resultsarray);$i++){
         $realresultsarray[$i]=&$resultsarray[$i];
     }
     call_user_func_array([$query,'bind_result'],$realresultsarray);
+    $results=[];
     while($query->fetch()){
-        echo $resultsarray;
-        echo json_encode($resultsarray);
+        array_push($results,json_encode($resultsarray));
     }
+    echo $results;
