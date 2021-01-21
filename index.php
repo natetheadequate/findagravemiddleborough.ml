@@ -48,21 +48,10 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
 <head>
     <title>Search Middleborough Cemeteries</title>
     <script>
-        function isDoubleArray(arr) {
-            if (!Array.isArray(arr)) {
-                return false;
-            }
-            arr.forEach(v => {
-                if (!Array.isArray(v)) {
-                    return false;
-                }
-            })
-        }
-
         function search() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                document.getElementById('results').innerHTML = isDoubleArray(JSON.parse(xhr.responseText)) ? JSON.parse(xhr.responseText).map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>')) : JSON.parse(xhr.responseText)[0];
+                document.getElementById('results').innerHTML = JSON.parse(xhr.responseText).map(v => ('<tr>' + v.map(v => ('<td>' + v + '</td>')) + '</tr>'));
             }
             xhr.open("POST", "query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
@@ -86,7 +75,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             <?php
             foreach ($formquestions as $formquestion) {
                 if (is_array($formquestion)) {
-                    echo '<label>' . clean($formquestion[0]) . '<select name="' . $formquestion[0] . '"><option value=""></option>';
+                    echo '<label>' . clean($formquestion[0]) . '<select style="max-width:100px" name="' . $formquestion[0] . '"><option value=""></option>';
                     for ($i = 1; $i < count($formquestion); $i++) {
                         echo '<option value=' . strip_tags($formquestion[$i]) . '>' . clean($formquestion[$i]) . '</option>';
                     }
