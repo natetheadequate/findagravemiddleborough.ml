@@ -8,13 +8,13 @@ $formquestions = []; //array of: arrays (echos select),string (echos text input)
 for ($i = 0; $i < count($columns); $i++) {
     $possibleoptions = [];
     $datafile=$DB->query("SELECT DISTINCT `notags" . $columns[$i] . "` FROM grave_data WHERE `notags".$columns[$i]."` IS NOT NULL AND NOT `notags".$columns[$i]."`=\"\"");
-    for($j = 0;$j < 11; $j++) {
+    for($j = 0;$j < 6; $j++) {
         $v=($datafile->fetch_array()[0]);
         if(null!==$v){
         $possibleoptions[$j] = $v;
         }else{break;}
     }
-    if (count($possibleoptions) < 10) {
+    if (count($possibleoptions) < 5) {
         array_push($formquestions, [$columns[$i], ...$possibleoptions]);
     } else {
         array_push($formquestions, $columns[$i]);
