@@ -64,6 +64,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
                         if(i==0){return (('<tr>' + v.map(v => ('<th>' + v + '</th>')).join('') + '</tr>').join(''));}
                         else{return (('<tr>' + v.map(v => ('<td>' + v + '</td>')).join('') + '</tr>').join(''));}
                     }
+                )
             }
             xhr.open("POST", "query.php");
             xhr.send(new FormData(document.getElementById('queryform')));
