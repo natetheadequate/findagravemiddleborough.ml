@@ -117,10 +117,10 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
         </fieldset>
         <fieldset style="column-width:140px">
             <legend style="column-span:all">Data to Retrieve</legend>
-            <label>Toggle All<input type="checkbox" checked id="toggler" onclick="toggle(document.getElementById('toggler').checked)"></label><br>
+            <div><b><label>Toggle All<input type="checkbox" checked id="toggler" onclick="toggle(document.getElementById('toggler').checked)"></b></label></div>
             <?php
             foreach ($columns as $column) {
-                echo '<label>' . clean($column) . '<input type="checkbox" checked name="select[]" value="' . strip_tags($column) . '"/></label><br>';
+                echo '<div><label>' . clean($column) . '<input type="checkbox" checked name="select[]" value="' . strip_tags($column) . '"/></label></div>';
             }
             ?>
         </fieldset>
