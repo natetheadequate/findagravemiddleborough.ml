@@ -1,5 +1,5 @@
 <?php
-    include 'DB.php';
+    include './DB.php';
     $datafile=$DB->query('SELECT `Last_Name`,`Given_Name`,`Prefix`,`Suffix`,`i` from `grave_data`');
     $names=[];
     while($data=$datafile->fetch_array()){
