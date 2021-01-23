@@ -32,7 +32,7 @@
         }
     }
     $wherestring=(count($wherearr)>0)?(" WHERE ".implode(' AND ',$wherearr)):'';
-    $querystring='SELECT '.$selectstring.' FROM `grave_data`'.$wherestring.' ORDER BY `notags'.$sortby.'` '.$sortorder; 
+    $querystring='SELECT '.$selectstring.' FROM `grave_data`'.$wherestring.' ORDER BY '.$sortby.' '.$sortorder; 
     $query=$DB->prepare($querystring);
     if(count($wherevaluearr)>0){$query->bind_param(str_repeat('s',count($wherevaluearr)),...$wherevaluearr);}
     $query->execute();
