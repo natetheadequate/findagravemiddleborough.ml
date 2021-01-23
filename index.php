@@ -52,7 +52,8 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
             border:1px dotted black;
         }
         td,th{
-            max-width:100px;
+            max-width:200px;
+            overflow:wrap;
         }
     </style>
     <script>
