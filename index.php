@@ -82,7 +82,6 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
 
 <body>
     <h1>Search the database of Friends of Middleborough Cemeteries</h1>
-
     <form id='queryform' onsubmit="e=>e.preventDefault()">
         <fieldset style="column-width:300px">
             <legend style="column-span:all">Search and Filter</legend>
@@ -127,6 +126,7 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
         <button aria-type="submit" type="button" onclick="search()">Go!</button>
     </form>
     <hr />
+    <p>Red text indicates the information was found from the gravestone. Black text indicates the information was found from paper records.</p>
     <table id="results">
     </table>
 </body>
