@@ -1,0 +1,22 @@
+id-one id per dead body
+Last_Name,Given_Name,Maiden_Name->one table each of id and i(FK), to be joined with a shared dictionary table `person_names` of i(PK) and string value
+prefix->table of id and i (FK), to be joined with a dictionary `prefixes` of i(PK) and string value
+suffix->ditto with `suffixes`
+Service_Number->plain text (service number should be text not int in teh event that a service number starts with 0, prefix and suffix are too small and rare to be worth making a dictionary table for unless space gets really tight
+Birthmonth,Birthday,Birthyear,Deathmonth,Deathday,Deathyear,Entry_Month,Entry_Day,Entry_Year,Exit_Month,Exit_Day,Exit_Year->int
+Birthplace,Deathplace->join table as described, dictionary called `places`
+Rank->join table `ranks`
+Branch -> join table `branches`
+Regiment ->
+War -> enum
+Medallion
+Cemetery -> enum
+Location_In_Cemetery
+Find-a-Grave_Memorial_Number
+Cenotaphs
+Notes
+Veteran_Status_Verified
+Father
+Mother
+Spouse
+Count
