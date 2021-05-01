@@ -7,11 +7,11 @@ result should look like this
      "last_name": "ALLEN", 
 	 [...]
 */
-const [human_names,branches,medallions,places,ranks,wars,cemeteries,locations_in_cemeteries]=Array(8).fill([])
-const xhr=new XMLHttpRequest()
-xhr.onload()=()=>{
-	xhr.responseText
-}
+const [human_names, branches, medallions, places, ranks, wars, cemeteries, locations_in_cemeteries] = Array(8).fill([]);
+const xhr = new XMLHttpRequest();
+xhr.onload() = () => {
+	xhr.responseText;
+};
 //get all the dictionaries from database
 
 function titleCase(str) {
@@ -86,15 +86,15 @@ function manyToMany(data, dictionary, field) {
 
 const or = "!@!@OR!!@!@!";
 ///prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix
-const prefixOrSuffix={
-	"Jr.":"suffix",
-	"Hon. Judge":"prefix"
-}
+const prefixOrSuffix = {
+	"Jr.": "suffix",
+	"Hon. Judge": "prefix",
+};
 const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 /*Initial verification of data/preparation to be inputted verbatim. 
 When there is multiple possibilities (eg WW2 & Vietnam, abodi or arodi), they are separated by the or variable defined above
 ntil they reach */
-const fatalError=false;//if theres a problem which needs to get fixed before sql, this is flipped. However, the checks continue so all fatal errors can be identified
+const fatalError = false; //if theres a problem which needs to get fixed before sql, this is flipped. However, the checks continue so all fatal errors can be identified
 Object.keys(data).forEach((id) => {
 	//first job: break given_name into first_name and middle_name or middle_initial, and prefix_suffix into prefix and suffix
 	if ((n = data[id].given_name)) {
@@ -136,22 +136,26 @@ Object.keys(data).forEach((id) => {
 		}
 	}
 	if ((n = data[id].prefix_suffix)) {
-		if(/sr/gi.test(n)){n="Sr."}
-		if(/jr/gi.test(n)){n="Jr."}
-		try{
-			data[id][prefixOrSuffix[n]]=n
-		}catch(e){
-			fatalError=true;
-			console.error(`the prefix or suffix ${n} must be added to the prefixOrSuffix object as a key with value "prefix" or "suffix"`)
+		if (/sr/gi.test(n)) {
+			n = "Sr.";
+		}
+		if (/jr/gi.test(n)) {
+			n = "Jr.";
+		}
+		try {
+			data[id][prefixOrSuffix[n]] = n;
+		} catch (e) {
+			fatalError = true;
+			console.error(`the prefix or suffix ${n} must be added to the prefixOrSuffix object as a key with value "prefix" or "suffix"`);
 		}
 	}
 
 	//now that all the new fields we wanted to make have been added, lets verify ALL the fields in the data to make sure they have a corresponding column in the sql and will meet the constraints of that column
-	//in this we console.warn for any values that seem off, and throw errors for anything that wouldn't fit the datatype of the sql column
-	const sql='START TRANSACTION';
-	const throwError=(key,id,data,reqs)=>{
+	//in this we console.warn for any values that seem off, and throw errors for anything that wouldn't fit the datatype of the sql column or are just clearly wrong (year 30005)
+	const sql = "START TRANSACTION";
+	const throwError = (key, id, data, reqs) => {
 		throw new Error(`${key} is bad for ${id} -- it's ${data[id][key]}, and it needs to ${reqs}`);
-	}
+	};
 	Object.keys(data[id]).forEach((key) => {
 		if (data[id][key] == "") {
 			delete data[id][key];
@@ -161,23 +165,23 @@ Object.keys(data).forEach((id) => {
 				case "maiden_name":
 				case "first_name":
 				case "middle_name":
-					data[id][key]=cleanName(data[id][key]);
-					if(!(/^.{1,32}$/.test(data[id][key]))){
-						throwError(key,id,data,"be between 1 and 32 characters and shouldn't contain a newline");
+					data[id][key] = cleanName(data[id][key]);
+					if (!/^.{1,32}$/.test(data[id][key])) {
+						throwError(key, id, data, "be between 1 and 32 characters and shouldn't contain a newline");
 					}
 					break;
 				case "middle_initial":
-					data[id][key]=data[id][key].toUpperCase();
-					if(!(/^[A-Z]$/.test(data[id][key]))){
-						throwError(key,id,data,"be one capital letter from A-Z...but the code should have made sure this was true before here");
+					data[id][key] = data[id][key].toUpperCase();
+					if (!/^[A-Z]$/.test(data[id][key])) {
+						throwError(key, id, data, "be one capital letter from A-Z...but the code should have made sure this was true before here");
 					}
 					break;
 				case "birth_month":
 				case "entry_month":
 				case "exit_month":
 				case "death_month":
-					if(!Number.isInteger(data[id][key]) || data[id][key]<1 || data[id][key]>12){//
-						
+					if (!Number.isInteger(data[id][key]) || data[id][key] < 1 || data[id][key] > 12) {
+						//
 					}
 				case "birth_year":
 				case "death_year":
@@ -185,43 +189,74 @@ Object.keys(data).forEach((id) => {
 				case "exit_year":
 				case "count":
 				case "veteran_status_verified":
-					"birth_day": "",
-					"birth_place": "",
-					"death_month": "",
-					"death_day": "",
-					"death_year": 1976,
-					"death_place": "",
-					"rank": "Private",
-					"branch": "US Army",
-					"unit": "",
-					"war": "WW II          (1939 - 1945)",
-					"entry_month": "",
-					"entry_day": "",
-					"entry_year": "",
-					"exit_month": "",
-					"exit_day": "",
-					"exit_year": "",
-					"medallion": "WW II   1941-1945",
-					"service_number": "",
-					"veteran_status_verified": "",
-					"cemetery": "Rock Cemetery    Highland Street                South Middleborough",
-					"location_in_cemetery": "Hope's Rest Section              Hope's Rest Lane                Lot 127",
-					"find_a_grave_memorial_number": "",
-					"cenotaphs": "",
-					"notes": "",
-					"father_name": "",
-					"mother_name": "",
-					"spouse_name": "",
-					"count": "",
-					"resident_id": "",
-					"records_checked": ""
+				case "birth_day":
+					break;
+				case "birth_place":
+					break;
+				case "death_month":
+					break;
+				case "death_day":
+					break;
+				case "death_year":
+					break;
+				case "death_place":
+					break;
+				case "rank":
+					break;
+				case "branch":
+					break;
+				case "unit":
+					break;
+				case "war":
+					break;
+				case "entry_month":
+					break;
+				case "entry_day":
+					break;
+				case "entry_year":
+					break;
+				case "exit_month":
+					break;
+				case "exit_day":
+					break;
+				case "exit_year":
+					break;
+				case "medallion":
+					break;
+				case "service_number":
+					break;
+				case "veteran_status_verified":
+					break;
+				case "cemetery":
+					break;
+				case "location_in_cemetery":
+					break;
+				case "find_a_grave_memorial_number":
+					break;
+				case "cenotaphs":
+					break;
+				case "notes":
+					break;
+				case "father_name":
+					break;
+				case "mother_name":
+					break;
+				case "spouse_name":
+					break;
+				case "count":
+					break;
+				case "resident_id":
+					break;
+				case "records_checked":
+					break;
 
-				default: throw new Error(`${key} is not a known datatype`)
+				default:
+					throw new Error(`${key} is not a known datatype`);
 			}
 		}
 	});
 });
-if(fatalError){
+if (fatalError) {
 	throw new Error("Fix the above errors before you may proceed");
 }
 //so now we create our dictionaries and tables from the json, which we know has only good fields with good values.
