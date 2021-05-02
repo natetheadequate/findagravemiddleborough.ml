@@ -1,22 +1,60 @@
-id-one id per dead body
-Last_Name,Given_Name,Maiden_Name->one table each of id and i(FK), to be joined with a shared dictionary table `person_names` of i(PK) and string value
-prefix->table of id and i (FK), to be joined with a dictionary `prefixes` of i(PK) and string value
-suffix->ditto with `suffixes`
-Service_Number->plain text (service number should be text not int in teh event that a service number starts with 0, prefix and suffix are too small and rare to be worth making a dictionary table for unless space gets really tight
-Birthmonth,Birthday,Birthyear,Deathmonth,Deathday,Deathyear,Entry_Month,Entry_Day,Entry_Year,Exit_Month,Exit_Day,Exit_Year->int
-Birthplace,Deathplace->join table as described, dictionary called `places`
-Rank->join table `ranks`
-Branch -> join table `branches`
-Regiment ->
-War -> enum
-Medallion
-Cemetery -> enum
-Location_In_Cemetery
-Find-a-Grave_Memorial_Number
-Cenotaphs
-Notes
-Veteran_Status_Verified
-Father
-Mother
-Spouse
-Count
+Dictionaries:(all have column i and then a column that is the singular of the table name eg name, prefix etc)
+    names
+    prefixes
+    suffixes
+    places
+    ranks
+    branches
+    wars
+    medallions
+    cemeteries
+    locations_in_cemeteries
+
+Data Tables:
+all the joins have column `id` and column `i`, which is foreign key to one of the dictionaries.
+all the other ones have `id` and the singular of the table name.
+The reason I put all of those non-joins separate from each other is that they either need to be able to accomodate multiple possibilities (dates) 
+    or are very sparse (notes)
+An interesting idea that might be stupid to accomodate the records like birthday is "14 or 5" is to have a row with 14 and the rest of the data, 
+    and a row with the id, nulls and 5.
+I just don't like that it means i can´t have primary key, which is bad. That could be avoided by making it like 1A and 1B. 
+I'll revisit that if speed is really bad with the current design
+
+    id_join_last_name
+    id_join_maiden_name
+    id_join_first_name
+    id_join_middle_name
+    id_join_prefix
+    id_join_suffix
+    birth_day
+    birth_month
+    birth_year
+    id_join_birth_place
+    death_day
+    death_month
+    death_year
+    id_join_death_place
+    id_join_rank
+    id_join_branch
+    unit
+    id_join_war
+    entry_day
+    entry_month
+    entry_year
+    exit_day
+    exit_month
+    exit_year
+    id_join_medallion
+    service_number
+    veteran_status_verified
+    id_join_cemetery
+    id_join_location_in_cemetery
+    find_a_grave_memorial_number
+    cenotaphs
+    notes
+    father_name
+    mother_name
+    spouse_name
+    count
+    records_checked
+    resident_id

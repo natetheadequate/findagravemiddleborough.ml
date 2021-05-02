@@ -7,11 +7,11 @@ result should look like this
      "last_name": "ALLEN", 
 	 [...]
 */
-const [human_names, branches, medallions, places, ranks, wars, cemeteries, locations_in_cemeteries] = Array(8).fill([]);
+/* const [human_names, branches, medallions, places, ranks, wars, cemeteries, locations_in_cemeteries] = Array(8).fill([]);
 const xhr = new XMLHttpRequest();
 xhr.onload() = () => {
 	xhr.responseText;
-};
+}; */
 //get all the dictionaries from database
 
 function titleCase(str) {
@@ -84,12 +84,9 @@ function manyToMany(data, dictionary, field) {
 	return resultarr;
 }
 
-const or = "!@!@OR!!@!@!";
+const or = "!@!@OR!!@!@!";//how to separate them...
 ///prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix
-const prefixOrSuffix = {
-	"Jr.": "suffix",
-	"Hon. Judge": "prefix",
-};
+const prefixOrSuffix = require("./prefixOrSuffix.json");
 const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 /*Initial verification of data/preparation to be inputted verbatim. 
 When there is multiple possibilities (eg WW2 & Vietnam, abodi or arodi), they are separated by the or variable defined above
@@ -107,7 +104,7 @@ Object.keys(data).forEach((id) => {
 					if (namearr[1].match(/[a-zA-Z]/g).length === 1) {
 						//the reason for the match() is "J." should be interpreted as an initial even though it's two chars.
 						//i know match wont be null because of the regex in the if statement
-						data[id]["middle_initial"] = namearr[1].match(/[a-zA-Z]/)[0].toUpperCase();
+						data[id]["middle_name"] = namearr[1].match(/[a-zA-Z]/)[0].toUpperCase(); //i dont believe in separating middle initials and middle names anymore
 					} else {
 						data[id]["middle_name"] = cleanName(namearr[1]);
 					}
@@ -152,7 +149,6 @@ Object.keys(data).forEach((id) => {
 
 	//now that all the new fields we wanted to make have been added, lets verify ALL the fields in the data to make sure they have a corresponding column in the sql and will meet the constraints of that column
 	//in this we console.warn for any values that seem off, and throw errors for anything that wouldn't fit the datatype of the sql column or are just clearly wrong (year 30005)
-	const sql = "START TRANSACTION";
 	const throwError = (key, id, data, reqs) => {
 		throw new Error(`${key} is bad for ${id} -- it's ${data[id][key]}, and it needs to ${reqs}`);
 	};
@@ -160,14 +156,16 @@ Object.keys(data).forEach((id) => {
 		if (data[id][key] == "") {
 			delete data[id][key];
 		} else {
-			switch (key) {
+			switch (
+				key //THIS IS BAD BECAUSE OF LACK OF TYPECHECKS
+			) {
 				case "last_name":
 				case "maiden_name":
 				case "first_name":
 				case "middle_name":
 					data[id][key] = cleanName(data[id][key]);
-					if (!/^.{1,32}$/.test(data[id][key])) {
-						throwError(key, id, data, "be between 1 and 32 characters and shouldn't contain a newline");
+					if (!/^.{1,30}$/.test(data[id][key])) {
+						throwError(key, id, data, "be between 1 and 30 characters and shouldn't contain a newline");
 					}
 					break;
 				case "middle_initial":
@@ -181,75 +179,55 @@ Object.keys(data).forEach((id) => {
 				case "exit_month":
 				case "death_month":
 					if (!Number.isInteger(data[id][key]) || data[id][key] < 1 || data[id][key] > 12) {
-						//
+						throwError(key, id, data, "be between 1 and 12");
 					}
+					break;
 				case "birth_year":
 				case "death_year":
 				case "entry_year":
 				case "exit_year":
+					if (!Number.isInteger(data[id][key]) || data[id][key] < 1) {
+						throwError(key, id, data, "be positive");
+					}
+					break;
 				case "count":
+					if (!Number.isInteger(data[id][key])) {
+						throwError(key, id, data, "be a number");
+					}
+					break;
 				case "veteran_status_verified":
+				case "records_checked":
+					if (typeof data[id][key] !== "boolean") {
+						throwError(key, id, data, "be either true or false");
+					}
 				case "birth_day":
+				case "death_day":
+				case "entry_day":
+				case "exit_day":
+					if (!Number.isInteger(data[id][key]) || data[id][key] < 1 || data[id][key] > 31) {
+						throwError(key, id, data, "be between 1 and 31");
+					}
 					break;
 				case "birth_place":
-					break;
-				case "death_month":
-					break;
-				case "death_day":
-					break;
-				case "death_year":
-					break;
 				case "death_place":
-					break;
 				case "rank":
-					break;
 				case "branch":
-					break;
 				case "unit":
-					break;
 				case "war":
-					break;
-				case "entry_month":
-					break;
-				case "entry_day":
-					break;
-				case "entry_year":
-					break;
-				case "exit_month":
-					break;
-				case "exit_day":
-					break;
-				case "exit_year":
-					break;
 				case "medallion":
-					break;
 				case "service_number":
-					break;
-				case "veteran_status_verified":
-					break;
 				case "cemetery":
-					break;
 				case "location_in_cemetery":
-					break;
 				case "find_a_grave_memorial_number":
-					break;
 				case "cenotaphs":
-					break;
 				case "notes":
-					break;
 				case "father_name":
-					break;
 				case "mother_name":
-					break;
 				case "spouse_name":
-					break;
-				case "count":
-					break;
 				case "resident_id":
-					break;
-				case "records_checked":
-					break;
-
+					if (typeof data[id][key] !== "string" || data[id][key].length > 250) {
+						throwError(key, id, data, "be a string less than 250 chars");
+					}
 				default:
 					throw new Error(`${key} is not a known datatype`);
 			}
@@ -259,6 +237,8 @@ Object.keys(data).forEach((id) => {
 if (fatalError) {
 	throw new Error("Fix the above errors before you may proceed");
 }
+const sql = "START TRANSACTION";
+
 //so now we create our dictionaries and tables from the json, which we know has only good fields with good values.
 //generate arrays which will then be used to generate sql. By dafault, any column will be uploaded without first encoding with a dictionary, but names, wars, and branches will be encoded as integers corresponding to indexes of other tables on the database
 Object.keys(data).forEach((id) => console.log(`${data[id]["given_name"]} ${id} ${data[id]["first_name"]} ${data[id]["middle_name"]} MI: ${data[id]["middle_initial"]}`));
