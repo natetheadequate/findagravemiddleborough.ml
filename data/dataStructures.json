@@ -17,8 +17,7 @@
         "branches",
         "wars",
         "medallions",
-        "cemeteries",
-        "locations_in_cemeteries"
+        "cemeteries"
     ],
     "dataTables": [
         "id_join_last_name",
@@ -49,7 +48,7 @@
         "service_number",
         "veteran_status_verified",
         "id_join_cemetery",
-        "id_join_location_in_cemetery",
+        "location_in_cemetery",
         "find_a_grave_memorial_number",
         "cenotaphs",
         "notes",
