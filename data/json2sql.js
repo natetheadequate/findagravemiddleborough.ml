@@ -30,6 +30,7 @@ function titleCase(str) {
 			capitalizenextletter = false;
 		}
 	});
+	return newstr;
 }
 function cleanName(str) {
 	str = str.trim();
@@ -106,6 +107,7 @@ Object.keys(data).forEach((id) => {
 						//i know match wont be null because of the regex in the if statement
 						data[id]["middle_name"] = namearr[1].match(/[a-zA-Z]/)[0].toUpperCase(); //i dont believe in separating middle initials and middle names anymore
 					} else {
+						console.log(namearr[1]);
 						data[id]["middle_name"] = cleanName(namearr[1]);
 					}
 				case 1:
@@ -115,7 +117,7 @@ Object.keys(data).forEach((id) => {
 					console.error("This one broke the code in the prefiltering of given_name to first_name and middle: " + id + " ||| which is listed as: " + n);
 			}
 			//check for irregularities
-			let recombinated = "";
+			let recombinated = [];
 			if (data[id].hasOwnProperty("first_name")) {
 				recombinated.push(data[id]["first_name"]);
 			}
@@ -228,6 +230,9 @@ Object.keys(data).forEach((id) => {
 					if (typeof data[id][key] !== "string" || data[id][key].length > 250) {
 						throwError(key, id, data, "be a string less than 250 chars");
 					}
+				case "given_name":
+				case "prefix_suffix":
+					break;
 				default:
 					throw new Error(`${key} is not a known datatype`);
 			}
