@@ -1,3 +1,4 @@
+const escapedor = "or"; // this will be replaced with "or", but won't cause a separation into two possibilities.
 function titleCase(str) {
 	//Cases Strings Like This
 	let capitalizenextletter = true;
@@ -19,7 +20,6 @@ function titleCase(str) {
 }
 function cleanName(str) {
 	//Meant for a single name ("Bob" not "Bob Smith"). Properly cases and flags anything with weird capitalization or spaces or length not between 2 and 20
-	console.debug(str);
 	str = str.trim();
 	switch (
 		true //Manual Exceptions
@@ -64,7 +64,7 @@ dictionaryNames.forEach((dictionaryName, i) => {
 	xhrs[i].myDictionaryName = dictionaryName;
 	xhrs[i].myIteratorValue = i; //these allow me to pass parameters to the callback
 	xhrs[i].onload = restofthecode;
-	xhrs[i].open("GET", "mocki.io/v1/d4867d8b-b5d5-4a48-a4ab-79131b5809b8");
+	xhrs[i].open("GET", "https://mocki.io/v1/d4867d8b-b5d5-4a48-a4ab-79131b5809b8"); //just so i don't flood the server, but can get to the calllback
 	//xhrs[i].open("GET", "https://dev.findagravemiddleborough.ml/data/dictionaries.php?dictionary=" + dictionaryName);
 	xhrs[i].send();
 });
@@ -73,7 +73,10 @@ function restofthecode() {
 	let i = this.myIteratorValue;
 	existingDictionaries[dictionaryName] = JSON.parse(this.responseText);
 	if (i + 1 === dictionaryNames.length) {
-		existingDictionaries = JSON.parse('{ prefixes: { 1: "Dr." }, suffixes: { 1: "Jr." }, ranks: { 1: "E2" }, names: { 1: "Allen", 2: "Eugene" }, wars: { 1: "WW II          (1939 - 1945)" }, places: { 1: "Middleborough" }, medallions: { 1: "American Legion" }, branches: { 1: "US Navy" }, cemeteries: { 1: "Rock Cemetery    Highland Street                South Middleborough" } }');
+		//console.dir(JSON.stringify(existingDictionaries));
+		existingDictionaries = JSON.parse('{"names":{"1":"Allen","2":"Eugene"},"prefixes":{"1":"Dr."},"suffixes":{"1":"Jr."},"ranks":{"1":"E2"},"places":{"1":"Middleborough"},"wars":{"1":"WW II          (1939 - 1945)"},"branches":{"1":"US Navy"},"medallions":{"1":"American Legion"},"cemeteries":{"1":"Rock Cemetery    Highland Street                South Middleborough"}}');
+		const prefixOrSuffix = require("./prefixOrSuffix.json"); ///prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix
+
 		Object.keys(data).forEach((id) => {
 			if ((n = data[id].given_name)) {
 				/*this regex checks capitalization because Abodi orArodi should get flagged bc theres clearly a missing space. 
@@ -86,9 +89,9 @@ function restofthecode() {
 							if (namearr[1].match(/[a-zA-Z]/g).length === 1) {
 								//the reason for the match() is "J." should be interpreted as an initial even though it's two chars.
 								//i know match wont be null because of the regex in the if statement
-								data[id]["middle_name"] = namearr[1].match(/[a-zA-Z]/)[0].toUpperCase(); //i dont believe in separating middle initials and middle names anymore
+								//middle name and middle initial will probably be merged into one column but im keeping them separate for the validation switch() below
+								data[id]["middle_initial"] = namearr[1].match(/[a-zA-Z]/)[0].toUpperCase();
 							} else {
-								console.log(namearr[1]);
 								data[id]["middle_name"] = cleanName(namearr[1]);
 							}
 						case 1:
@@ -108,8 +111,8 @@ function restofthecode() {
 					if (data[id].hasOwnProperty("middle_initial")) {
 						recombinated.push(data[id]["middle_initial"]);
 					}
-					if (true || n.trim() !== recombinated.join(" ")) {
-						console.warn(`${n} was deemed to be first_name: ${data[id]["first_name"]} middle_name/initial: ${data[id]["middle_name"]}`);
+					if (n.trim() !== recombinated.join(" ")) {
+						console.warn([ n, data[id]["first_name"],data[id]["middle_name"],data[id]["middle_initial"]]);
 					}
 				} else {
 					console.error("Manually input this one's middle initial/middle_name and first name in the data json: [" + id + "] has a given_name [" + n + "]");
@@ -121,86 +124,104 @@ function restofthecode() {
 				}
 				if (prefixOrSuffix[n]) {
 					if (prefixOrSuffix[n] === "prefix") {
-						data[id][prefix] = n;
+						data[id].prefix = n;
 					} else if (prefixOrSuffix[n] === "suffix") {
-						data[id][suffix] = n;
+						data[id].suffix = n;
 					} else {
 						console.error("prefixOrSuffix.json has " + n + " not listed as either 'suffix' or 'prefix'");
-						fatalError=true;
+						fatalError = true;
 					}
 				} else {
 					console.error(`the prefix or suffix ${n} must be added to the prefixOrSuffix object as a key with value "prefix" or "suffix"`);
-					fatalError=true;
+					fatalError = true;
 				}
 			}
 
 			//now that all the new fields we wanted to make have been added, lets verify ALL the fields in the data to make sure they have a corresponding column in the sql and will meet the constraints of that column
 			//in this we console.warn for any values that seem off, and throw errors for anything that wouldn't fit the datatype of the sql column or are just clearly wrong (year 30005)
-			const throwError = (key, id, data, reqs) => {
-				throw new Error(`${key} is bad for ${id} -- it's ${data[id][key]}, and it needs to ${reqs}`);
+			const throwError = (key, id, i, data, reqs) => {
+				fatalError = true;
+				console.error(`ID ${id}'s ${key} (alternative #${i}) is bad -- it's ${data[id][key][i]} as a ${(typeof data[id][key][i])} and it needs to ${reqs}.`);
 			};
 			Object.keys(data[id]).forEach((key) => {
 				if (data[id][key] == "" || key === "prefix_suffix" || key === "given_name") {
 					delete data[id][key];
 				} else {
 					if (/ or /.test(data[id][key])) {
+						console.warn(data[id][key] + " has been interpreted as " + JSON.stringify(data[id][key].split(" or ")));
 						data[id][key] = data[id][key].split(" or ");
-						console.warn(data[id][key] + " has been interpreted as " + JSON.stringify(data[id][key]));
 					} else {
-						data[id][key] = [data[id][key]]; //just useful to have them alll be arrays
+						data[id][key] = [data[id][key]]; //just useful to have them all be arrays
 					}
-					data[id][key].forEach((v) => v.replace("!ESC!or", "or")); //!ESC!or gets replaced with or but stops it from being interpreted as an array of values.
-					data[id][key].forEach((v) => {
+					data[id][key].forEach((dontusethisbecauseanychangesmadealreadywontbereflectedinitnorchangesmadetoitpreserved, i) => {
+						if ((typeof data[id][key][i]) === "string") {
+							data[id][key][i] = data[id][key][i].replace(escapedor, "or"); //escapedor \or gets replaced with or but stops it from being interpreted as an array of values.
+							if (/^\s*[0-9]+\s*$/.test(data[id][key][i])) {
+								data[id][key][i] = +data[id][key][i];
+							}
+						}
 						switch (
 							key //THIS IS BAD BECAUSE OF LACK OF TYPECHECKS
 						) {
+							case "prefix":
+								if (!prefixOrSuffix.hasOwnProperty(data[id][key][i]) || prefixOrSuffix[data[id][key][i]] !== "prefix") {
+									throwError(key, id, i, data, "be in the prefixOrSuffix.json as a prefix");
+								}
+								break;
+							case "suffix":
+								if (!prefixOrSuffix.hasOwnProperty(data[id][key][i]) || prefixOrSuffix[data[id][key][i]] !== "suffix") {
+									throwError(key, id, i, data, "be in the prefixOrSuffix.json as a suffix");
+								}
+								break;
 							case "last_name":
 							case "maiden_name":
 							case "first_name":
 							case "middle_name":
-								data[id][key] = cleanName(data[id][key]);
-								if (!/^.{1,30}$/.test(data[id][key])) {
-									throwError(key, id, data, "be between 1 and 30 characters and shouldn't contain a newline");
+								data[id][key][i] = cleanName(data[id][key][i]);
+								if (!/^.{1,30}$/.test(data[id][key][i])) {
+									throwError(key, id, i, data, "be between 1 and 30 characters and shouldn't contain a newline");
 								}
 								break;
 							case "middle_initial":
-								data[id][key] = data[id][key].toUpperCase();
-								if (!/^[A-Z]$/.test(data[id][key])) {
-									throwError(key, id, data, "be one capital letter from A-Z...but the code should have made sure this was true before here");
+								data[id][key][i] = data[id][key][i].toUpperCase();
+								if (!/^[A-Z]$/.test(data[id][key][i])) {
+									throwError(key, id, i, data, "be one capital letter from A-Z...but the code should have made sure this was true before here");
 								}
 								break;
 							case "birth_month":
 							case "entry_month":
 							case "exit_month":
 							case "death_month":
-								if (!Number.isInteger(data[id][key]) || data[id][key] < 1 || data[id][key] > 12) {
-									throwError(key, id, data, "be between 1 and 12");
+								if (!Number.isInteger(data[id][key][i]) || data[id][key][i] < 1 || data[id][key][i] > 12) {
+									throwError(key, id, i, data, "be between 1 and 12");
 								}
 								break;
 							case "birth_year":
 							case "death_year":
 							case "entry_year":
 							case "exit_year":
-								if (!Number.isInteger(data[id][key]) || data[id][key] < 1) {
-									throwError(key, id, data, "be positive");
+								if (!Number.isInteger(data[id][key][i]) || data[id][key][i] < 1500 || data[id][key][i] > 2100) {
+									throwError(key, id, i, data, "be an integer between 1500 and 2100");
 								}
 								break;
+							case "find_a_grave_memorial_number":
+							case "service_number":
 							case "count":
-								if (!Number.isInteger(data[id][key])) {
-									throwError(key, id, data, "be a number");
+								if (!Number.isInteger(data[id][key][i])) {
+									throwError(key, id, i, data, "be a number");
 								}
 								break;
 							case "veteran_status_verified":
 							case "records_checked":
-								if (typeof data[id][key] !== "boolean") {
-									throwError(key, id, data, "be either true or false");
+								if (typeof data[id][key][i] !== "boolean") {
+									throwError(key, id, i, data, "be either true or false");
 								}
 							case "birth_day":
 							case "death_day":
 							case "entry_day":
 							case "exit_day":
-								if (!Number.isInteger(data[id][key]) || data[id][key] < 1 || data[id][key] > 31) {
-									throwError(key, id, data, "be between 1 and 31");
+								if (!Number.isInteger(data[id][key][i]) || data[id][key][i] < 1 || data[id][key][i] > 31) {
+									throwError(key, id, i, data, "be between 1 and 31");
 								}
 								break;
 							case "birth_place":
@@ -210,21 +231,17 @@ function restofthecode() {
 							case "unit":
 							case "war":
 							case "medallion":
-							case "service_number":
 							case "cemetery":
 							case "location_in_cemetery":
-							case "find_a_grave_memorial_number":
 							case "cenotaphs":
 							case "notes":
 							case "father_name":
 							case "mother_name":
 							case "spouse_name":
 							case "resident_id":
-								if (typeof data[id][key] !== "string" || data[id][key].length > 250) {
-									throwError(key, id, data, "be a string less than 250 chars");
+								if (typeof data[id][key][i] !== "string" || data[id][key][i].length > 250) {
+									throwError(key, id, i, data, "be a string less than 250 chars");
 								}
-							case "given_name":
-							case "prefix_suffix":
 								break;
 							default:
 								throw new Error(`${key} is not a known datatype`);
@@ -236,13 +253,6 @@ function restofthecode() {
 		if (fatalError) {
 			throw new Error("Fix the above errors before you may proceed");
 		}
-
-		/* const [human_names, branches, medallions, places, ranks, wars, cemeteries, locations_in_cemeteries] = Array(8).fill([]);
-const xhr = new XMLHttpRequest();
-xhr.onload() = () => {
-	xhr.responseText;
-}; */
-		//get all the dictionaries from database
 
 		/*
 the data is the object of all the fields, the dictionary is array of names, the field is the property of the data object being read
@@ -270,9 +280,6 @@ TLDR; this function adds values to the dictionary as needed and returns [[id,ind
 			return resultarr;
 		}
 
-		const or = "!@!@OR!!@!@!"; //how to separate them...
-		///prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix
-		const prefixOrSuffix = require("./prefixOrSuffix.json");
 		const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 		/*Initial verification of data/preparation to be inputted verbatim. 
 When there is multiple possibilities (eg WW2 & Vietnam, abodi or arodi), they are separated by the or variable defined above
