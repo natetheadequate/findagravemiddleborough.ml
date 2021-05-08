@@ -1,4 +1,5 @@
-const escapedor = "or"; // this will be replaced with "or", but won't cause a separation into two possibilities.
+const logger = require("node-color-log");
+const escapedor = "or"; // this will be replaced with "or", but unlike an "or" literal, won't cause a separation into two possibilities.
 function titleCase(str) {
 	//Cases Strings Like This
 	let capitalizenextletter = true;
@@ -42,7 +43,7 @@ function cleanName(str) {
 	//reason why something is flagged for capitalization is because of the possibility of soemthing like "Arodi orAbodi" [sic]
 	//mostly working with standard american names, so any accents could be indication of encoding failure
 	//spaces could mean that a name wasn't properly parsed
-	console.warn(`"${str}" should be the properly capitalized first, last, or middle name of a person. If it is, ignore this. Otherwise, fix it where it occurs in the data. It was flagged as a possible error because of its unusual capitalization, non-letters, length, or spaces.`);
+	logger.warn(`"${str}" should be the properly capitalized first, last, or middle name of a person. If it is, ignore this. Otherwise, fix it where it occurs in the data. It was flagged as a possible error because of its unusual capitalization, non-letters, length, or spaces.`);
 	return str;
 }
 const data = require("./RockAtoPierce.json");
@@ -73,32 +74,32 @@ function restofthecode() {
 	let i = this.myIteratorValue;
 	existingDictionaries[dictionaryName] = JSON.parse(this.responseText);
 	if (i + 1 === dictionaryNames.length) {
-		//console.dir(JSON.stringify(existingDictionaries));
+		//logger.dir(JSON.stringify(existingDictionaries));
 		existingDictionaries = JSON.parse('{"names":{"1":"Allen","2":"Eugene"},"prefixes":{"1":"Dr."},"suffixes":{"1":"Jr."},"ranks":{"1":"E2"},"places":{"1":"Middleborough"},"wars":{"1":"WW II          (1939 - 1945)"},"branches":{"1":"US Navy"},"medallions":{"1":"American Legion"},"cemeteries":{"1":"Rock Cemetery    Highland Street                South Middleborough"}}');
 		const prefixOrSuffix = require("./prefixOrSuffix.json"); ///prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix
 
 		Object.keys(data).forEach((id) => {
 			if ((n = data[id].given_name)) {
-				/*this regex checks capitalization because Abodi orArodi should get flagged bc theres clearly a missing space. 
-		Certain first/middle names do have capitalization midway, but those are few enough that they can be manually separated for safety.
+				/*this regex checks for anything abnormal, and doesn't attempt to separate them if there is anything abnormal. 
+				The "Abodi orArodi"=>["Abodi","Arodi"] problem will be resolved in the verification switch, where cleanName() is called
         Also it allows for periods after middle initials and leading/trailing whitespace even though in the end they'll be stripped */
-				if (/^\s*[a-zA-Z][a-z]+( [A-Za-z](.|[a-z]*))*\s*$/.test(n)) {
+				if (/^\s*[a-z]+( [a-z](.|[a-z]*))?\s*$/i.test(n)) {
 					const namearr = n.trim().split(" "); //so namearr[0] will be the first name, and namearr[1] will be the middle name/initial or not exist, bc some records just list first name
 					switch (namearr.length) {
 						case 2:
-							if (namearr[1].match(/[a-zA-Z]/g).length === 1) {
+							if (namearr[1].match(/[a-z]/gi).length === 1) {
 								//the reason for the match() is "J." should be interpreted as an initial even though it's two chars.
 								//i know match wont be null because of the regex in the if statement
 								//middle name and middle initial will probably be merged into one column but im keeping them separate for the validation switch() below
 								data[id]["middle_initial"] = namearr[1].match(/[a-zA-Z]/)[0].toUpperCase();
 							} else {
-								data[id]["middle_name"] = cleanName(namearr[1]);
+								data[id]["middle_name"] = namearr[1];
 							}
 						case 1:
-							data[id]["first_name"] = cleanName(namearr[0]);
+							data[id]["first_name"] = namearr[0];
 							break;
 						default:
-							console.error("This one broke the code in the prefiltering of given_name to first_name and middle: " + id + " ||| which is listed as: " + n);
+							logger.error("This one broke the code in the prefiltering of given_name to first_name and middle: " + id + " ||| which is listed as: " + n);
 					}
 					//check for irregularities
 					let recombinated = [];
@@ -112,10 +113,10 @@ function restofthecode() {
 						recombinated.push(data[id]["middle_initial"]);
 					}
 					if (n.trim() !== recombinated.join(" ")) {
-						console.warn([ n, data[id]["first_name"],data[id]["middle_name"],data[id]["middle_initial"]]);
+						logger.warn([n, data[id]["first_name"], data[id]["middle_name"], data[id]["middle_initial"]]);
 					}
 				} else {
-					console.error("Manually input this one's middle initial/middle_name and first name in the data json: [" + id + "] has a given_name [" + n + "]");
+					logger.error("Manually input this one's middle initial/middle_name and first name in the data json: [" + id + "] has a given_name [" + n + "]");
 				}
 			}
 			if ((n = data[id].prefix_suffix)) {
@@ -128,35 +129,36 @@ function restofthecode() {
 					} else if (prefixOrSuffix[n] === "suffix") {
 						data[id].suffix = n;
 					} else {
-						console.error("prefixOrSuffix.json has " + n + " not listed as either 'suffix' or 'prefix'");
+						logger.error("Fatal Error: prefixOrSuffix.json has " + n + " not listed as either 'suffix' or 'prefix'");
 						fatalError = true;
 					}
 				} else {
-					console.error(`the prefix or suffix ${n} must be added to the prefixOrSuffix object as a key with value "prefix" or "suffix"`);
+					logger.error(`Fatal Error: the prefix or suffix ${n} must be added to the prefixOrSuffix object as a key with value "prefix" or "suffix"`);
 					fatalError = true;
 				}
 			}
 
 			//now that all the new fields we wanted to make have been added, lets verify ALL the fields in the data to make sure they have a corresponding column in the sql and will meet the constraints of that column
-			//in this we console.warn for any values that seem off, and throw errors for anything that wouldn't fit the datatype of the sql column or are just clearly wrong (year 30005)
+			//in this we logger.warn for any values that seem off, and throw errors for anything that wouldn't fit the datatype of the sql column or are just clearly wrong (year 30005)
 			const throwError = (key, id, i, data, reqs) => {
 				fatalError = true;
-				console.error(`ID ${id}'s ${key} (alternative #${i}) is bad -- it's ${data[id][key][i]} as a ${(typeof data[id][key][i])} and it needs to ${reqs}.`);
+				logger.error(`Fatal Error: ID ${id}'s ${key} (alternative #${i}) is bad -- it's ${data[id][key][i]} as a ${typeof data[id][key][i]} and it needs to ${reqs}.`);
 			};
 			Object.keys(data[id]).forEach((key) => {
 				if (data[id][key] == "" || key === "prefix_suffix" || key === "given_name") {
 					delete data[id][key];
 				} else {
 					if (/ or /.test(data[id][key])) {
-						console.warn(data[id][key] + " has been interpreted as " + JSON.stringify(data[id][key].split(" or ")));
+						logger.warn(data[id][key] + " has been interpreted as " + JSON.stringify(data[id][key].split(" or ")));
 						data[id][key] = data[id][key].split(" or ");
 					} else {
 						data[id][key] = [data[id][key]]; //just useful to have them all be arrays
 					}
 					data[id][key].forEach((dontusethisbecauseanychangesmadealreadywontbereflectedinitnorchangesmadetoitpreserved, i) => {
-						if ((typeof data[id][key][i]) === "string") {
+						if (typeof data[id][key][i] === "string") {
 							data[id][key][i] = data[id][key][i].replace(escapedor, "or"); //escapedor \or gets replaced with or but stops it from being interpreted as an array of values.
 							if (/^\s*[0-9]+\s*$/.test(data[id][key][i])) {
+								//replacing anything that's str
 								data[id][key][i] = +data[id][key][i];
 							}
 						}
@@ -244,14 +246,14 @@ function restofthecode() {
 								}
 								break;
 							default:
-								throw new Error(`${key} is not a known datatype`);
+								logger.error(`FATAL ERROR: ${key} is not a known datatype`);
 						}
 					});
 				}
 			});
 		});
 		if (fatalError) {
-			throw new Error("Fix the above errors before you may proceed");
+			throw new Error("Fix the above fatal errors before you may proceed");
 		}
 
 		/*
@@ -290,6 +292,6 @@ ntil they reach */
 
 		//so now we create our dictionaries and tables from the json, which we know has only good fields with good values.
 		//generate arrays which will then be used to generate sql. By dafault, any column will be uploaded without first encoding with a dictionary, but names, wars, and branches will be encoded as integers corresponding to indexes of other tables on the database
-		Object.keys(data).forEach((id) => console.log(`${data[id]["given_name"]} ${id} ${data[id]["first_name"]} ${data[id]["middle_name"]} MI: ${data[id]["middle_initial"]}`));
+		Object.keys(data).forEach((id) => logger.log(`${data[id]["given_name"]} ${id} ${data[id]["first_name"]} ${data[id]["middle_name"]} MI: ${data[id]["middle_initial"]}`));
 	}
 }

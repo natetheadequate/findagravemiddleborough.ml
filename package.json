@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "xhr2": "^0.2.1",
-    "xmlhttprequest": "^1.8.0"
+    "node-color-log": "^5.2.0",
+    "xhr2": "^0.2.1"
   }
 }
