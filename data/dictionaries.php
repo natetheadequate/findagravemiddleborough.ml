@@ -8,4 +8,3 @@ if(isset($_GET['dictionary']) && preg_match('/[a-z_]+/',$_GET['dictionary'],$mat
     }
     echo json_encode($assocdata);
 }
-

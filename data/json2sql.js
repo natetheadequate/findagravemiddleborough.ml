@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 //all dictionaries are presumed to have a string as the value, otherwise, the sql generated will convert everything to a string in makeJoinTable()
 const data = require("./RockAtoPierce.json");
 /*this is the new data to be added. 
@@ -10,6 +10,7 @@ result should look like this
 	 [...]
 */
 const dictionaryNames = require("./dataStructures.json").dictionaries;
+const writeFileSync = require("fs").writeFileSync;
 const escapedor = "|or|"; //this will be replaced with "or", but unlike an " or " literal, won't cause a separation into two possibilities.
 
 const logger = require("node-color-log");
@@ -21,8 +22,8 @@ dictionaryNames.forEach((dictionaryName, i) => {
 	xhrs[i].myDictionaryName = dictionaryName;
 	xhrs[i].myIteratorValue = i; //these allow me to pass parameters to the callback
 	xhrs[i].onload = saveResponse;
-	xhrs[i].open("GET", "https://mocki.io/v1/d4867d8b-b5d5-4a48-a4ab-79131b5809b8"); //just so i don't flood the server, but can get to the calllback
-	//xhrs[i].open("GET", "https://dev.findagravemiddleborough.ml/data/dictionaries.php?dictionary=" + dictionaryName);
+	//xhrs[i].open("GET", "https://mocki.io/v1/d4867d8b-b5d5-4a48-a4ab-79131b5809b8"); //just so i don't flood the server, but can get to the calllback
+	xhrs[i].open("GET", "https://dev.findagravemiddleborough.ml/data/dictionaries.php?dictionary=" + dictionaryName);
 	xhrs[i].send();
 });
 function saveResponse() {
@@ -30,7 +31,8 @@ function saveResponse() {
 	let i = this.myIteratorValue;
 	dictionaries[dictionaryName] = JSON.parse(this.responseText);
 	if (i + 1 === dictionaryNames.length) {
-		console.log(json2sql()); //this runs when the last dictionary has been added
+		var x = json2sql();
+		writeFileSync("data/generatedsql/RockCemeteryAtoPierce.sql", x); //this runs when the last dictionary has been added
 	}
 }
 //workaround because node is async, this function runs once all the existing dictionaries have been downloaded.
@@ -81,7 +83,7 @@ function json2sql() {
 		logger.warn(`"${str}" should be the properly capitalized first, last, or middle name of a person. If it is, ignore this. Otherwise, fix it where it occurs in the data. It was flagged as a possible error because of its unusual capitalization, non-letters, length, or spaces.`);
 		return str;
 	}
-	dictionaries= JSON.parse('{"names":{"1":"Allen","2":"Eugene"},"suffixes":{"1":"Jr."},"prefixes":{"1":"Dr."},"places":{"1":"Middleborough"},"branches":{"1":"US Navy"},"ranks":{"1":"E2"},"medallions":{"1":"American Legion"},"wars":{"1":"WW II          (1939 - 1945)"},"cemeteries":{"1":"Rock Cemetery    Highland Street                South Middleborough"}}');
+	//dictionaries = JSON.parse('{"names":{"1":"Allen","2":"Eugene"},"suffixes":{"1":"Jr."},"prefixes":{"1":"Dr."},"places":{"1":"Middleborough"},"branches":{"1":"US Navy"},"ranks":{"1":"E2"},"medallions":{"1":"American Legion"},"wars":{"1":"WW II          (1939 - 1945)"},"cemeteries":{"1":"Rock Cemetery    Highland Street                South Middleborough"}}');
 	const prefixOrSuffix = require("./prefixOrSuffix.json"); ///prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix
 	let fatalError = false; //if theres a problem which needs to get fixed before sql, this is flipped. However, the checks continue so all fatal errors can be identified at once.
 	Object.keys(data).forEach((id) => {
@@ -99,7 +101,7 @@ function json2sql() {
 						if (namearr[1].match(/[a-z]/gi).length === 1) {
 							//the reason for the match() is "J." should be interpreted as an initial even though it's two chars.
 							//i know match wont be null because of the regex in the if statement
-							//middle name and middle initial will probably be merged into one column but im keeping them separate for the validation switch() below
+							//middle name and middle initial will probably be merged into one column but im keeping them separate so middlename can go through cleanName() without generating warnings from the initials being only one character.
 							data[id]["middle_initial"] = namearr[1].match(/[a-zA-Z]/)[0].toUpperCase();
 						} else {
 							data[id]["middle_name"] = namearr[1];
@@ -171,15 +173,12 @@ function json2sql() {
 						if (/^\s*[0-9]+\s*$/.test(data[id][key][i])) {
 							//replacing anything that's str
 							data[id][key][i] = +data[id][key][i];
-						}
-						if(/"/.test(data[id][key][i])){
-							data[id][key][i].replace('"',"&quot;");
-						}
-						if(data[id][key][i]!==data[id][key][i].match('[a-zA-Z-\(\)]+')[0]){
-							console.warn(data[id][key][i]+" has at least one weird character.");
+						} else if (/"/.test(data[id][key][i])) {
+							//else if because it was the first if converted it to a number
+							data[id][key][i].replace('"', "&quot;");
 						}
 					}
-					
+
 					switch (
 						key //THIS IS BAD BECAUSE OF LACK OF TYPECHECKS
 					) {
@@ -273,7 +272,11 @@ function json2sql() {
 	if (fatalError) {
 		throw new Error("Fix the above fatal errors before you may proceed");
 	}
-
+	Object.keys(data).forEach((id) => {
+		if (data[id].hasOwnProperty("middle_initial")) {
+			data[id]["middle_name"]=data[id]["middle_initial"];
+		}
+	});
 	/*
 returns an array of arrays-with-length-2 that consist of ids (unique grave identifier from the toplevel keys of the data object) and the integer representation of a name
 One id may be repeated in this because sometimes the last name isn't known and could be one of two options
@@ -286,9 +289,11 @@ TLDR; this function adds values to the dictionary as needed and returns [[id in 
 			if (data[id].hasOwnProperty(field)) {
 				data[id][field].forEach((dontusethisnochangeswillbereflected, i) => {
 					if (typeof data[id][field][i] !== undefined && data[id][field][i] !== null && data[id][field][i] !== "") {
-						const value=data[id][field][i];
+						const value = data[id][field][i];
 						if (dictionaryName == "") {
-							if(typeof data[id][field][i]==='string'){data[id][field][i]='"'+data[id][field][i]+'"'}
+							if (typeof data[id][field][i] === "string") {
+								data[id][field][i] = '"' + data[id][field][i] + '"';
+							}
 							resultstr += "INSERT INTO `" + field + "` (id, i) VALUES (" + id + "," + data[id][field][i] + ");";
 						} else {
 							const nextIndex = +Array.from(Object.keys(dictionaries[dictionaryName])).sort((a, b) => +b - +a)[0] + 1;
@@ -296,7 +301,7 @@ TLDR; this function adds values to the dictionary as needed and returns [[id in 
 								dictionaries[dictionaryName][nextIndex] = value; //that way the value is there for any subsequent runs
 								resultstr += "INSERT INTO `" + dictionaryName + "` VALUES (" + nextIndex + ',"' + value + '");';
 							}
-							resultstr += "INSERT INTO `id_join_" + field + "` (id, i) VALUES (" + id + ',' + Object.keys(dictionaries[dictionaryName]).find((v) => dictionaries[dictionaryName][v] === value) + ');';
+							resultstr += "INSERT INTO `id_join_" + field + "` (id, i) VALUES (" + id + "," + Object.keys(dictionaries[dictionaryName]).find((v) => dictionaries[dictionaryName][v] === value) + ");";
 						}
 					} else {
 						throw new Error("Somethings off about the " + field + " of " + id);
@@ -315,17 +320,4 @@ TLDR; this function adds values to the dictionary as needed and returns [[id in 
 	require("./dataStructures.json").dataTables.forEach((field) => (sql += makeJoinTable(field)));
 	sql += "END TRANSACTION";
 	return sql;
-	/* sql+=makeJoinTable("last_name", "names");
-	const id_join_maiden_name = makeJoinTable("maiden_name", "names");
-	const id_join_first_name = makeJoinTable("first_name", "names");
-	const id_join_middle_name = makeJoinTable("middle_name", "names");
-	const id_join_prefix = makeJoinTable("prefix", "prefixes");
-	const id_join_suffix = makeJoinTable("suffix", "suffixes");
-	const id_join_birth_place = makeJoinTable("birth_place", "places");
-	const id_join_death_place = makeJoinTable("death_place", "places");
-	const id_join_rank = makeJoinTable("rank", "ranks");
-	const id_join_branch = makeJoinTable("branch", "branches");
-	const id_join_war = makeJoinTable("war", "wars");
-	const id_join_medallion = makeJoinTable("medallion", "medallions");
-	const id_join_cemetery = makeJoinTable("cemetery", "cemeteries"); */
 }

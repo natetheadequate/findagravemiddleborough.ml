@@ -229,11 +229,6 @@ CREATE TABLE `suffixes` (
   `suffix` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `tests` (
-  `i` int(11) NOT NULL,
-  `test` varchar(250) CHARACTER SET utf8mb4 NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE `unit` (
   `id` tinyint(4) DEFAULT NULL,
   `unit` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL
@@ -346,10 +341,6 @@ ALTER TABLE `suffixes`
   ADD PRIMARY KEY (`i`),
   ADD UNIQUE KEY `i` (`i`),
   ADD UNIQUE KEY `suffix` (`suffix`);
-
-ALTER TABLE `tests`
-  ADD PRIMARY KEY (`i`),
-  ADD UNIQUE KEY `test` (`test`);
 
 ALTER TABLE `wars`
   ADD PRIMARY KEY (`i`),
