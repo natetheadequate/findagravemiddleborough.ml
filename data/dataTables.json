@@ -112,62 +112,62 @@
     {
         "name": "birth_day",
         "type": "independent",
-        "datatype": "smallint"
+        "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "birth_month",
         "type": "independent",
-        "datatype": "tinyint"
+        "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "birth_year",
         "type": "independent",
-        "datatype": "smallint"
+        "datatype": "smallint UNSIGNED"
     },
     {
         "name": "death_day",
         "type": "independent",
-        "datatype": "tinyint"
+        "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "death_month",
         "type": "independent",
-        "datatype": "tinyint"
+        "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "death_year",
         "type": "independent",
-        "datatype": "smallint"
+        "datatype": "smallint UNSIGNED"
     },
     {
         "name": "entry_day",
         "type": "independent",
-        "datatype": "tinyint"
+        "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "entry_month",
         "type": "independent",
-        "datatype": "tinyint"
+        "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "entry_year",
         "type": "independent",
-        "datatype": "smallint"
+        "datatype": "smallint UNSIGNED"
     },
     {
         "name": "exit_day",
         "type": "independent",
-        "datatype": "tinyint"
+        "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "exit_month",
         "type": "independent",
-        "datatype": "tinyint"
+        "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "exit_year",
         "type": "independent",
-        "datatype": "smallint"
+        "datatype": "smallint UNSIGNED"
     },
     {
         "name": "unit",
@@ -177,7 +177,7 @@
     {
         "name": "service_number",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "int UNSIGNED"
     },
     {
         "name": "veteran_status_verified",
@@ -192,7 +192,7 @@
     {
         "name": "find_a_grave_memorial_number",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "int UNSIGNED"
     },
     {
         "name": "cenotaphs",
@@ -222,7 +222,7 @@
     {
         "name": "count",
         "type": "independent",
-        "datatype": "smallint"
+        "datatype": "smallint UNSIGNED"
     },
     {
         "name": "records_checked",

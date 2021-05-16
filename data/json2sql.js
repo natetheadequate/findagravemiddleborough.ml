@@ -1,4 +1,4 @@
-module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existingDictionaries = {}) => {
+module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}, escapedor = "ESCor", escapedand = "ESCand") => {
 	/*
 		prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix.
 	*/
@@ -53,7 +53,7 @@ module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existin
 	let fields = [];
 	dataTables.forEach((v) => {
 		if (v.type === "independent") fields.push(v.name);
-		else if ((v.type = "join")) fields.push(v.name.replace("join_", ""));
+		else if (v.type === "join") fields.push(v.name.replaceAll("join_", ""));
 	});
 	Object.keys(data).forEach((id) => {
 		let n;
@@ -139,7 +139,7 @@ module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existin
 				case "number":
 					if (Number.isInteger(data[id][key][i])) {
 						if (data[id][key][i] > -1) {
-							if (data[id][key] < max + 1) {
+							if (data[id][key][i] < max + 1) {
 								return true;
 							} else {
 								spthrowError("be less than " + (max + 1));
@@ -159,17 +159,26 @@ module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existin
 			if (data[id][key] == "" || key === "prefix_suffix" || key === "given_name") {
 				delete data[id][key];
 			} else {
-				if (/ or /.test(data[id][key])) {
-					logger.info(data[id][key] + " has been split into " + JSON.stringify(data[id][key].split(" or ")));
-					data[id][key] = data[id][key].split(" or ");
+				if (typeof data[id][key] === "string") {
+					data[id][key] = data[id][key].replace(/\s+/g, " ");
+					data[id][key] = data[id][key].replace(/\t|\n/g, ": ");
+					if (/( or | and |\s*&\s*)/i.test(data[id][key]) && key !== "notes" && key !=='location_in_cemetery' && key !== 'cemetery') {
+						//this regex is broader than the regex used to split to highlight any cases where it may false-negative
+						const split = data[id][key].split(/\s+or\s+|\s+and\s+|\s*&\s*/g);
+						logger.info(data[id][key] + " has been split into " + JSON.stringify(split));
+						data[id][key] = split;
+					} else {
+						data[id][key] = [data[id][key]]; //easier to have them all be arrays
+					}
 				} else {
-					data[id][key] = [data[id][key]]; //easier to have them all be arrays
+					data[id][key]=[data[id][key]];
 				}
 				data[id][key].forEach((dontusethisbecauseanychangesmadealreadywontbereflectedinitnorchangesmadetoitpreserved, i) => {
 					const spthrowError = (reqs) => throwError(key, id, i, data, reqs);
 					if (typeof data[id][key][i] === "string") {
-						data[id][key][i] = data[id][key][i].replace(escapedor, "or");
-						data[id][key][i] = data[id][key][i].replace('"', "&quot;");
+						data[id][key][i] = data[id][key][i].replaceAll(escapedor, "or");
+						data[id][key][i] = data[id][key][i].replaceAll(escapedand, "and");
+						data[id][key][i] = data[id][key][i].replaceAll('"', "&quot;");
 					}
 					switch (key) {
 						case "first_name":
@@ -178,24 +187,39 @@ module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existin
 						case "maiden_name":
 							data[id][key][i] = cleanName(data[id][key][i]);
 							break;
-					}
-					Object.keys(data).forEach((id) => {
-						if (data[id].hasOwnProperty("middle_initial")) {
+						case "middle_initial":
 							data[id]["middle_name"] = data[id]["middle_initial"];
-						}
-					});
+							delete data[id]["middle_initial"];
+							key = "middle_name"; //continue loop as if it was a middle_name since thats the column its going to.
+					}
 					if (!fields.includes(key)) {
 						logger.error(`FATAL ERROR: ${key} is not a known datatype`);
 						fatalError = true;
 					}
 					let datatype;
-					dataTables.forEach((v) => {
-						if (v.name === key) {
-							datatype = v.datatype;
-						} else if (v.name.replace("join_", "") === key) {
-							datatype = "varchar(255)";
+					dataTables.some((v) => {
+						let found = false;
+						switch (v.type) {
+							case "dictionary":
+								break;
+							case "join":
+								if (v.name.replace("join_", "") === key) {
+									datatype = "varchar(255)";
+									found = true;
+								}
+								break;
+							case "independent":
+								if (v.name === key) {
+									datatype = v.datatype;
+									found = true;
+								}
+								break;
+							default:
+								spthrowError("not have a strange type in dataTables. What is " + v.type + "?");
 						}
+						return found;
 					});
+
 					switch (datatype) {
 						case "tinyint(1)":
 							switch (data[id][key][i]) {
@@ -219,11 +243,14 @@ module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existin
 									spthrowError("be yes or no or 0 or 1 or true or false");
 							}
 							break;
-						case "tinyint":
+						case "tinyint UNSIGNED":
 							verifyInteger(data, id, key, i, spthrowError, 255);
 							break;
-						case "smallint":
+						case "smallint UNSIGNED":
 							verifyInteger(data, id, key, i, spthrowError, 65535);
+							break;
+						case "int UNSIGNED":
+							verifyInteger(data, id, key, i, spthrowError, 4294967295);
 							break;
 						case "varchar(255)":
 							if (typeof data[id][key][i] !== "string") {
@@ -294,7 +321,7 @@ module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existin
 				throw new Error("Invalid type in dataTable json: " + dataTable.type);
 		}
 	});
-	function makeJoinTable(field, dictionaryName = "") {
+	function makeJoinTable(field, dictionaryName) {
 		let resultstr = "";
 		Object.keys(data).forEach((id) => {
 			if (data[id].hasOwnProperty(field)) {
@@ -305,14 +332,14 @@ module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existin
 							if (typeof data[id][field][i] === "string") {
 								data[id][field][i] = '"' + data[id][field][i] + '"';
 							}
-							resultstr += "INSERT INTO `" + field + "` (id, i) VALUES (" + id + "," + data[id][field][i] + ");";
+							resultstr += "INSERT INTO `" + field + "` VALUES (" + id + "," + data[id][field][i] + ");";
 						} else {
-							const nextIndex = dictionaries[dictionaryName].length === 0 ? 1 : +Array.from(Object.keys(dictionaries[dictionaryName])).sort((a, b) => +b - +a)[0] + 1;
+							const nextIndex = dictionaries[dictionaryName]==={} ? 1 : +Array.from(Object.keys(dictionaries[dictionaryName])).sort((a, b) => +b - +a)[0] + 1;
 							if (!Object.values(dictionaries[dictionaryName]).includes(value)) {
 								dictionaries[dictionaryName][nextIndex] = value; //that way the value is there for any subsequent runs
 								resultstr += "INSERT INTO `" + dictionaryName + "` VALUES (" + nextIndex + ',"' + value + '");';
 							}
-							resultstr += "INSERT INTO `join_" + field + "` (id, i) VALUES (" + id + "," + Object.keys(dictionaries[dictionaryName]).find((v) => dictionaries[dictionaryName][v] === value) + ");";
+							resultstr += "INSERT INTO `join_" + field + "` VALUES (" + id + "," + Object.keys(dictionaries[dictionaryName]).find((v) => dictionaries[dictionaryName][v] === value) + ");";
 						}
 					} else {
 						throw new Error("Somethings off about the " + field + " of " + id);
@@ -322,6 +349,7 @@ module.exports = (data, dataTables, prefixOrSuffix, escapedor = "ESCor", existin
 		});
 		return resultstr; //also the dictionary has been modified
 	}
+	let sql = "";
 	//so now we create our tables from the json, which we know has only good fields with good values.
 	joinTables.forEach((v) => (sql += makeJoinTable(v[0].replace("join_", ""), v[1])));
 	independentTables.forEach((field) => (sql += makeJoinTable(field)));
