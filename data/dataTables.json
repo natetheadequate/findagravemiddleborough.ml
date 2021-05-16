@@ -1,0 +1,237 @@
+[
+    {
+        "name": "names",
+        "type": "dictionary",
+        "columnName": "name"
+    },
+    {
+        "name": "prefixes",
+        "type": "dictionary",
+        "columnName": "prefix"
+    },
+    {
+        "name": "suffixes",
+        "type": "dictionary",
+        "columnName": "suffix"
+    },
+    {
+        "name": "places",
+        "type": "dictionary",
+        "columnName": "place"
+    },
+    {
+        "name": "ranks",
+        "type": "dictionary",
+        "columnName": "rank"
+    },
+    {
+        "name": "branches",
+        "type": "dictionary",
+        "columnName": "branch"
+    },
+    {
+        "name": "wars",
+        "type": "dictionary",
+        "columnName": "war"
+    },
+    {
+        "name": "medallions",
+        "type": "dictionary",
+        "columnName": "medallion"
+    },
+    {
+        "name": "cemeteries",
+        "type": "dictionary",
+        "columnName": "cemetery"
+    },
+    {
+        "name": "join_last_name",
+        "type": "join",
+        "dictionary": "names"
+    },
+    {
+        "name": "join_maiden_name",
+        "type": "join",
+        "dictionary": "names"
+    },
+    {
+        "name": "join_first_name",
+        "type": "join",
+        "dictionary": "names"
+    },
+    {
+        "name": "join_middle_name",
+        "type": "join",
+        "dictionary": "names"
+    },
+    {
+        "name": "join_prefix",
+        "type": "join",
+        "dictionary": "prefixes"
+    },
+    {
+        "name": "join_suffix",
+        "type": "join",
+        "dictionary": "suffixes"
+    },
+    {
+        "name": "join_birth_place",
+        "type": "join",
+        "dictionary": "places"
+    },
+    {
+        "name": "join_death_place",
+        "type": "join",
+        "dictionary": "places"
+    },
+    {
+        "name": "join_rank",
+        "type": "join",
+        "dictionary": "ranks"
+    },
+    {
+        "name": "join_branch",
+        "type": "join",
+        "dictionary": "branches"
+    },
+    {
+        "name": "join_war",
+        "type": "join",
+        "dictionary": "wars"
+    },
+    {
+        "name": "join_medallion",
+        "type": "join",
+        "dictionary": "medallions"
+    },
+    {
+        "name": "join_cemetery",
+        "type": "join",
+        "dictionary": "cemeteries"
+    },
+    {
+        "name": "birth_day",
+        "type": "independent",
+        "datatype": "smallint"
+    },
+    {
+        "name": "birth_month",
+        "type": "independent",
+        "datatype": "tinyint"
+    },
+    {
+        "name": "birth_year",
+        "type": "independent",
+        "datatype": "smallint"
+    },
+    {
+        "name": "death_day",
+        "type": "independent",
+        "datatype": "tinyint"
+    },
+    {
+        "name": "death_month",
+        "type": "independent",
+        "datatype": "tinyint"
+    },
+    {
+        "name": "death_year",
+        "type": "independent",
+        "datatype": "smallint"
+    },
+    {
+        "name": "entry_day",
+        "type": "independent",
+        "datatype": "tinyint"
+    },
+    {
+        "name": "entry_month",
+        "type": "independent",
+        "datatype": "tinyint"
+    },
+    {
+        "name": "entry_year",
+        "type": "independent",
+        "datatype": "smallint"
+    },
+    {
+        "name": "exit_day",
+        "type": "independent",
+        "datatype": "tinyint"
+    },
+    {
+        "name": "exit_month",
+        "type": "independent",
+        "datatype": "tinyint"
+    },
+    {
+        "name": "exit_year",
+        "type": "independent",
+        "datatype": "smallint"
+    },
+    {
+        "name": "unit",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "service_number",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "veteran_status_verified",
+        "type": "independent",
+        "datatype": "tinyint(1)"
+    },
+    {
+        "name": "location_in_cemetery",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "find_a_grave_memorial_number",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "cenotaphs",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "notes",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "father_name",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "mother_name",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "spouse_name",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    },
+    {
+        "name": "count",
+        "type": "independent",
+        "datatype": "smallint"
+    },
+    {
+        "name": "records_checked",
+        "type": "independent",
+        "datatype": "tinyint(1)"
+    },
+    {
+        "name": "resident_id",
+        "type": "independent",
+        "datatype": "varchar(255)"
+    }
+]

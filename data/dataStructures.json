@@ -6,7 +6,8 @@
         "The reason I put all of those non-joins separate from each other is that they either need to be able to accomodate multiple possibilities (dates) or are very sparse (notes)",
         "An interesting idea that might be stupid to accomodate the records like birthday is \"14 or 5\" is to have a row with 14 and the rest of the dataand a row with the id, nulls and 5.",
         "I just don't like that it means i can´t have primary key, which is bad. That could be avoided by making it like 1A and 1B.",
-        "I'll revisit that if speed is really bad with the current design "
+        "I'll revisit that if speed is really bad with the current design ",
+        "It is not more space efficient to use enums instead of tinyint according to docs, and it is bad practice to have enums of ints. Also I have checking in json2sql.js, so i wont be inserting 13 as a month"
     ],
     "dictionaries": [
         "names",
@@ -59,5 +60,5 @@
         "count",
         "records_checked",
         "resident_id"
-    ]
+]
 }
