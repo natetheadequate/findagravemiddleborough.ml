@@ -321,7 +321,7 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}, e
 				throw new Error("Invalid type in dataTable json: " + dataTable.type);
 		}
 	});
-	function makeJoinTable(field, dictionaryName) {
+	function makeJoinTable(field, dictionaryName="") {
 		let resultstr = "";
 		Object.keys(data).forEach((id) => {
 			if (data[id].hasOwnProperty(field)) {
