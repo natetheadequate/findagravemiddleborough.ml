@@ -1,4 +1,4 @@
-module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}, escapedor = "ESCor", escapedand = "ESCand") => {
+module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}) => {
 	/*
 		prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix.
 	*/
@@ -162,9 +162,9 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}, e
 				if (typeof data[id][key] === "string") {
 					data[id][key] = data[id][key].replace(/\s+/g, " ");
 					data[id][key] = data[id][key].replace(/\t|\n/g, ": ");
-					if (/( or | and |\s*&\s*)/i.test(data[id][key]) && key !== "notes" && key !=='location_in_cemetery' && key !== 'cemetery') {
+					if (/(?<!ESC)\/| or | and |\s*(?<!ESC)&\s*/i.test(data[id][key]) && key !== "notes" && key !=='location_in_cemetery' && key !== 'cemetery') {
 						//this regex is broader than the regex used to split to highlight any cases where it may false-negative
-						const split = data[id][key].split(/\s+or\s+|\s+and\s+|\s*&\s*/g);
+						const split = data[id][key].split(/\s*(?<!ESC)\/\s*|\s+or\s+|\s+and\s+|\s*(?<!ESC)&\s*/g);
 						logger.info(data[id][key] + " has been split into " + JSON.stringify(split));
 						data[id][key] = split;
 					} else {
@@ -176,9 +176,10 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}, e
 				data[id][key].forEach((dontusethisbecauseanychangesmadealreadywontbereflectedinitnorchangesmadetoitpreserved, i) => {
 					const spthrowError = (reqs) => throwError(key, id, i, data, reqs);
 					if (typeof data[id][key][i] === "string") {
-						data[id][key][i] = data[id][key][i].replaceAll(escapedor, "or");
-						data[id][key][i] = data[id][key][i].replaceAll(escapedand, "and");
-						data[id][key][i] = data[id][key][i].replaceAll('"', "&quot;");
+						data[id][key][i] = data[id][key][i].replaceAll('ESCor', "or");
+						data[id][key][i] = data[id][key][i].replaceAll('ESCand', "and");
+						data[id][key][i] = data[id][key][i].replaceAll('ESC/', "/");
+						data[id][key][i] = data[id][key][i].replaceAll('ESC&', "&");
 					}
 					switch (key) {
 						case "first_name":
@@ -334,7 +335,7 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}, e
 							}
 							resultstr += "INSERT INTO `" + field + "` VALUES (" + id + "," + data[id][field][i] + ");";
 						} else {
-							const nextIndex = dictionaries[dictionaryName]==={} ? 1 : +Array.from(Object.keys(dictionaries[dictionaryName])).sort((a, b) => +b - +a)[0] + 1;
+							const nextIndex = Object.keys(dictionaries[dictionaryName]).length ? +Array.from(Object.keys(dictionaries[dictionaryName])).sort((a, b) => +b - +a)[0] + 1:1;
 							if (!Object.values(dictionaries[dictionaryName]).includes(value)) {
 								dictionaries[dictionaryName][nextIndex] = value; //that way the value is there for any subsequent runs
 								resultstr += "INSERT INTO `" + dictionaryName + "` VALUES (" + nextIndex + ',"' + value + '");';
@@ -353,5 +354,6 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}, e
 	//so now we create our tables from the json, which we know has only good fields with good values.
 	joinTables.forEach((v) => (sql += makeJoinTable(v[0].replace("join_", ""), v[1])));
 	independentTables.forEach((field) => (sql += makeJoinTable(field)));
+	Object.keys(dictionaries).forEach(dictionaryName=>console.log(dictionaryName+":"+JSON.stringify(dictionaries[dictionaryName])+'\n'));
 	return sql;
 };
