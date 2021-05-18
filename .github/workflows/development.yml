@@ -32,7 +32,7 @@ jobs:
         server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: frontend/build
+        local-dir: frontend/build/
   FTP-Deploy-Action-Backend:
     name: FTP-Deploy-Action-Backend
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
         server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/api
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: backend
+        local-dir: backend/
 
   FTP-Deploy-Action-Data:
     name: FTP-Deploy-Action-Data
@@ -63,4 +63,4 @@ jobs:
         server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/data
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: data
+        local-dir: data/
