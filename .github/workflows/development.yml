@@ -24,7 +24,7 @@ jobs:
         npm run build --prefix frontend
   
     - name: List output files
-      run: find build/ -print
+      run: find frontend/build/ -print
 
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
@@ -44,7 +44,7 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
-        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/api
+        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/api/
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: backend/
@@ -60,7 +60,7 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
-        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/data
+        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/data/
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: data/
