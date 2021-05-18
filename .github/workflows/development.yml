@@ -27,7 +27,7 @@ jobs:
       run: find build/ -print
 
     - name: FTP-Deploy-Action
-      uses: SamKirkland/FTP-Deploy-Action@4
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
         ftp-server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}
         ftp-username: ${{ secrets.FTP_USERNAME }}
@@ -42,7 +42,7 @@ jobs:
         fetch-depth: 2
       
     - name: FTP-Deploy-Action
-      uses: SamKirkland/FTP-Deploy-Action@4
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
         ftp-server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/api
         ftp-username: ${{ secrets.FTP_USERNAME }}
@@ -58,7 +58,7 @@ jobs:
         fetch-depth: 2
       
     - name: FTP-Deploy-Action
-      uses: SamKirkland/FTP-Deploy-Action@4
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
         ftp-server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/data
         ftp-username: ${{ secrets.FTP_USERNAME }}
