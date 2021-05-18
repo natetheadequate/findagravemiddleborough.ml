@@ -29,39 +29,27 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
-<<<<<<< HEAD
         server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: dev.findagravemiddleborough.ml/htdocs/
         local-dir: frontend/build/
-=======
-        ftp-server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}
-        ftp-username: ${{ secrets.FTP_USERNAME }}
-        ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: /frontend/build
->>>>>>> parent of 9ef67e9 (edits because of updates to ftp-upload)
   FTP-Deploy-Action-Backend:
     name: FTP-Deploy-Action-Backend
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with: 
+      with: s
         fetch-depth: 2
       
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
-<<<<<<< HEAD
-        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/api/
+        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: backend/
-=======
-        ftp-server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/api
-        ftp-username: ${{ secrets.FTP_USERNAME }}
-        ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: backend
->>>>>>> parent of 9ef67e9 (edits because of updates to ftp-upload)
+        server-dir: dev.findagravemiddleborough.ml/htdocs/api/
 
   FTP-Deploy-Action-Data:
     name: FTP-Deploy-Action-Data
@@ -74,14 +62,8 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
-<<<<<<< HEAD
-        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/data/
+        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: data/
-=======
-        ftp-server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}/data
-        ftp-username: ${{ secrets.FTP_USERNAME }}
-        ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: data
->>>>>>> parent of 9ef67e9 (edits because of updates to ftp-upload)
+        server-dir: dev.findagravemiddleborough.ml/htdocs/data/
