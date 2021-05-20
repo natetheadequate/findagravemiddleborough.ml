@@ -197,41 +197,49 @@
     {
         "name": "cenotaphs",
         "type": "independent",
+        "inputType":"text",
         "datatype": "varchar(255)"
     },
     {
         "name": "notes",
         "type": "independent",
+        "inputType":"text",
         "datatype": "varchar(255)"
     },
     {
         "name": "father_name",
         "type": "independent",
+        "inputType":"text",
         "datatype": "varchar(255)"
     },
     {
         "name": "mother_name",
         "type": "independent",
+        "inputType":"text",
         "datatype": "varchar(255)"
     },
     {
         "name": "spouse_name",
         "type": "independent",
+        "inputType":"text",
         "datatype": "varchar(255)"
     },
     {
         "name": "count",
         "type": "independent",
+        "inputType":"text",
         "datatype": "smallint UNSIGNED"
     },
     {
         "name": "records_checked",
         "type": "independent",
+        "inputType":"none",
         "datatype": "tinyint(1)"
     },
     {
         "name": "resident_id",
         "type": "independent",
+        "inputType": "text",
         "datatype": "varchar(255)"
     }
 ]
