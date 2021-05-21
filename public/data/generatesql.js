@@ -1,11 +1,10 @@
-"use strict";
+/* eslint-disable no-multi-str */
 //all dictionaries are presumed to have a string as the value, otherwise, the sql generated will convert everything to a string in makeJoinTable()
 const data = require("./input/RockAtoPierce.json");
 const dataTables=require('./info/dataTables.json');
 const prefixOrSuffix=require("./info/prefixOrSuffix.json");
 let sql='';
 let dictionaries=[];
-let joinTables=[];
 const writeFileSync = require("fs").writeFileSync;
 dataTables.forEach(dataTable=>{
     sql+='CREATE TABLE `'+dataTable.name+'` (';

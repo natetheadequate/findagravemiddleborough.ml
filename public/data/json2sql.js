@@ -29,7 +29,7 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}) =
 			true //Manual Exceptions
 		) {
 			case /^Ma?c[A-Z][a-z]+$/.test(str):
-			case /^O\'[A-Z][a-z]+$/.test(str):
+			case /^O'[A-Z][a-z]+$/.test(str):
 			case /^Le[A-Z][a-z]+$/.test(str):
 				return str;
 		}
@@ -75,6 +75,7 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}) =
 						} else {
 							data[id]["middle_name"] = namearr[1];
 						}
+					// eslint-disable-next-line no-fallthrough
 					case 1:
 						data[id]["first_name"] = namearr[0];
 						break;
@@ -156,7 +157,7 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}) =
 			}
 		};
 		Object.keys(data[id]).forEach((key) => {
-			if (data[id][key] == "" || key === "prefix_suffix" || key === "given_name") {
+			if (data[id][key] === "" || key === "prefix_suffix" || key === "given_name") {
 				delete data[id][key];
 			} else {
 				if (typeof data[id][key] === "string") {
@@ -331,7 +332,7 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}) =
 				data[id][field].forEach((dontusethisnochangeswillbereflected, i) => {
 					if (typeof data[id][field][i] !== undefined && data[id][field][i] !== null && data[id][field][i] !== "") {
 						const value = data[id][field][i];
-						if (dictionaryName == "") {
+						if (dictionaryName === "") {
 							if (typeof data[id][field][i] === "string") {
 								data[id][field][i] = '"' + data[id][field][i] + '"';
 							}
