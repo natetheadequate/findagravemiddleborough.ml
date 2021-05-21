@@ -5,8 +5,8 @@ on:
       - development
 name: Update Development Website
 jobs:
-  FTP-Deploy-Action-Frontend:
-    name: FTP-Deploy-Action-Frontend
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -20,11 +20,11 @@ jobs:
         
     - name: Build Project
       run: |
-        npm install --prefix frontend
-        npm run build --prefix frontend
+        npm install
+        npm run build
   
     - name: List output files
-      run: find frontend/build/ -print
+      run: find build/ -print
 
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
@@ -33,37 +33,4 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: dev.findagravemiddleborough.ml/htdocs/
-        local-dir: frontend/build/
-  FTP-Deploy-Action-Backend:
-    name: FTP-Deploy-Action-Backend
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 2
-      
-    - name: FTP-Deploy-Action
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
-      with:
-        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: backend/
-        server-dir: dev.findagravemiddleborough.ml/htdocs/api/
-
-  FTP-Deploy-Action-Data:
-    name: FTP-Deploy-Action-Data
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with: 
-        fetch-depth: 2
-      
-    - name: FTP-Deploy-Action
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
-      with:
-        server: ${{ secrets.FTP_DEVELOPMENT_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: data/
-        server-dir: dev.findagravemiddleborough.ml/htdocs/data/
+        local-dir: build/
