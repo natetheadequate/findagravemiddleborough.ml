@@ -14,7 +14,7 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}) =
 			} else {
 				newstr += c.toLowerCase();
 			}
-			if (c == " " || c == "/") {
+			if (c === " " || c === "/") {
 				capitalizenextletter = true;
 			} else {
 				capitalizenextletter = false;
@@ -317,6 +317,8 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}) =
 				break;
 			case "independent":
 				independentTables.push(dataTable.name);
+				break;
+			case "virtual":
 				break;
 			default:
 				throw new Error("Invalid type in dataTable json: " + dataTable.type);
