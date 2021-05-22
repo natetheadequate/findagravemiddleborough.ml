@@ -43,7 +43,7 @@ function App({ fields }) {
 				return { ...state, [+Object.keys(state).sort((a, b) => b - a)[0]+1]: { field: '', operator: '=', query: '' } }
 			default:
 		}
-	}, { 0: { field: '', operator: '=', query: '' } })
+	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
 	const spacing = "5px";
 	return (
 		<>
@@ -98,19 +98,17 @@ function App({ fields }) {
 				<fieldset style={{ marginTop: spacing }}>
 					<legend>Filter</legend>
 					<div>
-						{Object.entries(conditions).map((v) => {
-							const i=v[0];
-							const condition=v[1];
+						{Object.entries(conditions).map(([i]) => {
 							return(
 							<div key={i}>
 								<InputLabel>Condition {i}:</InputLabel>
-								<Autocomplete
+								{/* <Autocomplete
 									multiple
 									id={'condition' + i + 'field'}
 									options={fieldNames}
 									getOptionLabel={clean}
 									filterSelectedOptions
-									value={condition['field']}
+									value={conditions[i]['field']}
 									onChange={e => dispatchConditions({ type: 'edit', payload: { i: i, key: 'field', newValue: e.target.value } })}
 									renderInput={(v) =>
 										<TextField
@@ -122,10 +120,10 @@ function App({ fields }) {
 								/>
 								<Select
 									id={'condition' + i + 'operator'}
-									value={condition['operator']}
+									value={conditions[i]['operator']}
 									onChange={e => dispatchConditions({ type: 'edit', payload: { i: i, key: 'operator', payload: e.target.value } })}
 								>{() => {
-									const FieldObject = Object.values(fields).find((v) => v.name === condition['field']);
+									const FieldObject = Object.values(fields).find((v) => v.name === conditions[i]['field']);
 									const inputType = FieldObject.hasOwnProperty('inputType') ? FieldObject.inputType : '';
 									switch (inputType) {
 										case 'date':
@@ -156,8 +154,8 @@ function App({ fields }) {
 
 								}}
 								</Select>
-								<TextField id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i: i, key: 'query', newValue: e.target.value } })} value={condition.query} />
-							</div>
+								<TextField id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i: i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
+							 */}</div>
 						)})
 						}
 					</div>
