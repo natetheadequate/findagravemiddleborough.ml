@@ -46,9 +46,13 @@ function App({ fields }) {
 		}
 	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
 	const spacing = "5px";
+	const [response,setResponse]=useState(null);
+	const submitForm=()=>{
+		fetch('/api/echo.php',{method:'POST',body:{'select':fieldsToBeRetrieved,'sortBy':sortBy,'sortOrder':sortOrder,'conditions':conditions}})
+	}
 	return (
 		<>
-			<form action="/api/getData.php" method="GET" style={{ margin: '10px' }}>
+			<form onSubmit={(e)=>e.preventDefault()} style={{ margin: '10px' }}>
 				<FormControl>
 					<Autocomplete
 						multiple
@@ -137,8 +141,7 @@ function App({ fields }) {
 						}
 					</div>
 				</fieldset>
-
-
+				<Button type="submit" onClick={()=>{submitForm()}}>Go!</Button>
 			</form>
 		</>
 	);
