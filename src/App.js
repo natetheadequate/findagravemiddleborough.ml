@@ -29,9 +29,6 @@ const clean = (str) => {
 }
 
 function App({ fields }) {
-	/* useEffect(()=>{
-		console.dir(fields);
-	},[fields]) */
 	const fieldNames = fields.map(v => v.name);
 	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(fieldNames);
 	const [sortBy, setSortBy] = useState('join_last_name');
@@ -54,7 +51,6 @@ function App({ fields }) {
 			sortOrder,
 			conditions
 		}
-		console.dir(body)
 		fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) })
 	}
 	return (

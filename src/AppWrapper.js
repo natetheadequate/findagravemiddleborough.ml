@@ -5,7 +5,6 @@ const useFields = () => {
 	const [fields, setFields] = useState(null);
 	async function retrieve() {
 		const res = await fetch(process.env.PUBLIC_URL + "data/info/dataTables.json");
-		console.log(res);
 		const json = await res.json();
 		let temp = [];
 		json.forEach((v) => {
@@ -26,7 +25,6 @@ const useFields = () => {
 	useEffect(() => {
 		retrieve();
 	}, []);
-	console.dir(fields);
 	return fields;
 };
 
