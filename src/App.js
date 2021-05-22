@@ -44,14 +44,15 @@ function App({ fields }) {
 	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
 	const spacing = "5px";
 	const [response, setResponse] = useState(null);
-	const submitForm = () => {
+	async function submitForm(){
 		const body = {
 			select: fieldsToBeRetrieved,
 			sortBy,
 			sortOrder,
 			conditions
 		}
-		fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) })
+		let x=await fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) });
+		setResponse(x);
 	}
 	return (
 		<>
@@ -154,6 +155,7 @@ function App({ fields }) {
 				</fieldset>
 				<Button type="submit" variant="contained" style={{margin:"10px 0"}} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
+			<p>{response}</p>
 			<footer style={{position:'absolute', bottom:'30px', display:"flex",float:'bottom',alignItems:'center',width:"100%"}}>
 				<ButtonGroup style={{maxWidth:'max-content',margin:"auto"}} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
