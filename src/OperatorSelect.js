@@ -5,6 +5,7 @@ function OperatorSelect({value,i,fieldObject,setOperator}) {
 	const selectProps={
 		id:('condition'+ i + 'operator'),
 		value:value,
+		style:{width: "300px",margin:"auto 5px" },
 		onChange:e => setOperator(e.target.value)
 	}
 	switch (inputType) {

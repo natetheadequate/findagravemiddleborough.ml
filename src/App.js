@@ -1,4 +1,4 @@
-import { FormControl, Button, InputLabel, MenuItem, Select, TextField } from "@material-ui/core";
+import { FormControl, Button, InputLabel, MenuItem, Select, TextField, FormGroup } from "@material-ui/core";
 import TrendingDown from "@material-ui/icons/TrendingDown";
 import TrendingUp from "@material-ui/icons/TrendingUp";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -46,20 +46,20 @@ function App({ fields }) {
 		}
 	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
 	const spacing = "5px";
-	const [response,setResponse]=useState(null);
-	const submitForm=()=>{
-		const body={
-			select:fieldsToBeRetrieved,
+	const [response, setResponse] = useState(null);
+	const submitForm = () => {
+		const body = {
+			select: fieldsToBeRetrieved,
 			sortBy,
 			sortOrder,
 			conditions
 		}
 		console.dir(body)
-		fetch('/api/echo.php',{method:'POST', body:JSON.stringify(body)})
+		fetch('/api/echo.php', { method: 'POST', body: JSON.stringify(body) })
 	}
 	return (
 		<>
-			<form onSubmit={(e)=>e.preventDefault()} style={{ margin: '10px' }}>
+			<form onSubmit={(e) => e.preventDefault()} style={{ margin: '10px' }}>
 				<FormControl>
 					<Autocomplete
 						multiple
@@ -112,32 +112,39 @@ function App({ fields }) {
 					<div>
 						{Object.entries(conditions).map(([i]) => {
 							return (
-								<>
-									<InputLabel>Condition {+i + 1}:</InputLabel>
-									<Autocomplete
-										id={'condition' + i + 'field'}
-										onKeyDown={'condition' + i + 'field'}
-										options={fieldNames}
-										getOptionLabel={clean}
-										value={conditions[i]['field']}
-										onChange={(e, v) => dispatchConditions({ type: 'edit', payload: { i, key: 'field', newValue: v } })}
-										renderInput={(v) =>
-											<TextField
-												{...v}
-												variant="outlined"
-												label="Field"
-											/>
-										}
-									/>
-									<OperatorSelect
-										i={i}
-										value={conditions[i].operator}
-										fieldObject={Object.values(fields).find((v) => v.name === conditions[i]['field'])}
-										setOperator={(newValue) =>
-											dispatchConditions({ type: 'edit', payload: { i, key: 'operator', newValue } })
-										} />
-									<TextField id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
-								</>
+								<FormGroup row={true} style={{margin:"10px 0px"}}>
+									<InputLabel style={{margin:'auto 5px'}}>Condition {+i + 1}:</InputLabel>
+									<FormControl>
+										<Autocomplete
+											style={{ width: '300px' }}
+											id={'condition' + i + 'field'}
+											onKeyDown={'condition' + i + 'field'}
+											options={fieldNames}
+											getOptionLabel={clean}
+											value={conditions[i]['field']}
+											onChange={(e, v) => dispatchConditions({ type: 'edit', payload: { i, key: 'field', newValue: v } })}
+											renderInput={(v) =>
+												<TextField
+													{...v}
+													variant="outlined"
+													label="Field"
+												/>
+											}
+										/>
+									</FormControl>
+									<FormControl>
+										<OperatorSelect
+											i={i}
+											value={conditions[i].operator}
+											fieldObject={Object.values(fields).find((v) => v.name === conditions[i]['field'])}
+											setOperator={(newValue) =>
+												dispatchConditions({ type: 'edit', payload: { i, key: 'operator', newValue } })
+											} />
+									</FormControl>
+									<FormControl>
+										<TextField style={{margin:'auto 5px' }} placeholder="Enter query here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
+									</FormControl>
+								</FormGroup>
 							)
 						})
 						}
@@ -148,7 +155,7 @@ function App({ fields }) {
 						}
 					</div>
 				</fieldset>
-				<Button type="submit" onClick={()=>{submitForm()}}>Go!</Button>
+				<Button type="submit" onClick={() => { submitForm() }}>Go!</Button>
 			</form>
 		</>
 	);
