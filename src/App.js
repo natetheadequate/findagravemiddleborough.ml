@@ -48,7 +48,14 @@ function App({ fields }) {
 	const spacing = "5px";
 	const [response,setResponse]=useState(null);
 	const submitForm=()=>{
-		fetch('/api/echo.php',{method:'POST',body:{'select':fieldsToBeRetrieved,'sortBy':sortBy,'sortOrder':sortOrder,'conditions':conditions}})
+		const body={
+			select:fieldsToBeRetrieved,
+			sortBy,
+			sortOrder,
+			conditions
+		}
+		console.dir(body)
+		fetch('/api/echo.php',{method:'POST',body})
 	}
 	return (
 		<>
@@ -113,7 +120,7 @@ function App({ fields }) {
 										options={fieldNames}
 										getOptionLabel={clean}
 										value={conditions[i]['field']}
-										onChange={(e, v) => dispatchConditions({ type: 'edit', payload: { i: i, key: 'field', newValue: v } })}
+										onChange={(e, v) => dispatchConditions({ type: 'edit', payload: { i, key: 'field', newValue: v } })}
 										renderInput={(v) =>
 											<TextField
 												{...v}
@@ -127,9 +134,9 @@ function App({ fields }) {
 										value={conditions[i].operator}
 										fieldObject={Object.values(fields).find((v) => v.name === conditions[i]['field'])}
 										setOperator={(newValue) =>
-											dispatchConditions({ type: 'edit', payload: { i: i, key: 'operator', newValue: newValue } })
+											dispatchConditions({ type: 'edit', payload: { i, key: 'operator', newValue } })
 										} />
-									<TextField id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i: i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
+									<TextField id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
 								</>
 							)
 						})
