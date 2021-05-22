@@ -10,9 +10,9 @@ const useFields = () => {
 		json.forEach((v) => {
 			switch (v.type) {
 				case "dictionary":
+				case "virtual":
 					break;
 				case "join":
-				case "virtual":
 				case "independent":
 					temp.push(v);
 					break;
