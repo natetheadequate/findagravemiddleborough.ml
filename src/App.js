@@ -1,4 +1,4 @@
-import { FormControl, Link,Button, InputLabel, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup, BottomNavigation } from "@material-ui/core";
+import { FormControl, Link, Button, InputLabel, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup, BottomNavigation } from "@material-ui/core";
 import TrendingDown from "@material-ui/icons/TrendingDown";
 import TrendingUp from "@material-ui/icons/TrendingUp";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -44,14 +44,14 @@ function App({ fields }) {
 	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
 	const spacing = "5px";
 	const [response, setResponse] = useState(null);
-	async function submitForm(){
+	async function submitForm() {
 		const body = {
 			select: fieldsToBeRetrieved,
 			sortBy,
 			sortOrder,
 			conditions
 		}
-		let x=await fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) });
+		let x = await fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) });
 		setResponse(x);
 	}
 	return (
@@ -110,8 +110,8 @@ function App({ fields }) {
 					<div>
 						{Object.entries(conditions).map(([i]) => {
 							return (
-								<FormGroup row={true} style={{margin:"10px 0px"}}>
-									<InputLabel style={{margin:'auto 5px'}}>Condition {+i + 1}:</InputLabel>
+								<FormGroup row={true} style={{ margin: "10px 0px" }}>
+									<InputLabel style={{ margin: 'auto 5px' }}>Condition {+i + 1}:</InputLabel>
 									<FormControl>
 										<Autocomplete
 											style={{ width: '300px' }}
@@ -140,7 +140,7 @@ function App({ fields }) {
 											} />
 									</FormControl>
 									<FormControl>
-										<TextField style={{margin:'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
+										<TextField style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
 									</FormControl>
 								</FormGroup>
 							)
@@ -153,11 +153,11 @@ function App({ fields }) {
 						}
 					</div>
 				</fieldset>
-				<Button type="submit" variant="contained" style={{margin:"10px 0"}} onClick={() => { submitForm() }}>Go!</Button>
+				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
-			<p>{JSON.parse(response)||response.toString()}</p>
-			<footer style={{position:'absolute', bottom:'30px', display:"flex",float:'bottom',alignItems:'center',width:"100%"}}>
-				<ButtonGroup style={{maxWidth:'max-content',margin:"auto"}} >
+			<p>{JSON.stringify(response)}</p>
+			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", float: 'bottom', alignItems: 'center', width: "100%" }}>
+				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Friends of Middleborough Cemeteries</Button>
 					<Button href='mailto:natewhite345+fomc@gmail.com'>Contact Developer/Report Bug</Button>
