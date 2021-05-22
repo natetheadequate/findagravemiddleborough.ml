@@ -55,7 +55,7 @@ function App({ fields }) {
 			conditions
 		}
 		console.dir(body)
-		fetch('/api/echo.php', { method: 'POST', body: JSON.stringify(body) })
+		fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) })
 	}
 	return (
 		<>
