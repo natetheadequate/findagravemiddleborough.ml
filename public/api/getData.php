@@ -2,7 +2,7 @@
     include 'DB.php';
     $tables=[];
     $tablesraw=($DB->query('SHOW TABLES'));
-    while($tableraw=$tablesraw->fetch()){
+    while($tableraw=($tablesraw->fetch_array())){
         array_push($tables,$tableraw[0]);
     }
     $req=json_decode(file_get_contents('php://input'),true);
