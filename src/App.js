@@ -1,4 +1,4 @@
-import { FormControl, Button, InputLabel, MenuItem, Select, TextField, FormGroup } from "@material-ui/core";
+import { FormControl, Link,Button, InputLabel, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup, BottomNavigation } from "@material-ui/core";
 import TrendingDown from "@material-ui/icons/TrendingDown";
 import TrendingUp from "@material-ui/icons/TrendingUp";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -59,6 +59,7 @@ function App({ fields }) {
 	}
 	return (
 		<>
+			<Typography variant="h2" align="center" component="h1">Search the Database of Friends of Middleborough Cemeteries</Typography>
 			<form onSubmit={(e) => e.preventDefault()} style={{ margin: '10px' }}>
 				<FormControl>
 					<Autocomplete
@@ -142,7 +143,7 @@ function App({ fields }) {
 											} />
 									</FormControl>
 									<FormControl>
-										<TextField style={{margin:'auto 5px' }} placeholder="Enter query here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
+										<TextField style={{margin:'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
 									</FormControl>
 								</FormGroup>
 							)
@@ -151,12 +152,19 @@ function App({ fields }) {
 					</div>
 					<div>
 						{
-							<Button onClick={() => dispatchConditions({ type: 'add' })}>Add Condition</Button>
+							<Button variant="outlined" onClick={() => dispatchConditions({ type: 'add' })}>Add Condition</Button>
 						}
 					</div>
 				</fieldset>
-				<Button type="submit" onClick={() => { submitForm() }}>Go!</Button>
+				<Button type="submit" variant="contained" style={{margin:"10px 0"}} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
+			<footer style={{position:'absolute', bottom:'30px', display:"flex",float:'bottom',alignItems:'center',width:"100%"}}>
+				<ButtonGroup style={{maxWidth:'max-content',margin:"auto"}} >
+					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
+					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Friends of Middleborough Cemeteries</Button>
+					<Button href='mailto:natewhite345+fomc@gmail.com'>Contact Developer/Report Bug</Button>
+				</ButtonGroup>
+			</footer>
 		</>
 	);
 }
