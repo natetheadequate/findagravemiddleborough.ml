@@ -111,61 +111,73 @@
     },
     {
         "name": "birth_day",
+        "inputType":"number",
         "type": "independent",
         "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "birth_month",
+        "inputType":"number",
         "type": "independent",
         "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "birth_year",
+        "inputType":"number",
         "type": "independent",
         "datatype": "smallint UNSIGNED"
     },
     {
         "name": "death_day",
+        "inputType":"number",
         "type": "independent",
         "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "death_month",
+        "inputType":"number",
         "type": "independent",
         "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "death_year",
+        "inputType":"number",
         "type": "independent",
         "datatype": "smallint UNSIGNED"
     },
     {
         "name": "entry_day",
+        "inputType":"number",
         "type": "independent",
         "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "entry_month",
         "type": "independent",
+        "inputType":"number",
         "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "entry_year",
         "type": "independent",
+        "inputType":"number",
         "datatype": "smallint UNSIGNED"
     },
     {
         "name": "exit_day",
         "type": "independent",
+        "inputType":"number",
         "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "exit_month",
+        "inputType":"number",
         "type": "independent",
         "datatype": "tinyint UNSIGNED"
     },
     {
         "name": "exit_year",
+        "inputType":"number",
         "type": "independent",
         "datatype": "smallint UNSIGNED"
     },
@@ -222,11 +234,13 @@
     {
         "name": "count",
         "type": "independent",
+        "inputType":"number",
         "datatype": "smallint UNSIGNED"
     },
     {
         "name": "records_checked",
         "type": "independent",
+        "inputType":"boolean",
         "datatype": "tinyint(1)"
     },
     {
@@ -235,12 +249,12 @@
         "datatype": "varchar(255)"
     },
     {
-        "name": "birth",
+        "name": "born",
         "type": "virtual",
         "inputType":"date"
     },
     {
-        "name": "death",
+        "name": "died",
         "type": "virtual",
         "inputType":"date"
     },
