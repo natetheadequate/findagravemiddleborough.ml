@@ -155,7 +155,7 @@ function App({ fields }) {
 				</fieldset>
 				<Button type="submit" variant="contained" style={{margin:"10px 0"}} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
-			<p>{response}</p>
+			<p>{JSON.parse(response)||response.toString()}</p>
 			<footer style={{position:'absolute', bottom:'30px', display:"flex",float:'bottom',alignItems:'center',width:"100%"}}>
 				<ButtonGroup style={{maxWidth:'max-content',margin:"auto"}} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
