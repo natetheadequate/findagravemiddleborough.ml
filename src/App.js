@@ -1,4 +1,5 @@
-import { FormControl, Button, InputLabel, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup } from "@material-ui/core";
+import { FormControl, Button, InputLabel, DataGrid, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup } from "@material-ui/core";
+import { FormatColorReset } from "@material-ui/icons";
 import TrendingDown from "@material-ui/icons/TrendingDown";
 import TrendingUp from "@material-ui/icons/TrendingUp";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -44,6 +45,30 @@ function App({ fields }) {
 	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
 	const spacing = "5px";
 	const [response, setResponse] = useState(null);
+	let noresponse = true;
+	let nodata = false;
+	let rows;
+	let columns;
+	if (response !== null) {
+		noresponse=false;
+		if (response === []) {
+			nodata = true;
+		} else {
+			rows = response;
+			let rawcols = [];
+			response.forEach(obj => {
+				Object.keys(obj).forEach(key => {
+					if (!rawcols.includes(key)) {
+						rawcols.push(key);
+					}
+				})
+			});
+			columns = [];
+			rawcols.forEach(rawcol => {
+				columns.push({ field: rawcol, headerName: clean(rawcol) });
+			})
+		}
+	}
 	async function submitForm() {
 		const body = {
 			select: fieldsToBeRetrieved,
@@ -52,7 +77,7 @@ function App({ fields }) {
 			conditions
 		}
 		let x = await fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) });
-		setResponse(x);
+		setResponse(x.json());
 	}
 	return (
 		<>
@@ -128,7 +153,7 @@ function App({ fields }) {
 				</fieldset>
 				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
-			<p>{JSON.stringify(response)}</p>
+			{(noresponse && <br />) || (nodata && "No matching records found") || (<DataGrid rows={rows} columns={columns} />)}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", float: 'bottom', alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
