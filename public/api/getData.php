@@ -1,87 +1,141 @@
 <?php
 include 'DB.php';
-$tables = [];
-$tablesraw = ($DB->query('SHOW TABLES'));
+$tables = []; //any valid table in the database
+$tablesraw = ($DB->query("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA!=Database();"));
 while ($tableraw = ($tablesraw->fetch_array())) {
     array_push($tables, $tableraw[0]);
 }
-$req = json_decode(file_get_contents('php://input'), true);
-if (!$req) {
-    echo "Malformed Request";
+$fields = []; //no dictionaries bc of the column name clause (dictionaries have i as their first column, not id)
+$fieldsraw = ($DB->query("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME='id' AND TABLE_SCHEMA!=Database();"));
+while ($fieldraw = ($fieldsraw->fetch_array())) {
+    array_push($fields, $fieldraw[0]);
+}
+try {
+    $req = json_decode(file_get_contents('php://input'), true);
+} catch (Exception $e) {
+    echo "Error: Malformed Request";
     exit;
 }
 if (!isset($req['select'])) {
-    echo "No columns selected";
+    echo "Error: No Fields Selected";
+    exit;
+}
+if (!is_array($req['select'])) {
+    if (!is_string(($req['select']))) {
+        echo "Error: Malformed Fields-To-Be-Retrieved: is not array nor string";
+        exit;
+    }
+    $req['select'] = [$req['select']];
+}
+$req['select'] = array_intersect($fields, $req['select']);
+if (isset($req['select'][0])) {
+    echo "Error: No valid fields provided to be retrieved";
     exit;
 }
 if (!isset($req['sortBy'])) {
     $req['sortBy'] = 'join_last_name';
+} else {
+    if (is_string($req['sortBy'])) {
+        $req['sortBy'] = [$req['sortBy']];
+    }
+    if (is_array($req['sortBy'])) {
+        $req['sortBy'] = array_intersect($fields, $req['sortBy']);
+    } else {
+        echo "Error: Invalid sortBy value";
+        exit;
+    }
+    if (!isset($req['sortBy'][0])) {
+        echo "Error: Invalid sortBy value";
+        exit;
+    }
+    $req['sortBy'] = $req['sortBy'][0];
 }
 if (!isset($req['sortOrder'])) {
     $req['sortOrder'] = 'ASC';
-}
-function getWhere($table,$col,$operator,$query,$goodids=null,$iOrId){
-        //null for goodids means check all ids. If we have already filtered some ids, then we only need to check
-        //those ones. For getWhere run on dictionaries, then we can do select distinct but cant check ids. 
-        $operator='=';
-        $terminator='';
-        switch($condition['operator']){
-            case '%LIKE%':$operator=' LIKE %';$terminator='%';break;
-            case '%LIKE':$operator=' LIKE %';break;
-            case 'LIKE%':$operator=' LIKE ';$terminator='%';break;
-            case '>':
-            case '<':
-            case '>=':
-            case '<=':
-                $operator=$condition['operator'];
-        }
-        var_dump($operator,$terminator,$dictcolumn);
-        $q=$DB->prepare("SELECT `".$iOrId."` FROM ".$table." WHERE `".$col.'`'.$operator.'?'.$terminator.';');
-        $q->bind_param('s',$query);
-        $q->execute();
-        $iVals=($q->get_result()->fetch_all())[0];//need error handling here
-        var_dump($iVals);
-        return $iVals;//false if no such string in dictionary
-}
-function iValsFromWhereClause($condition){
-    $dict=str_replace('fk_',' ',(($DB->query('Describe `'.$condtion['field'].'`'))->fetch_all())[1][0]);//the fk column is fk_[dictionary]);
-    $field=($DB->query('DESCRIBE '.$dict)->fetch_all())[1][0];
-    $x=getWhere($dict,$field,$operator,$query);
-    if($x===false){
-        echo json_encode([]);
+} else {
+    if ($req['sortOrder'] !== 'ASC' && $req['sortOrder'] !== 'DESC') {
+        echo "Error: invalid sortOrder. Must be ASC or DESC";
         exit;
     }
 }
-function idsFromColVals($table,$vals){
-    if($vals===false){
+function validCondition($condition, $fields)
+{
+    if (!isset($condition['field'], $condition['query'], $condition['operator'])) {
         return false;
-    }else{
-        if($ids===null){
-            $DB->query('SELECT `id` FROM '.$table.' WHERE '.)
+    }
+    if (!in_array($condition['field'], $fields)) {
+        return false;
+    }
+    if (!is_string($condition['query']) && !is_array($condition['query'])) {
+        return false;
+    }
+}
+$ids = null;
+if (isset($req['conditions'])) {
+    if (is_iterable($req['conditions'])) {
+        foreach ($req['conditions'] as $condition) {
+            if (validCondition($condition, $fields) && $ids !== []) {
+                $operator = '=';
+                $terminator = '';
+                switch ($condition['operator']) {
+                    case '%LIKE%':
+                        $operator = ' LIKE %';
+                        $terminator = '%';
+                        break;
+                    case '%LIKE':
+                        $operator = ' LIKE %';
+                        break;
+                    case 'LIKE%':
+                        $operator = ' LIKE ';
+                        $terminator = '%';
+                        break;
+                    case '>':
+                    case '<':
+                    case '>=':
+                    case '<=':
+                        $operator = $condition['operator'];
+                }
+                $q;
+                if (preg_match('/join_/', $condition['field']) !== false) {
+                    $dict = str_replace('fk_', ' ', (($DB->query('Describe `' . $condition['field'] . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
+                    $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
+                    $q = $DB->prepare("SELECT " . $condition['field'] . ".id FROM " . $condition['field'] . " JOIN " . $dict . " ON " . $condition['field'] . ".fk_" . $dict . "=" . $dict . ".i WHERE " . $dict . "." . $dictColumnName . $operator . "?" . $terminator . ";");
+                } else {
+                    $q = $DB->prepare("SELECT id FROM " . $condition['field'] . " WHERE " . $condition['field'] . $operator . "?" . $terminator . ";");
+                }
+                $q->bind_param('s', $query);
+                $q->execute();
+                $newids = [];
+                $d = $q->get_result();
+                while ($datum = $d->fetch_array()) {
+                    array_push($newids, $datum['id']);
+                }
+                if (is_null($ids)) {
+                    $ids = $newids;
+                } else {
+                    $ids = array_intersect($ids, $newids);
+                }
+            }
         }
     }
 }
-$ids=null;
-if (isset($req['conditions'])) {
-    foreach ($req['conditions'] as $condition) {
-        if(ids!==[] && ids!==false && is_string($condition['query']) && $condition['query']!=='' && array_search($condition['field'], $tables) !== false){
-            if (preg_match('/join_/', $condition['field'])!==false) {
-                
-            }else{
-            $dict=$field;
-        }
-        getWhere()
-            if (preg_match('/join_/', $condition['field'])!==false) {
-                $newids=idswithcolvals($condition['field'],iValsFromWhereClause($condition));
-                if($newids==false){
-                    echo json_encode([]);
-                    exit;
-                }
-                if($ids===null){
-                    $ids=$newids;//might set ids to false, thats ok
-                }else{
-                    array_push($ids,$newids);
-                }
-                }else{
-
-            }  
+if ($ids === []) {
+    echo json_encode([]);
+    exit;
+}
+$results = [];
+foreach ($ids as $id) {
+    $results[$id] = [];
+}
+foreach ($reqs['select'] as $col) {
+    $d;
+    if (is_null($ids)) {
+        $d = $DB->query("SELECT * FROM " . $reqs['select'] . ";");
+    } else {
+        $d = $DB->query("SELECT * FROM " . $reqs['select'] . " WHERE `id` IN (" . implode(',', $ids) . ");");
+    }
+    while ($datum = $d->fetch_array()) {
+        $results[$datum['id']][$reqs['select']] = $datum[1];
+    }
+}
+echo json_encode($results);
