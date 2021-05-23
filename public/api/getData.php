@@ -1,12 +1,13 @@
 <?php
 include 'DB.php';
 $tables = []; //any valid table in the database
-$tablesraw = ($DB->query("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA NOT IN ('information_schema', 'mysql', 'performance_schema');"));
+$tablesraw = ($DB->query("SHOW TABLES"));
 while ($tableraw = ($tablesraw->fetch_array())) {
     array_push($tables, $tableraw[0]);
 }
+$dbname=$DB->query("select Database()")->fetch_array()[0];
 $fields = []; //no dictionaries bc of the column name clause (dictionaries have i as their first column, not id)
-$fieldsraw = ($DB->query("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME='id' AND TABLE_SCHEMA!=Database();"));
+$fieldsraw = $DB->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME='id' AND TABLE_SCHEMA='".$dbname."';");
 while ($fieldraw = ($fieldsraw->fetch_array())) {
     array_push($fields, $fieldraw[0]);
 }
