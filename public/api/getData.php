@@ -97,7 +97,7 @@ if (isset($req['conditions'])) {
                         $operator = $condition['operator'];
                 }
                 $q;
-                if (preg_match('/join_/', $condition['field']) !== false) {
+                if (preg_match('/join_/', $condition['field']) != false) {
                     $dict = str_replace('fk_', ' ', (($DB->query('Describe `' . $condition['field'] . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
                     $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
                     $q = $DB->prepare("SELECT " . $condition['field'] . ".id FROM " . $condition['field'] . " JOIN " . $dict . " ON " . $condition['field'] . ".fk_" . $dict . "=" . $dict . ".i WHERE " . $dict . "." . $dictColumnName . $operator . "?" . $terminator . ";");
@@ -133,21 +133,38 @@ if (!is_null($ids)) {
 foreach ($req['select'] as $col) {
     $d;
     $q;
-    if (preg_match('/join_/', $col) !== false) {
-        $dict = str_replace('fk_', ' ', (($DB->query('Describe `' . $col . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
+    if (preg_match('/join_/', $col) != false) {
+        echo $col;
+        echo preg_match('/join_/', $col);
+        $dict = str_replace('fk_', '', (($DB->query('Describe `' . $col . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
         $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
         $q = "SELECT * FROM " . $col . " JOIN " . $dict . " ON " . $col . ".fk_" . $dict . "=" . $dict . ".i";
+        if (is_null($ids)) {
+            $d = $DB->query($q . ';');
+        } else {
+            $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
+        }
+        while ($datum = $d->fetch_array()) {
+            if (is_array($results[$datum['id']][$col])) {
+                array_push($results[$datum['id']][$col], $datum[3]);
+            } else {
+                $results[$datum['id']][$col] = [$datum[3]];
+            }
+        }
     } else {
         $q = "SELECT * FROM " . $col;
-    }
-    if (is_null($ids)) {
-        $d = $DB->query($q);
-    } else {
-        $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
-    }
-
-    while ($datum = $d->fetch_array()) {
-        $results[$datum['id']][$req['select']] = $datum[1];
+        if (is_null($ids)) {
+            $d = $DB->query($q . ';');
+        } else {
+            $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
+        }
+        while ($datum = $d->fetch_array()) {
+            if (is_array($results[$datum['id']][$col])) {
+                array_push($results[$datum['id']][$col], $datum[1]);
+            } else {
+                $results[$datum['id']][$col] = [$datum[1]];
+            }
+        }
     }
 }
 echo json_encode($results);
