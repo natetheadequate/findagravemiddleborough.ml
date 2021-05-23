@@ -26,7 +26,6 @@ dataTables.forEach(dataTable=>{
             `"+dataTable.name+"` "+dataTable.datatype+" NOT NULL,\n\
             PRIMARY KEY(`id`,`"+dataTable.name+"`));\n";
             break;
-        case "virtual":break;
         default: throw new Error(dataTable.type+" is an invalid value for the 'type' key.");
     }
 })

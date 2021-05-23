@@ -247,25 +247,5 @@
         "name": "resident_id",
         "type": "independent",
         "datatype": "varchar(255)"
-    },
-    {
-        "name": "born",
-        "type": "virtual",
-        "inputType":"date"
-    },
-    {
-        "name": "died",
-        "type": "virtual",
-        "inputType":"date"
-    },
-    {
-        "name": "entry",
-        "type": "virtual",
-        "inputType":"date"
-    },
-    {
-        "name": "exit",
-        "type": "virtual",
-        "inputType":"date"
     }
 ]
