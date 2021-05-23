@@ -77,33 +77,6 @@ function App({ fields }) {
 					/>
 				</FormControl>
 				<br />
-				<FormControl style={{ marginTop: spacing }}>
-					<InputLabel id='sort-by-label'>Sort By</InputLabel>
-					<Select
-						id="sort-by"
-						value={sortBy}
-						onChange={e => setSortBy(e.target.value)}
-						labelId="sort-by-label"
-					>
-						{fieldNames.map(field => (
-							<MenuItem value={field}>{clean(field)}</MenuItem>
-						))}
-					</Select>
-				</FormControl>
-				<FormControl style={{ verticalAlign: 'bottom' }}>
-					<Button
-						variant='text'
-						onClick={() => {
-							if (sortOrder === 'ASC') {
-								setSortOrder('DESC');
-							} else {
-								setSortOrder('ASC');
-							}
-						}}
-					>
-						{sortOrder === 'DESC' ? <TrendingDown /> : <TrendingUp />}
-					</Button>
-				</FormControl>
 				<br />
 				<fieldset style={{ marginTop: spacing }}>
 					<legend>Filter</legend>
