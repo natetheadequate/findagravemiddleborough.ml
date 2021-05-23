@@ -32,7 +32,7 @@ if (isset($req['select'][0])) {
     echo "Error: No valid fields provided to be retrieved";
     exit;
 }
-if (!isset($req['sortBy'])) {
+/* if (!isset($req['sortBy'])) {
     $req['sortBy'] = 'join_last_name';
 } else {
     if (is_string($req['sortBy'])) {
@@ -57,7 +57,7 @@ if (!isset($req['sortOrder'])) {
         echo "Error: invalid sortOrder. Must be ASC or DESC";
         exit;
     }
-}
+} */
 function validCondition($condition, $fields)
 {
     if (!isset($condition['field'], $condition['query'], $condition['operator'])) {
