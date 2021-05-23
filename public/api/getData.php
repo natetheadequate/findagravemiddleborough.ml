@@ -1,7 +1,7 @@
 <?php
 include 'DB.php';
 $tables = []; //any valid table in the database
-$tablesraw = ($DB->query("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA!=Database();"));
+$tablesraw = ($DB->query("SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA NOT IN ('information_schema', 'mysql', 'performance_schema');"));
 while ($tableraw = ($tablesraw->fetch_array())) {
     array_push($tables, $tableraw[0]);
 }
