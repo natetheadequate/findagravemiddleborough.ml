@@ -1,4 +1,5 @@
-import { FormControl, Button, InputLabel, DataGrid, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup } from "@material-ui/core";
+import { FormControl, Button, InputLabel, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup } from "@material-ui/core";
+import { DataGrid } from '@material-ui/data-grid';
 import { FormatColorReset } from "@material-ui/icons";
 import TrendingDown from "@material-ui/icons/TrendingDown";
 import TrendingUp from "@material-ui/icons/TrendingUp";
@@ -50,7 +51,7 @@ function App({ fields }) {
 	let rows;
 	let columns;
 	if (response !== null) {
-		noresponse=false;
+		noresponse = false;
 		if (response === []) {
 			nodata = true;
 		} else {
