@@ -5,9 +5,9 @@ $tablesraw = ($DB->query("SHOW TABLES"));
 while ($tableraw = ($tablesraw->fetch_array())) {
     array_push($tables, $tableraw[0]);
 }
-$dbname=$DB->query("select Database()")->fetch_array()[0];
+$dbname = $DB->query("select Database()")->fetch_array()[0];
 $fields = []; //no dictionaries bc of the column name clause (dictionaries have i as their first column, not id)
-$fieldsraw = $DB->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME='id' AND TABLE_SCHEMA='".$dbname."';");
+$fieldsraw = $DB->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME='id' AND TABLE_SCHEMA='" . $dbname . "';");
 while ($fieldraw = ($fieldsraw->fetch_array())) {
     array_push($fields, $fieldraw[0]);
 }
@@ -28,8 +28,8 @@ if (!is_array($req['select'])) {
     }
     $req['select'] = [$req['select']];
 }
-$req['select'] = array_intersect($fields, $req['select']);
-if (isset($req['select'][0])) {
+$req['select'] = array_intersect($req['select'], $fields);
+if (!isset($req['select'][0])) {
     echo "Error: No valid fields provided to be retrieved";
     exit;
 }
@@ -125,18 +125,29 @@ if ($ids === []) {
     exit;
 }
 $results = [];
-foreach ($ids as $id) {
-    $results[$id] = [];
-}
-foreach ($reqs['select'] as $col) {
-    $d;
-    if (is_null($ids)) {
-        $d = $DB->query("SELECT * FROM " . $reqs['select'] . ";");
-    } else {
-        $d = $DB->query("SELECT * FROM " . $reqs['select'] . " WHERE `id` IN (" . implode(',', $ids) . ");");
+if (!is_null($ids)) {
+    foreach ($ids as $id) {
+        $results[$id] = [];
     }
+}
+foreach ($req['select'] as $col) {
+    $d;
+    $q;
+    if (preg_match('/join_/', $col) !== false) {
+        $dict = str_replace('fk_', ' ', (($DB->query('Describe `' . $col . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
+        $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
+        $q = "SELECT * FROM " . $col . " JOIN " . $dict . " ON " . $col . ".fk_" . $dict . "=" . $dict . ".i";
+    } else {
+        $q = "SELECT * FROM " . $col;
+    }
+    if (is_null($ids)) {
+        $d = $DB->query($q);
+    } else {
+        $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
+    }
+
     while ($datum = $d->fetch_array()) {
-        $results[$datum['id']][$reqs['select']] = $datum[1];
+        $results[$datum['id']][$req['select']] = $datum[1];
     }
 }
 echo json_encode($results);
