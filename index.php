@@ -20,7 +20,7 @@ for ($i = 0; $i < count($columns); $i++) {
         array_push($formquestions, $columns[$i]);
     }
 }
-$specialformquestions = [
+/* $specialformquestions = [
     [array_search('Birthyear', $formquestions) + 1, '
         <label>Born After: <input type="date" name="bornafter"></label><br>
         <label>Born Before: <input type="date" name="bornbefore"></label>
@@ -40,7 +40,7 @@ $specialformquestions = [
 ];
 for ($i = 0; $i < count($specialformquestions); $i++) {
     array_splice($formquestions, $specialformquestions[$i][0], 0, $i);
-}
+} */
 ?>
 <!DOCTYPE html>
 <html>
@@ -93,9 +93,9 @@ for ($i = 0; $i < count($specialformquestions); $i++) {
                         echo '<option value=' . strip_tags($formquestion[$i]) . '>' . clean($formquestion[$i]) . '</option>';
                     }
                     echo '</select></label>';
-                } elseif (is_numeric($formquestion)) {
+                } /* elseif (is_numeric($formquestion)) {
                     echo $specialformquestions[$formquestion][1];
-                } else {
+                }  */else {
                     echo '<label>' . clean($formquestion) . ': <input type="text" name="' . strip_tags($formquestion) . '"></label>';
                 }
                 echo '<br>';
