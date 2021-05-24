@@ -156,7 +156,7 @@ function App({ fields }) {
 				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
 			{(noresponse && <br />) || (nodata && "No matching records found") || (<DataGrid rows={rows} columns={columns} />)}
-			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", float: 'bottom', alignItems: 'center', width: "100%" }}>
+			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org'>Friends of Middleborough Cemeteries</Button>
