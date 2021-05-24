@@ -77,7 +77,7 @@ function App({ fields }) {
 			sortOrder,
 			conditions
 		}
-		await fetch('http://dev.findagravemiddleborough.ml/api/getData.php', { method: 'POST', body: JSON.stringify(body) })
+		await fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) })
 			.then(res => res.json())
 			.then(data => setResponse(data));
 	}
