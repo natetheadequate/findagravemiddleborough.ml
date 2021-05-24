@@ -126,11 +126,6 @@ if ($ids === []) {
     exit;
 }
 $results = [];
-if (!is_null($ids)) {
-    foreach ($ids as $id) {
-        $results[$id] = [];
-    }
-}
 foreach ($req['select'] as $col) {
     $d;
     $q;
@@ -143,11 +138,13 @@ foreach ($req['select'] as $col) {
         } else {
             $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
         }
+        
         while ($datum = $d->fetch_array()) {
+            $results[$datum['id']]['id']=$datum['id'];
             if (is_array($results[$datum['id']][$col])) {
                 array_push($results[$datum['id']][$col], $datum[3]);
             } else {
-                $results[$datum['id']][$col] = [$datum[3]];
+                $results[$datum['id']][$col] =[$datum[3]];
             }
         }
     } else {
@@ -158,6 +155,7 @@ foreach ($req['select'] as $col) {
             $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
         }
         while ($datum = $d->fetch_array()) {
+            $results[$datum['id']]['id']=$datum['id'];
             if (is_array($results[$datum['id']][$col])) {
                 array_push($results[$datum['id']][$col], $datum[1]);
             } else {
