@@ -71,6 +71,7 @@ function validCondition($condition, $fields)
     if (!is_string($condition['query']) && !is_array($condition['query'])) {
         return false;
     }
+    return true;
 }
 $ids = null;
 if (isset($req['conditions'])) {
