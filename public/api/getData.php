@@ -1,4 +1,5 @@
 <?php
+header("Access-Control-Allow-Origin: *");
 include 'DB.php';
 $tables = []; //any valid table in the database
 $tablesraw = ($DB->query("SHOW TABLES"));
@@ -134,8 +135,6 @@ foreach ($req['select'] as $col) {
     $d;
     $q;
     if (preg_match('/join_/', $col) != false) {
-        echo $col;
-        echo preg_match('/join_/', $col);
         $dict = str_replace('fk_', '', (($DB->query('Describe `' . $col . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
         $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
         $q = "SELECT * FROM " . $col . " JOIN " . $dict . " ON " . $col . ".fk_" . $dict . "=" . $dict . ".i";

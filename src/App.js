@@ -52,7 +52,7 @@ function App({ fields }) {
 	let columns;
 	if (response !== null) {
 		noresponse = false;
-		if (response === []) {
+		if (!Array.is_array(response) || response === []) {
 			nodata = true;
 		} else {
 			rows = response;
@@ -77,8 +77,9 @@ function App({ fields }) {
 			sortOrder,
 			conditions
 		}
-		let x = await fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) });
-		setResponse(x.json());
+		await fetch('http://dev.findagravemiddleborough.ml/api/getData.php', { method: 'POST', body: JSON.stringify(body) })
+			.then(res => res.json())
+			.then(data => setResponse(data));
 	}
 	return (
 		<>
