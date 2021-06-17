@@ -46,7 +46,7 @@ function App({ fields }) {
 	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
 	const spacing = "5px";
 	const [response, setResponse] = useState(null);
-	let noresponse = true;
+	/* let noresponse = true;
 	let nodata = false;
 	let rows;
 	let columns;
@@ -69,7 +69,7 @@ function App({ fields }) {
 				columns.push({ field: rawcol, headerName: clean(rawcol) });
 			})
 		}
-	}
+	} */
 	async function submitForm() {
 		const body = {
 			select: fieldsToBeRetrieved,
@@ -156,8 +156,8 @@ function App({ fields }) {
 				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
 			{response}
-			{(noresponse && <br />) || (nodata && "No matching records found") || (<DataGrid autoHeight={true} rows={rows} columns={columns} />)}
-			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
+			{/* {(noresponse && <br />) || (nodata && "No matching records found") || (<DataGrid autoHeight={true} rows={rows} columns={columns} />)}
+			 */}<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org'>Friends of Middleborough Cemeteries</Button>
