@@ -106,7 +106,7 @@ if (isset($req['conditions'])) {
                 } else {
                     $q = $DB->prepare("SELECT id FROM " . $condition['field'] . " WHERE " . $condition['field'] . $operator . "?" . $terminator . ";");
                 }
-                $q->bind_param('s', $query);
+                $q->bind_param('s', $condition['query']);
                 $q->execute();
                 $newids = [];
                 $d = $q->get_result();
