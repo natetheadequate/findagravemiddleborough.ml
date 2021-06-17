@@ -78,7 +78,7 @@ function App({ fields }) {
 			conditions
 		}
 		await fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) })
-			.then(res => res.json())
+			.then(res => res.text())
 			.then(data => setResponse(data));
 	}
 	return (
