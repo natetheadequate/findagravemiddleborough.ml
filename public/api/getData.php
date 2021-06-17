@@ -100,7 +100,7 @@ if (isset($req['conditions'])) {
                 }
                 $q;
                 if (preg_match('/join_/', $condition['field']) != false) {
-                    $dict = str_replace('fk_', ' ', (($DB->query('Describe `' . $condition['field'] . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
+                    $dict = str_replace('fk_', '', (($DB->query('Describe `' . $condition['field'] . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
                     $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
                     $q = $DB->prepare("SELECT " . $condition['field'] . ".id FROM " . $condition['field'] . " JOIN " . $dict . " ON " . $condition['field'] . ".fk_" . $dict . "=" . $dict . ".i WHERE " . $dict . "." . $dictColumnName . $operator . "?" . $terminator . ";");
                 } else {
