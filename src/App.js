@@ -155,6 +155,7 @@ function App({ fields }) {
 				</fieldset>
 				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
+			{response}
 			{(noresponse && <br />) || (nodata && "No matching records found") || (<DataGrid autoHeight={true} rows={rows} columns={columns} />)}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >

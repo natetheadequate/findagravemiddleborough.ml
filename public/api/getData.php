@@ -15,7 +15,7 @@ while ($fieldraw = ($fieldsraw->fetch_array())) {
 try {
     $req = json_decode(file_get_contents('php://input'), true);
 } catch (Exception $e) {
-    echo "Error: Malformed Request";
+    echo "Error: Malformed Request - Request should be sent via POST";
     exit;
 }
 if (!isset($req['select'])) {
@@ -123,7 +123,7 @@ if (isset($req['conditions'])) {
     }
 }
 if ($ids === []) {
-    echo json_encode([]);
+    echo "No matching records.";
     exit;
 }
 $results = [];
