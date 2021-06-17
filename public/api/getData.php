@@ -79,18 +79,18 @@ if (isset($req['conditions'])) {
         foreach ($req['conditions'] as $condition) {
             if (validCondition($condition, $fields) && $ids !== []) {
                 $operator = '=';
-                $terminator = '';
                 switch ($condition['operator']) {
                     case '%LIKE%':
-                        $operator = ' LIKE %';
-                        $terminator = '%';
+                        $operator = ' LIKE ';
+                        $condition['query'] = '%'.$condition['query'].'%';
                         break;
                     case '%LIKE':
-                        $operator = ' LIKE %';
+                        $operator = ' LIKE ';
+                        $condition['query'] = '%'.$condition['query'];
                         break;
                     case 'LIKE%':
                         $operator = ' LIKE ';
-                        $terminator = '%';
+                        $condition['query'] = $condition['query'].'%';
                         break;
                     case '>':
                     case '<':
@@ -102,9 +102,9 @@ if (isset($req['conditions'])) {
                 if (preg_match('/join_/', $condition['field']) != false) {
                     $dict = str_replace('fk_', '', (($DB->query('Describe `' . $condition['field'] . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
                     $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
-                    $q = $DB->prepare("SELECT " . $condition['field'] . ".id FROM " . $condition['field'] . " JOIN " . $dict . " ON " . $condition['field'] . ".fk_" . $dict . "=" . $dict . ".i WHERE " . $dict . "." . $dictColumnName . $operator . "?" . $terminator . ";");
+                    $q = $DB->prepare("SELECT " . $condition['field'] . ".id FROM " . $condition['field'] . " JOIN " . $dict . " ON " . $condition['field'] . ".fk_" . $dict . "=" . $dict . ".i WHERE " . $dict . "." . $dictColumnName . $operator . "?" . ";");
                 } else {
-                    $q = $DB->prepare("SELECT id FROM " . $condition['field'] . " WHERE " . $condition['field'] . $operator . "?" . $terminator . ";");
+                    $q = $DB->prepare("SELECT id FROM " . $condition['field'] . " WHERE " . $condition['field'] . $operator . "?" . ";");
                 }
                 $q->bind_param('s', $condition['query']);
                 $q->execute();
