@@ -71,15 +71,16 @@ function App({ fields }) {
 			})
 		}
 	} */
-	let responsearr=[];
-	let responsestr='';
-	try{
-		responsearr=JSON.parse(response);
-	}catch(e){
-		if(!(e instanceof SyntaxError)){
-			responsestr="There was an error retrieving the data.";
-		}else{
-			responsestr=response;
+	let responsearr = [];
+	let responsestr = '';
+	try {
+		responsearr = JSON.parse(response);
+		Object.values(responsearr).foreach
+	} catch (e) {
+		if (!(e instanceof SyntaxError)) {
+			responsestr = "There was an error parsing the data.";//this should never happen
+		} else {
+			responsestr = response;//these are the error messsages, like no results found and invalid query
 		}
 	}
 	async function submitForm() {
@@ -167,10 +168,17 @@ function App({ fields }) {
 				</fieldset>
 				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
-			{responsestr}
-			<JsonToTable json={responsearr}/>
-			{/* {(noresponse && <br />) || (nodata && "No matching records found") || (<DataGrid autoHeight={true} rows={rows} columns={columns} />)}
-			 */}<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
+			{responsestr ||
+				<table>
+					{fieldsToBeRetrieved.map(v => <tr>clean(v)</tr>)}
+					{Object.values(responsearr).map((record,i) => {
+						if(fieldsToBeRetrieved[i] in record) return <td>record[fieldsToBeRetrieved[i]]</td>;
+						return <td></td>
+					})
+					}
+				</table>
+			}
+			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org'>Friends of Middleborough Cemeteries</Button>
