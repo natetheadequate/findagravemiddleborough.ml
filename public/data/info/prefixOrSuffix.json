@@ -1,0 +1,10 @@
+{
+    "Dr.":"prefix",
+    "Jr.":"suffix",
+    "Hon. Judge":"prefix",
+    "Sr.":"suffix",
+    "Jr., DVM":"suffix",
+    "III":"suffix",
+    "Rev.":"prefix",
+    "Deacon":"prefix"
+}

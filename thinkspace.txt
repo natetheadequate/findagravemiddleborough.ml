@@ -3,7 +3,3 @@ MAKE SURE THAT BLANK OR NULLS ALWAYS MATCH
 Once you got a ton of records, need limits and pagination
 
 Export as csv/json option
-
-Match all, then check to see if it was matching a tag instead of a word in a record. This will keep it speedy.
-
-
