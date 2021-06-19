@@ -1,4 +1,4 @@
-import { FormControl, Button, InputLabel, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup } from "@material-ui/core";
+import { FormControl, Button, InputLabel, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody } from "@material-ui/core";
 import { JsonToTable } from "react-json-to-table";
 import { DataGrid } from '@material-ui/data-grid';
 import { FormatColorReset } from "@material-ui/icons";
@@ -170,17 +170,17 @@ function App({ fields }) {
 				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
 			{responsestr ||
-				<table>
-					<thead><tr>{fieldsToBeRetrieved.map(v => <th>{clean(v)}</th>)}</tr></thead>
-					<tbody>
+				<Table>
+					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
+					<TableBody>
 						{Object.values(responseobj).map((record, i) => (
-							<tr>{fieldsToBeRetrieved.map(field => {
-								if (field in record) return <td>{record[field].join('; ')}</td>;
-								return <td></td>
-							})}</tr>
+							<TableRow>{fieldsToBeRetrieved.map(field => {
+								if (field in record) return <TableCell>{record[field].join('; ')}</TableCell>;
+								return <TableCell></TableCell>
+							})}</TableRow>
 						))}
-					</tbody>
-				</table>
+					</TableBody>
+				</Table>
 			}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
