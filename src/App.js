@@ -73,13 +73,15 @@ function App({ fields }) {
 	} */
 	let responseobj = {};
 	let responsestr = '';
-	try {
-		responseobj = JSON.parse(response);
-	} catch (e) {
-		if (!(e instanceof SyntaxError)) {
-			responsestr = "There was an error parsing the data.";//this should never happen
-		} else {
-			responsestr = response;//these are the error messsages, like no results found and invalid query
+	if (response !== null) {
+		try {
+			responseobj = JSON.parse(response);
+		} catch (e) {
+			if (!(e instanceof SyntaxError)) {
+				responsestr = "There was an error parsing the data.";//this should never happen
+			} else {
+				responsestr = response;//these are the error messsages, like no results found and invalid query
+			}
 		}
 	}
 	async function submitForm() {
@@ -169,12 +171,15 @@ function App({ fields }) {
 			</form>
 			{responsestr ||
 				<table>
-					{fieldsToBeRetrieved.map(v => <tr>clean(v)</tr>)}
-					{Object.values(responseobj).map((record,i) => {
-						if(fieldsToBeRetrieved[i] in record) return <td>record[fieldsToBeRetrieved[i]]</td>;
-						return <td></td>
-					})
-					}
+					<thead><tr>{fieldsToBeRetrieved.map(v => <th>{clean(v)}</th>)}</tr></thead>
+					<tbody>
+						{Object.values(responseobj).map((record, i) => (
+							<tr>{fieldsToBeRetrieved.map(field => {
+								if (field in record) return <td>{record[field].join('; ')}</td>;
+								return <td></td>
+							})}</tr>
+						))}
+					</tbody>
 				</table>
 			}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
