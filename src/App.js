@@ -76,7 +76,7 @@ function App({ fields }) {
 	try{
 		responsearr=JSON.parse(response);
 	}catch(e){
-		if(!e.instanceOf(SyntaxError)){
+		if(!(e instanceof SyntaxError)){
 			responsestr="There was an error retrieving the data.";
 		}else{
 			responsestr=response;
