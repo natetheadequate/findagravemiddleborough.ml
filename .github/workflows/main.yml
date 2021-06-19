@@ -3,15 +3,30 @@ on:
   push:
     branches: 
       - main
-name: Publish Website
+name: Publich Website
 jobs:
   FTP-Deploy-Action:
     name: FTP-Deploy-Action
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2.1.0
+    - uses: actions/checkout@v2
       with:
         fetch-depth: 2
+  
+    - name: Use Node.js 16.0
+      uses: actions/setup-node@v1
+      with:
+        node-version: '16'
+        
+    - name: Build Project
+      run: |
+        npm install
+        CI=false
+        npm run build
+  
+    - name: List output files
+      run: find build/ -print
+
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
@@ -19,3 +34,4 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /htdocs/
+        local-dir: build/
