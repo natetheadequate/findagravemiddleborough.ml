@@ -75,7 +75,6 @@ function App({ fields }) {
 	let responsestr = '';
 	try {
 		responsearr = JSON.parse(response);
-		Object.values(responsearr).foreach
 	} catch (e) {
 		if (!(e instanceof SyntaxError)) {
 			responsestr = "There was an error parsing the data.";//this should never happen
