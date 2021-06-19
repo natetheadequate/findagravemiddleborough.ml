@@ -1,6 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-include 'DB.php';
+include './DB.php';
 $tables = []; //any valid table in the database
 $tablesraw = ($DB->query("SHOW TABLES"));
 while ($tableraw = ($tablesraw->fetch_array())) {
