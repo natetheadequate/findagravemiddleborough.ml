@@ -71,10 +71,10 @@ function App({ fields }) {
 			})
 		}
 	} */
-	let responsearr = [];
+	let responseobj = {};
 	let responsestr = '';
 	try {
-		responsearr = JSON.parse(response);
+		responseobj = JSON.parse(response);
 	} catch (e) {
 		if (!(e instanceof SyntaxError)) {
 			responsestr = "There was an error parsing the data.";//this should never happen
@@ -170,7 +170,7 @@ function App({ fields }) {
 			{responsestr ||
 				<table>
 					{fieldsToBeRetrieved.map(v => <tr>clean(v)</tr>)}
-					{Object.values(responsearr).map((record,i) => {
+					{Object.values(responseobj).map((record,i) => {
 						if(fieldsToBeRetrieved[i] in record) return <td>record[fieldsToBeRetrieved[i]]</td>;
 						return <td></td>
 					})
