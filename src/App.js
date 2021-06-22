@@ -1,9 +1,4 @@
-import { FormControl, Button, InputLabel, MenuItem, Select, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody } from "@material-ui/core";
-import { JsonToTable } from "react-json-to-table";
-import { DataGrid } from '@material-ui/data-grid';
-import { FormatColorReset } from "@material-ui/icons";
-import TrendingDown from "@material-ui/icons/TrendingDown";
-import TrendingUp from "@material-ui/icons/TrendingUp";
+import { FormControl, Button, InputLabel, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import React, { useReducer, useState } from "react";
 import OperatorSelect from "./OperatorSelect";
