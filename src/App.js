@@ -1,4 +1,4 @@
-import { FormControl, Button, InputLabel, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody } from "@material-ui/core";
+import { FormControl, Button, InputLabel, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody, Tabs, Tab } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import React, { useReducer, useState } from "react";
 import OperatorSelect from "./OperatorSelect";
@@ -42,30 +42,7 @@ function App({ fields }) {
 	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
 	const spacing = "5px";
 	const [response, setResponse] = useState(null);
-	/* let noresponse = true;
-	let nodata = false;
-	let rows;
-	let columns;
-	if (response !== null) {
-		noresponse = false;
-		if (!Array.isArray(response) || response === []) {
-			nodata = true;
-		} else {
-			rows = response;
-			let rawcols = [];
-			response.forEach(obj => {
-				Object.keys(obj).forEach(key => {
-					if (!rawcols.includes(key)) {
-						rawcols.push(key);
-					}
-				})
-			});
-			columns = [];
-			rawcols.forEach(rawcol => {
-				columns.push({ field: rawcol, headerName: clean(rawcol) });
-			})
-		}
-	} */
+	const [resultFormat, setResultFormat] = useState("table");
 	let responseobj = {};
 	let responsestr = '';
 	if (response !== null) {
@@ -164,7 +141,11 @@ function App({ fields }) {
 				</fieldset>
 				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
-			{responsestr ||
+			<Tabs value={resultFormat} onChange={(e,n)=>setResultFormat(n)}>
+				<Tab label="Table" value="table" />
+				<Tab label="JSON" value="json"/>
+			</Tabs>
+			{responsestr || ((resultFormat==="table") && (
 				<Table>
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
@@ -176,6 +157,9 @@ function App({ fields }) {
 						))}
 					</TableBody>
 				</Table>
+			)) || ((resultFormat==="json") &&
+				JSON.stringify(responseobj)
+			)
 			}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
