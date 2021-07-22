@@ -26,7 +26,7 @@ const clean = (str) => {
 	return titleCase((' ' + str).replace('join_', '').replaceAll('_', ' '))
 }
 
-function App({ fields, edit=false }) {
+function App({ fields, edit = false }) {
 	const fieldNames = fields.map(v => v.name);
 	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(fieldNames);
 	const [sortBy, setSortBy] = useState('join_last_name');
@@ -69,7 +69,7 @@ function App({ fields, edit=false }) {
 	}
 	return (
 		<>
-			<Typography variant="h2" align="center" component="h1">{edit?'Edit':'Search'} the Database of Friends of Middleborough Cemeteries</Typography>
+			<Typography variant="h2" align="center" component="h1">{edit ? 'Edit' : 'Search'} the Database of Friends of Middleborough Cemeteries</Typography>
 			<form onSubmit={(e) => e.preventDefault()} style={{ margin: '10px' }}>
 				<FormControl>
 					<Autocomplete
@@ -141,27 +141,32 @@ function App({ fields, edit=false }) {
 				</fieldset>
 				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
 			</form>
-			<Tabs value={resultFormat} onChange={(e,n)=>setResultFormat(n)}>
+			<Tabs value={resultFormat} onChange={(e, n) => setResultFormat(n)}>
 				<Tab label="Table" value="table" />
-				<Tab label="JSON" value="json"/>
+				<Tab label="JSON" value="json" />
 			</Tabs>
-			{responsestr || ((resultFormat==="table") && (
+			{responsestr || ((resultFormat === "table") && (
 				<Table>
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
 						{Object.values(responseobj).map((record, i) => (
 							<TableRow>
-								{edit && <TableCell><a href={'/api/edit.php?i='+i}>Edit</a></TableCell>}
 								{fieldsToBeRetrieved.map(field => {
-								if (field in record) return <TableCell>{record[field].join('; ')}</TableCell>;
-								return <TableCell></TableCell>
-							})}</TableRow>
+									if (field in record) {
+										return (<TableCell>
+											{edit && <a href={'/edit.php?i=' + i + '&field=' + field}>Edit</a>}
+											{record[field].join('; ')}
+										</TableCell>);
+									} else {
+										return <TableCell></TableCell>
+									}
+								})}</TableRow>
 						))}
 					</TableBody>
 				</Table>
-			)) || ((resultFormat==="json") &&
+			)) || ((resultFormat === "json") &&
 				JSON.stringify(responseobj)
-			)
+				)
 			}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
