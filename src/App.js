@@ -26,7 +26,7 @@ const clean = (str) => {
 	return titleCase((' ' + str).replace('join_', '').replaceAll('_', ' '))
 }
 
-function App({ fields }) {
+function App({ fields, edit=false }) {
 	const fieldNames = fields.map(v => v.name);
 	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(fieldNames);
 	const [sortBy, setSortBy] = useState('join_last_name');
@@ -69,7 +69,7 @@ function App({ fields }) {
 	}
 	return (
 		<>
-			<Typography variant="h2" align="center" component="h1">Search the Database of Friends of Middleborough Cemeteries</Typography>
+			<Typography variant="h2" align="center" component="h1">{edit?'Edit':'Search'} the Database of Friends of Middleborough Cemeteries</Typography>
 			<form onSubmit={(e) => e.preventDefault()} style={{ margin: '10px' }}>
 				<FormControl>
 					<Autocomplete
@@ -150,7 +150,9 @@ function App({ fields }) {
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
 						{Object.values(responseobj).map((record, i) => (
-							<TableRow>{fieldsToBeRetrieved.map(field => {
+							<TableRow>
+								{edit && <TableCell><a href={'/api/edit.php?i='+i}>Edit</a></TableCell>}
+								{fieldsToBeRetrieved.map(field => {
 								if (field in record) return <TableCell>{record[field].join('; ')}</TableCell>;
 								return <TableCell></TableCell>
 							})}</TableRow>
