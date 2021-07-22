@@ -1,4 +1,13 @@
 <?php
+/* 
+Pass via POST:
+  select:  (optional) a list of fields that you want to select (first_name,last_name, etc). Defaults to all
+  conditions: (optional) an array to filter results
+    field: the field you are searching
+    operator: (optional) defaults to "=". Can also be <,>,>=,<=,%LIKE%,LIKE%, and %LIKE
+    query: the search value
+  
+*/
 header("Access-Control-Allow-Origin: *");
 include '../DB.php';
 $tables = []; //any valid table in the database
@@ -19,8 +28,7 @@ try {
     exit;
 }
 if (!isset($req['select'])) {
-    echo "Error: No Fields Selected";
-    exit;
+    $req['select']=$fields;
 }
 if (!is_array($req['select'])) {
     if (!is_string(($req['select']))) {
