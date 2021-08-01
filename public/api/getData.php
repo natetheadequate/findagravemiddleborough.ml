@@ -1,8 +1,8 @@
 <?php
 /* 
 Pass via POST:
-  select:  (optional) a list of fields that you want to select (first_name,last_name, etc). Defaults to all
-  conditions: (optional) an array to filter results
+  select:  (optional) an array of fields that you want to select (first_name,last_name, etc). Defaults to all.
+  conditions: (optional) an object to filter results
     field: the field you are searching
     operator: (optional) defaults to "=". Can also be <,>,>=,<=,%LIKE%,LIKE%, and %LIKE
     query: the search value
