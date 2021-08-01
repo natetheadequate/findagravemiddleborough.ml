@@ -1,4 +1,16 @@
 <?php
+<<<<<<< HEAD
+=======
+/* 
+Pass via POST:
+  select:  (optional) an array of fields that you want to select (first_name,last_name, etc). Defaults to all.
+  conditions: (optional) an object to filter results
+    field: the field you are searching
+    operator: (optional) defaults to "=". Can also be <,>,>=,<=,%LIKE%,LIKE%, and %LIKE
+    query: the search value
+  
+*/
+>>>>>>> 4285d31 (clarifying comments)
 header("Access-Control-Allow-Origin: *");
 include '../DB.php';
 $tables = []; //any valid table in the database
