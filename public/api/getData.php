@@ -142,7 +142,7 @@ foreach ($req['select'] as $col) {
         $dict = str_replace('fk_', '', (($DB->query('Describe `' . $col . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
         $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
         $q = "SELECT * FROM " . $col . " JOIN " . $dict . " ON " . $col . ".fk_" . $dict . "=" . $dict . ".i";
-        if (is_null($ids)) {
+        if (is_null($ids)) {//returning all records
             $d = $DB->query($q . ';');
         } else {
             $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");

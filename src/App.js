@@ -147,15 +147,15 @@ function App({ fields, edit = false }) {
 			</Tabs>
 			{responsestr || ((resultFormat === "table") && (
 				<Table>
+					<p>Click on the data to edit it.</p>
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
-						{Object.values(responseobj).map((record, i) => (
+						{Object.values(responseobj).map(record => (
 							<TableRow>
 								{fieldsToBeRetrieved.map(field => {
 									if (field in record) {
 										return (<TableCell>
-											{edit && <a href={'/edit.php?i=' + i + '&field=' + field}>Edit</a>}
-											{record[field].join('; ')}
+											{edit && <a href={'/edit.php?id=' + record['id'] + '&field=' + field}>record[field].join('; ')</a>}
 										</TableCell>);
 									} else {
 										return <TableCell></TableCell>
