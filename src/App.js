@@ -34,20 +34,21 @@ function App({ fields, edit = false }) {
 	const [conditions, dispatchConditions] = useReducer((state, action) => {
 		switch (action.type) {
 			case 'delete':
-				let x = { ...state };
-				delete x[action.payload.i];
-				return x
+				document.activeElement.blur(); 
+				/* that line causes a ForwardRef error, but its necessary to keep the next autocomplete from getting focus.
+				If I didn't have it, the next autocomplete would be cleared and focused when you delete the one before it.
+				I don't give the autocompletes any permanance, they rerender every time one is deleted and have no id or key.
+				*/
+				return state.filter((v,i)=>i!==action.payload.i);
 			case 'edit':
-				return { ...state, [action.payload.i]: { ...state[action.payload.i], [action.payload.key]: action.payload.newValue } }
+				let x=[...state];
+				x.splice(action.payload.i,1,{ ...state[action.payload.i], [action.payload.key]: action.payload.newValue });
+				return x;
 			case 'add':
-				let i = 0;
-				if (Object.keys(state).length !== 0) {
-					i = +Object.keys(state).sort((a, b) => +b - +a)[0] + 1
-				}
-				return { ...state, [i]: { field: 'join_last_name', operator: '=', query: '' } }
-			default:
+				return [ ...state, { field: 'join_last_name', operator: '=', query: '' } ]
+			default://okay FINE! if it makes you happy eslint 
 		}
-	}, {})
+	}, [])
 	const spacing = "5px";
 	const [response, setResponse] = useState(null);
 	const [resultFormat, setResultFormat] = useState("table");
@@ -104,15 +105,12 @@ function App({ fields, edit = false }) {
 				<fieldset style={{ marginTop: spacing }}>
 					<legend>Filter</legend>
 					<div>
-						{Object.keys(conditions).map(i => {
+						{conditions.map((v,i) => {
 							return (
 								<FormGroup row={true} style={{ margin: "10px 0px" }}>
-									<InputLabel style={{ margin: 'auto 5px' }}>Condition {i}:</InputLabel>
 									<FormControl>
 										<Autocomplete
 											style={{ width: '300px' }}
-											id={'condition' + i + 'field'}
-											onKeyDown={'condition' + i + 'field'}
 											options={fieldNames}
 											getOptionLabel={clean}
 											value={conditions[i]['field']}
