@@ -147,7 +147,7 @@ function App({ fields, edit = false }) {
 			</Tabs>
 			{responsestr || ((resultFormat === "table") && (
 				<Table>
-					<p>Click on the data to edit it.</p>
+					{edit && <p>Click on the data to edit it.</p>}
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
 						{Object.values(responseobj).map(record => (
