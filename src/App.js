@@ -33,13 +33,21 @@ function App({ fields, edit = false }) {
 	const [sortOrder, setSortOrder] = useState('ASC');
 	const [conditions, dispatchConditions] = useReducer((state, action) => {
 		switch (action.type) {
+			case 'delete':
+				let x = { ...state };
+				delete x[action.payload.i];
+				return x
 			case 'edit':
 				return { ...state, [action.payload.i]: { ...state[action.payload.i], [action.payload.key]: action.payload.newValue } }
 			case 'add':
-				return { ...state, [+Object.keys(state).sort((a, b) => b - a)[0] + 1]: { field: 'join_last_name', operator: '=', query: '' } }
+				let i = 0;
+				if (Object.keys(state).length !== 0) {
+					i = +Object.keys(state).sort((a, b) => +b - +a)[0] + 1
+				}
+				return { ...state, [i]: { field: 'join_last_name', operator: '=', query: '' } }
 			default:
 		}
-	}, { 0: { field: 'join_last_name', operator: '=', query: '' } })
+	}, {})
 	const spacing = "5px";
 	const [response, setResponse] = useState(null);
 	const [resultFormat, setResultFormat] = useState("table");
@@ -70,8 +78,8 @@ function App({ fields, edit = false }) {
 	return (
 		<>
 			<Typography variant="h2" align="center" component="h1">{edit ? 'Edit' : 'Search'} the Database of Friends of Middleborough Cemeteries</Typography>
-			{!edit && <Button style={{position:'absolute',top:0,right:0,color:"blue"}} href="/edit">Admin</Button> }
-			{edit && <Button style={{position:'absolute',top:0,right:0,color:"blue"}} href="/">View-Only</Button> }
+			{!edit && <Button style={{ position: 'absolute', top: 0, right: 0, color: "blue" }} href="/edit">Admin</Button>}
+			{edit && <Button style={{ position: 'absolute', top: 0, right: 0, color: "blue" }} href="/">View-Only</Button>}
 			<form onSubmit={(e) => e.preventDefault()} style={{ margin: '10px' }}>
 				<FormControl>
 					<Autocomplete
@@ -96,10 +104,10 @@ function App({ fields, edit = false }) {
 				<fieldset style={{ marginTop: spacing }}>
 					<legend>Filter</legend>
 					<div>
-						{Object.entries(conditions).map(([i]) => {
+						{Object.keys(conditions).map(i => {
 							return (
 								<FormGroup row={true} style={{ margin: "10px 0px" }}>
-									<InputLabel style={{ margin: 'auto 5px' }}>Condition {+i + 1}:</InputLabel>
+									<InputLabel style={{ margin: 'auto 5px' }}>Condition {i}:</InputLabel>
 									<FormControl>
 										<Autocomplete
 											style={{ width: '300px' }}
@@ -108,7 +116,13 @@ function App({ fields, edit = false }) {
 											options={fieldNames}
 											getOptionLabel={clean}
 											value={conditions[i]['field']}
-											onChange={(e, v) => dispatchConditions({ type: 'edit', payload: { i, key: 'field', newValue: v } })}
+											onChange={(e, v, eventType) => {
+												switch (eventType) {
+													case "clear": dispatchConditions({ type: 'delete', payload: { i } }); break;
+													default: dispatchConditions({ type: 'edit', payload: { i, key: 'field', newValue: v } })
+												}
+											}
+											}
 											renderInput={(v) =>
 												<TextField
 													{...v}
