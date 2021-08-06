@@ -70,7 +70,8 @@ function App({ fields, edit = false }) {
 	return (
 		<>
 			<Typography variant="h2" align="center" component="h1">{edit ? 'Edit' : 'Search'} the Database of Friends of Middleborough Cemeteries</Typography>
-			<Button style={{position:'absolute',top:0,right:0}} href="/edit">Admin</Button>
+			{!edit && <Button style={{position:'absolute',top:0,right:0,color:"blue"}} href="/edit">Admin</Button> }
+			{edit && <Button style={{position:'absolute',top:0,right:0,color:"blue"}} href="/">View-Only</Button> }
 			<form onSubmit={(e) => e.preventDefault()} style={{ margin: '10px' }}>
 				<FormControl>
 					<Autocomplete
@@ -146,9 +147,9 @@ function App({ fields, edit = false }) {
 				<Tab label="Table" value="table" />
 				<Tab label="JSON" value="json" />
 			</Tabs>
-			{responsestr || ((resultFormat === "table") && (
+			{responsestr || ((resultFormat === "table") && (<>
+				{edit && <p>Click on the data to edit it.</p>}
 				<Table>
-					{edit && <p>Click on the data to edit it.</p>}
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
 						{Object.values(responseobj).map(record => (
@@ -165,7 +166,7 @@ function App({ fields, edit = false }) {
 						))}
 					</TableBody>
 				</Table>
-			)) || ((resultFormat === "json") &&
+			</>)) || ((resultFormat === "json") &&
 				JSON.stringify(responseobj)
 				)
 			}
