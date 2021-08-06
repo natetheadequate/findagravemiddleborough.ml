@@ -34,7 +34,7 @@ if (isset($_GET['id'])) {
 				select: <?php echo '"' . $_GET['field'] . '"' ?>,
 				conditions: {
 					field: "id",
-					query: <?php echo '"' . $_GET['i'] . '"' ?>
+					query: <?php echo '"' . $_GET['id'] . '"' ?>
 				}
 			}
 			await fetch('/api/getData.php', {
