@@ -1,4 +1,13 @@
 <?php
+/* 
+Pass via POST:
+  select:  (optional) an array of fields that you want to select (first_name,last_name, etc). Defaults to all.
+  conditions: (optional) an object to filter results
+    field: the field you are searching
+    operator: (optional) defaults to "=". Can also be <,>,>=,<=,%LIKE%,LIKE%, and %LIKE
+    query: the search value
+  
+*/
 header("Access-Control-Allow-Origin: *");
 include '../DB.php';
 $tables = []; //any valid table in the database
@@ -19,8 +28,7 @@ try {
     exit;
 }
 if (!isset($req['select'])) {
-    echo "Error: No Fields Selected";
-    exit;
+    $req['select']=$fields;
 }
 if (!is_array($req['select'])) {
     if (!is_string(($req['select']))) {
@@ -134,7 +142,7 @@ foreach ($req['select'] as $col) {
         $dict = str_replace('fk_', '', (($DB->query('Describe `' . $col . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
         $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
         $q = "SELECT * FROM " . $col . " JOIN " . $dict . " ON " . $col . ".fk_" . $dict . "=" . $dict . ".i";
-        if (is_null($ids)) {
+        if (is_null($ids)) {//returning all records
             $d = $DB->query($q . ';');
         } else {
             $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
