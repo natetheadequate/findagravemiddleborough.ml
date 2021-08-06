@@ -26,7 +26,7 @@ if (isset($_GET['id'])) {
 
 		function displayData(data) {
 			const el = document.getElementById('form');
-			data.forEach(v => el.append('<input type="text name="values" />').value = v);
+			Object.values(data).forEach(v => el.append('<input type="text name="values" />').value = v);
 			el.append('<button onclick="addValue()">Add Value</button>');
 		}
 		async function getData() {
