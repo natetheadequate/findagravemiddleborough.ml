@@ -173,7 +173,7 @@ function App({ fields, edit = false }) {
 											{!edit && record[field].join('; ')}
 										</TableCell>);
 									} else {
-										return <TableCell></TableCell>
+										return <TableCell>{edit && <a href={'/api/edit.php?id=' + record['id'] + '&field=' + field}>[<i>Blank</i>]</a>}</TableCell>
 									}
 								})}</TableRow>
 						))}
