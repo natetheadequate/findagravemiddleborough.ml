@@ -3,7 +3,7 @@
 It comes with GETS with the i and field of the data that was clicked on. 
 Also, when the form with the changes is submitted, it goes to an action page that then redirects back here with gets successful=true|timeout|password|false with a possible timeout get of the amount of seconds until another attempt should be tried (only if successful is timeout or password(because a failed password attempt locks password attempts for an increasing amount of time)) as well as an i and field */
 if (isset($_GET['id'])) {
-	if (is_integer($_GET['id'])) {
+	if (is_integer($_GET['id']+0)) {
 		if (is_string($_GET['field'])) {
 		} else {
 			echo "field is not a string";
