@@ -70,6 +70,7 @@ function App({ fields, edit = false }) {
 	return (
 		<>
 			<Typography variant="h2" align="center" component="h1">{edit ? 'Edit' : 'Search'} the Database of Friends of Middleborough Cemeteries</Typography>
+			<Button style={{position:'absolute',top:0,right:0}} href="/edit">Admin</Button>
 			<form onSubmit={(e) => e.preventDefault()} style={{ margin: '10px' }}>
 				<FormControl>
 					<Autocomplete
