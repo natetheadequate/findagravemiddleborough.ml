@@ -1,6 +1,4 @@
 <?php
-<<<<<<< HEAD
-=======
 /* 
 Pass via POST:
   select:  (optional) an array of fields that you want to select (first_name,last_name, etc). Defaults to all.
@@ -10,7 +8,6 @@ Pass via POST:
     query: the search value
   
 */
->>>>>>> 4285d31 (clarifying comments)
 header("Access-Control-Allow-Origin: *");
 include '../DB.php';
 $tables = []; //any valid table in the database
