@@ -170,6 +170,7 @@ function App({ fields, edit = false }) {
 									if (field in record) {
 										return (<TableCell>
 											{edit && <a href={'/edit.php?id=' + record['id'] + '&field=' + field}>record[field].join('; ')</a>}
+											{!edit && record[field].join('; ')}
 										</TableCell>);
 									} else {
 										return <TableCell></TableCell>
