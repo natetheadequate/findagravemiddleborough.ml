@@ -139,6 +139,9 @@ if (isset($req['conditions'])) {
                 exit(1);
             }
         }
+    }else{
+        echo "Error: conditions must be an array";
+        exit(1);
     }
 }
 if ($ids === []) {
