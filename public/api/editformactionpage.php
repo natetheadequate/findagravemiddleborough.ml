@@ -10,7 +10,7 @@ if (!is_int($timeout) || !is_string($password)) {
     $successful = "false";
 } else {
     if (time() > $timeout) {
-        fwrite('../timeout.php', '<?php $timeout=' . (time() + 15));
+        file_put_contents('../timeout.php', '<?php $timeout=' . (time() + 15));
         if ($password === $_POST['password']) {
             include '../DB.php';
             if (isset($DB)) {
