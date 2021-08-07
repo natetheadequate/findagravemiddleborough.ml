@@ -153,7 +153,7 @@ if (!is_null($ids) || $idfilters !== []) {
     $wherestring .= " WHERE ";
     $wherearr = [];
     if (!is_null($ids)) {
-        array_push($wherearr, "`id` IN (" . implode(',', $ids));
+        array_push($wherearr, "`id` IN (" . implode(',', $ids) . ")");
     }
     foreach ($idfilters as $idfilter) {
         switch ($idfilter['operator']) { //if not set, warns and does default ("=")
