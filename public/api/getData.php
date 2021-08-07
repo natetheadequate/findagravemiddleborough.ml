@@ -167,7 +167,7 @@ if (!is_null($ids) || $idfilters !== []) {
     }
     $wherestring += implode(" AND ", $wherearr);
 };
-$results = (Object) [];
+$results = [];
 foreach ($req['select'] as $col) {
     $joinadjuster = 0;
     if (preg_match('/join_/', $col)) {
@@ -188,4 +188,4 @@ foreach ($req['select'] as $col) {
         }
     }
 }
-echo json_encode($results);
+echo json_encode((Object) $results);
