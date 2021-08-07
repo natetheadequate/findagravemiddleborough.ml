@@ -24,19 +24,23 @@ if (isset($_GET['id'])) {
 			document.getElementById('datafieldset').insertAdjacentHTML('beforeend', '<input type="text name="values" />');
 		}
 
-		function displayData(data) {
+		function displayData(rawdata) {
+			let data;
 			const root = document.getElementById('datafieldset');
-			const id = Object.keys(data)[0];
-			const field = Object.keys(data[id])[0];
-			if (id != <?php echo $_GET['id'] ?> || field != <?php echo $_GET['field'] ?>) {
-				document.write("Error");
+			try {
+				data = JSON.parse(rawdata);
+				const id = Object.keys(data)[0];
+				const field = Object.keys(data[id])[0];
+				data[key][field].forEach(v => {
+					let el = root.insertAdjacentElement('afterbegin', createElement('input'));
+					el.type = "text";
+					el.name = "values";
+					el.value = v;
+				})
+			} catch (e) {
+				root.innerHTML = '<p>' + rawdata + '</p>';
+				return;
 			}
-			data[key][field].forEach(v => {
-				let el = root.insertAdjacentElement('afterbegin', createElement('input'));
-				el.type = "text";
-				el.name = "values";
-				el.value = v;
-			})
 		}
 		async function getData() {
 			const body = {
