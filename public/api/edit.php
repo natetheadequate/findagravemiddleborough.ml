@@ -32,7 +32,7 @@ if (isset($_GET['id'])) {
 				const id = Object.keys(data)[0];
 				const field = Object.keys(data[id])[0];
 				data[id][field].forEach(v => {
-					let el = root.insertAdjacentElement('afterbegin', createElement('input'));
+					let el = root.insertAdjacentElement('afterbegin', document.createElement('input'));
 					el.type = "text";
 					el.name = "values";
 					el.value = v;
