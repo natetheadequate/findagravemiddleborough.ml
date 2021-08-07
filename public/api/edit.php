@@ -20,25 +20,33 @@ if (isset($_GET['id'])) {
 
 <head>
 	<script>
-		function addValue() {
-			document.getElementById('datafieldset').insertAdjacentHTML('beforeend', '<input type="text name="values" />');
+		function addValue(value = "") {
+			const root = document.getElementById('datafieldset');
+			let el = root.insertAdjacentElement('beforeend', document.createElement('input'));
+			el.type = "text";
+			el.name = "values";
+			el.minlength = "1";
+			el.value = value;
+			let deletebutton = root.insertAdjacentElement('beforeend', document.createElement('button'));
+			deletebutton.type = "button";
+			deletebutton.innerHTML = "❌"; //this is a red x emoji
+			deletebutton.onclick = () => el.remove();
+			root.insertAdjacentHTML('beforeend','<br />')
+
 		}
 
 		function displayData(rawdata) {
 			let data;
-			const root = document.getElementById('datafieldset');
 			try {
 				data = JSON.parse(rawdata);
 				const id = Object.keys(data)[0];
 				const field = Object.keys(data[id])[0];
-				data[id][field].forEach(v => {
-					let el = root.insertAdjacentElement('afterbegin', document.createElement('input'));
-					el.type = "text";
-					el.name = "values";
-					el.value = v;
+				data[id][field].forEach(v, i => {
+					addValue(i, v);
+					nexti++
 				})
 			} catch (e) {
-				root.innerHTML = '<p>' + rawdata + '</p>';
+				root.innerHTML = '<p>Error processing data</p><p>' + rawdata + '</p>';
 				return;
 			}
 		}
@@ -81,7 +89,6 @@ if (isset($_GET['id'])) {
 		echo "Try again in " . $_GET['timeout'] . " seconds";
 	} ?>
 	<form method="post" action="editformactionpage.php">
-		<p>Clear an input to be blank to have it be deleted</p>
 		<label>Password: <input name="password" type="password" required /></label>
 		<textarea name="field" hidden><?php echo $_GET['field'] ?></textarea>
 		<textarea name="id" hidden><?php echo $_GET['id'] ?></textarea>
