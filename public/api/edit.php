@@ -31,7 +31,7 @@ if (isset($_GET['id'])) {
 				data = JSON.parse(rawdata);
 				const id = Object.keys(data)[0];
 				const field = Object.keys(data[id])[0];
-				data[key][field].forEach(v => {
+				data[id][field].forEach(v => {
 					let el = root.insertAdjacentElement('afterbegin', createElement('input'));
 					el.type = "text";
 					el.name = "values";
