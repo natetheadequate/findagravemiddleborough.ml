@@ -50,7 +50,7 @@ if (isset($_GET['id'])) {
 					method: 'POST',
 					body: JSON.stringify(body)
 				})
-				.then(res => res.json())
+				.then(res => res.text())
 				.then(data => displayData(data));
 		}
 	</script>
@@ -76,7 +76,7 @@ if (isset($_GET['id'])) {
 	if (isset($_GET['timeout'])) {
 		echo "Try again in " . $_GET['timeout'] . " seconds";
 	} ?>
-	<form method="post" action="/editformactionpage.php">
+	<form method="post" action="editformactionpage.php">
 		<p>Clear an input to be blank to have it be deleted</p>
 		<label>Password: <input type="password" required /></label>
 		<textarea name="field" hidden><?php echo $_GET['field'] ?></textarea>
