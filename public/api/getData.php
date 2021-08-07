@@ -16,8 +16,8 @@ while ($tableraw = ($tablesraw->fetch_array())) {
     array_push($tables, $tableraw[0]);
 }
 $dbname = $DB->query("select Database()")->fetch_array()[0];
-$fields = []; //no dictionaries bc of the column name clause (dictionaries have i as their first column, not id)
-$fieldsraw = $DB->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME='id' AND TABLE_SCHEMA='" . $dbname . "';");
+$fields = [];
+$fieldsraw = $DB->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMN_NAME='id' AND TABLE_SCHEMA='" . $dbname . "';"); //column name clause excludes dictionaries, who have i as their first column, not id)
 while ($fieldraw = ($fieldsraw->fetch_array())) {
     array_push($fields, $fieldraw[0]);
 }
@@ -28,7 +28,7 @@ try {
     exit;
 }
 if (!isset($req['select'])) {
-    $req['select']=$fields;
+    $req['select'] = $fields;
 }
 if (!is_array($req['select'])) {
     if (!is_string(($req['select']))) {
@@ -70,18 +70,20 @@ if (!isset($req['sortOrder'])) {
 } */
 function validCondition($condition, $fields)
 {
+    //a field of id returns false, but thats okay, because ids are handled after the big condition loop
     if (!isset($condition['field'], $condition['query'], $condition['operator'])) {
         return false;
     }
     if (!in_array($condition['field'], $fields)) {
         return false;
     }
-    if (!is_string($condition['query']) && !is_array($condition['query'])) {
+    if (!is_string($condition['query'])) {
         return false;
     }
     return true;
 }
 $ids = null;
+$idfilters = [];
 if (isset($req['conditions'])) {
     if (is_iterable($req['conditions'])) {
         foreach ($req['conditions'] as $condition) {
@@ -90,15 +92,15 @@ if (isset($req['conditions'])) {
                 switch ($condition['operator']) {
                     case '%LIKE%':
                         $operator = ' LIKE ';
-                        $condition['query'] = '%'.$condition['query'].'%';
+                        $condition['query'] = '%' . $condition['query'] . '%';
                         break;
                     case '%LIKE':
                         $operator = ' LIKE ';
-                        $condition['query'] = '%'.$condition['query'];
+                        $condition['query'] = '%' . $condition['query'];
                         break;
                     case 'LIKE%':
                         $operator = ' LIKE ';
-                        $condition['query'] = $condition['query'].'%';
+                        $condition['query'] = $condition['query'] . '%';
                         break;
                     case '>':
                     case '<':
@@ -126,6 +128,15 @@ if (isset($req['conditions'])) {
                 } else {
                     $ids = array_intersect($ids, $newids);
                 }
+            } else if ($condition['field'] == 'id') {
+                if (isset($condition['query']) && is_int($condition['query'] + 0)) {
+                    array_push($idfilters, $condition);
+                } else {
+                    echo "Error with id filter: <hr />" . json_encode($condition);
+                }
+            } else {
+                echo "Error with condition:<hr />" . json_encode($condition);
+                exit(1);
             }
         }
     }
@@ -134,42 +145,45 @@ if ($ids === []) {
     echo "No matching records.";
     exit;
 }
+$wherestring = "";
+if (!is_null($ids) || $idfilters !== []) {
+    $wherestring += " WHERE ";
+    $wherearr = [];
+    if (!is_null($ids)) {
+        array_push($wherearr, "`id` IN (" . implode(',', $ids));
+    }
+    foreach ($idfilters as $idfilter) {
+        switch ($idfilter['operator']) { //if not set, warns and does default ("=")
+            case '>':
+            case '<':
+            case '>=':
+            case '<=':
+                $operator = $condition['operator'];
+                break;
+            default:
+                $operator = "=";
+        }
+        array_push($wherearr, '`id`' . $operator . ($idfilter['query'] + 0));
+    }
+    $wherestring += implode(" AND ", $wherearr);
+};
 $results = [];
 foreach ($req['select'] as $col) {
-    $d;
-    $q;
-    if (preg_match('/join_/', $col) != false) {
+    $joinadjuster = 0;
+    if (preg_match('/join_/', $col)) {
         $dict = str_replace('fk_', '', (($DB->query('Describe `' . $col . '`'))->fetch_all())[1][0]); //the fk column is fk_[dictionary]);
         $dictColumnName = ($DB->query('DESCRIBE ' . $dict)->fetch_all())[1][0];
         $q = "SELECT * FROM " . $col . " JOIN " . $dict . " ON " . $col . ".fk_" . $dict . "=" . $dict . ".i";
-        if (is_null($ids)) {//returning all records
-            $d = $DB->query($q . ';');
-        } else {
-            $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
-        }
-        
-        while ($datum = $d->fetch_array()) {
-            $results[$datum['id']]['id']=$datum['id'];
-            if (is_array($results[$datum['id']][$col])) {
-                array_push($results[$datum['id']][$col], $datum[3]);
-            } else {
-                $results[$datum['id']][$col] =[$datum[3]];
-            }
-        }
+        $joinadjuster = 2; //the result column we want is 3 instead of 1 with a join query
     } else {
-        $q = "SELECT * FROM " . $col;
-        if (is_null($ids)) {
-            $d = $DB->query($q . ';');
+        $q = "SELECT * FROM " . $col; //the table is named after the column for type:independent
+    }
+    $d = $DB->query($q . $wherestring . ';');
+    while ($datum = $d->fetch_array()) {
+        if (is_array($results[$datum['id']][$col])) {
+            array_push($results[$datum['id']][$col], $datum[1 + $joinadjuster]);
         } else {
-            $d = $DB->query($q . " WHERE `id` IN (" . implode(',', $ids) . ");");
-        }
-        while ($datum = $d->fetch_array()) {
-            $results[$datum['id']]['id']=$datum['id'];
-            if (is_array($results[$datum['id']][$col])) {
-                array_push($results[$datum['id']][$col], $datum[1]);
-            } else {
-                $results[$datum['id']][$col] = [$datum[1]];
-            }
+            $results[$datum['id']][$col] = [$datum[1 + $joinadjuster]];
         }
     }
 }

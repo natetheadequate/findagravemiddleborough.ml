@@ -21,13 +21,17 @@ if (isset($_GET['id'])) {
 <head>
 	<script>
 		function addValue() {
-			document.getElementById('form').append('<input type="text name="values" />');
+			document.getElementById('datafieldset').insertAdjacentHTML('beforeend','<input type="text name="values" />');
 		}
 
 		function displayData(data) {
-			const el = document.getElementById('form');
-			Object.values(data).forEach(v => el.append('<input type="text name="values" />').value = v);
-			el.append('<button onclick="addValue()">Add Value</button>');
+			const root = document.getElementById('datafieldset');
+			Object.keys(data[Object.keys(data)[0]])[0].forEach(v => {
+				let el=root.insertAdjacentElement('afterbegin',createElement('input'));
+				el.type="text";
+				el.name="values";
+				el.value=v;
+			})
 		}
 		async function getData() {
 			const body = {
@@ -41,7 +45,7 @@ if (isset($_GET['id'])) {
 					method: 'POST',
 					body: JSON.stringify(body)
 				})
-				.then(res => res.text())
+				.then(res => res.json())
 				.then(data => displayData(data));
 		}
 	</script>
@@ -72,7 +76,8 @@ if (isset($_GET['id'])) {
 		<label>Password: <input type="password" required/></label>
 		<textarea name="field" hidden><?php echo $_GET['field'] ?></textarea>
 		<textarea name="id" hidden><?php echo $_GET['id'] ?></textarea>
-		<fieldset id="form"></fieldset>
+		<fieldset id="datafieldset"></fieldset>
+		<button onclick="addValue()">Add Value</button>
 		<button type="submit">Submit</button>
 	</form>
 	<script>getData()</script>
