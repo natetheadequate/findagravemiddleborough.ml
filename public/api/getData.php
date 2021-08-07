@@ -180,11 +180,12 @@ foreach ($req['select'] as $col) {
     }
     $d = $DB->query($q . $wherestring . ';');
     while ($datum = $d->fetch_array()) {
-        if (is_array($results[$datum['id']][$col])) {//subsequent times, there are already at least one value for this id and field/col
-            array_push($results[$datum['id']][$col], $datum[1 + $joinadjuster]);
+        //im concatening a blank string to coerce the key into a string so an associative array is formed, and thus an object will be returned with keys being ids instead of an array of objects
+        if (is_array("".$results[$datum['id']][$col])) {//subsequent times, there are already at least one value for this id and field/col
+            array_push($results["".$datum['id']][$col], $datum[1 + $joinadjuster]);
         } else {//first time adding a value for this id and field/col
-            $results[$datum['id']][$col] = [$datum[1 + $joinadjuster]];
+            $results["".$datum['id']][$col] = [$datum[1 + $joinadjuster]];
         }
     }
 }
-echo json_encode($results,JSON_FORCE_OBJECT);
+echo json_encode($results);
