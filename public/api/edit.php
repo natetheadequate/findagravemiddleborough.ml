@@ -41,10 +41,10 @@ if (isset($_GET['id'])) {
 		async function getData() {
 			const body = {
 				select: <?php echo '"' . $_GET['field'] . '"' ?>,
-				conditions: {
+				conditions: [{
 					field: "id",
 					query: <?php echo '"' . $_GET['id'] . '"' ?>
-				}
+				}]
 			}
 			await fetch('/api/getData.php', {
 					method: 'POST',
