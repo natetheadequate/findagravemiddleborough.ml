@@ -150,7 +150,7 @@ if ($ids === []) {
 }
 $wherestring = "";
 if (!is_null($ids) || $idfilters !== []) {
-    $wherestring += " WHERE ";
+    $wherestring .= " WHERE ";
     $wherearr = [];
     if (!is_null($ids)) {
         array_push($wherearr, "`id` IN (" . implode(',', $ids));
@@ -168,7 +168,7 @@ if (!is_null($ids) || $idfilters !== []) {
         }
         array_push($wherearr, '`id`' . $operator . ($idfilter['query'] + 0));
     }
-    $wherestring += implode(" AND ", $wherearr);
+    $wherestring .= implode(" AND ", $wherearr);
 };
 $results = [];
 foreach ($req['select'] as $col) {
