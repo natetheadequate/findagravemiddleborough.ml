@@ -187,4 +187,4 @@ foreach ($req['select'] as $col) {
         }
     }
 }
-echo json_encode($results);
+echo json_encode($results,JSON_FORCE_OBJECT);
