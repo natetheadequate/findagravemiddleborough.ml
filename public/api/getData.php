@@ -180,9 +180,9 @@ foreach ($req['select'] as $col) {
     }
     $d = $DB->query($q . $wherestring . ';');
     while ($datum = $d->fetch_array()) {
-        if (is_array($results[$datum['id']][$col])) {
+        if (is_array($results[$datum['id']][$col])) {//subsequent times, there are already at least one value for this id and field/col
             array_push($results[$datum['id']][$col], $datum[1 + $joinadjuster]);
-        } else {
+        } else {//first time adding a value for this id and field/col
             $results[$datum['id']][$col] = [$datum[1 + $joinadjuster]];
         }
     }
