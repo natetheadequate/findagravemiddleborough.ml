@@ -164,16 +164,16 @@ function App({ fields, edit = false }) {
 				<Table>
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
-						{Object.values(responseobj).map(record => (
+						{Object.entries(responseobj).map(([id,record]) => (
 							<TableRow>
 								{fieldsToBeRetrieved.map(field => {
 									if (field in record) {
 										return (<TableCell>
-											{edit && <a href={'/api/edit.php?id=' + record['id'] + '&field=' + field}>{record[field].join('; ')}</a>}
+											{edit && <a href={'/api/edit.php?id=' + id + '&field=' + field}>{record[field].join('; ')}</a>}
 											{!edit && record[field].join('; ')}
 										</TableCell>);
 									} else {
-										return <TableCell>{edit && <a href={'/api/edit.php?id=' + record['id'] + '&field=' + field}>[<i>Blank</i>]</a>}</TableCell>
+										return <TableCell>{edit && <a href={'/api/edit.php?id=' + id + '&field=' + field}>[<i>Blank</i>]</a>}</TableCell>
 									}
 								})}</TableRow>
 						))}
