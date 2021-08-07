@@ -97,4 +97,4 @@ if (!is_int($timeout) || !is_string($password)) {
         $timeouturlstring = "&timeout=" . ($timeout - time());
     }
 }
-header('Location: edit.php?i=' . $_POST['id'] . "&field=" . $_POST['field'] . "&successful=" . $successful . $timeouturlstring);
+header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&successful=" . $successful . $timeouturlstring);
