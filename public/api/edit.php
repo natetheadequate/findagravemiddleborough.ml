@@ -5,7 +5,7 @@
 It comes with GETS with the i and field of the data that was clicked on. 
 Also, when the form with the changes is submitted, it goes to an action page that then redirects back here with gets successful=true|timeout|password|false with a possible timeout get of the amount of seconds until another attempt should be tried (only if successful is timeout or password(because a failed password attempt locks password attempts for an increasing amount of time)) as well as an i and field */
 if (isset($_GET['id'])) {
-	if (is_integer($_GET['id']+0)) {
+	if (is_integer($_GET['id'] + 0)) {
 		if (is_string($_GET['field'])) {
 		} else {
 			echo "field is not a string";
@@ -21,16 +21,21 @@ if (isset($_GET['id'])) {
 <head>
 	<script>
 		function addValue() {
-			document.getElementById('datafieldset').insertAdjacentHTML('beforeend','<input type="text name="values" />');
+			document.getElementById('datafieldset').insertAdjacentHTML('beforeend', '<input type="text name="values" />');
 		}
 
 		function displayData(data) {
 			const root = document.getElementById('datafieldset');
-			Object.keys(data[Object.keys(data)[0]])[0].forEach(v => {
-				let el=root.insertAdjacentElement('afterbegin',createElement('input'));
-				el.type="text";
-				el.name="values";
-				el.value=v;
+			const id = Object.keys(data)[0];
+			const field = Object.keys(data[id])[0];
+			if (id != <?php echo $_GET['id'] ?> || field != <?php echo $_GET['field'] ?>) {
+				document.write("Error");
+			}
+			data[key][field].forEach(v => {
+				let el = root.insertAdjacentElement('afterbegin', createElement('input'));
+				el.type = "text";
+				el.name = "values";
+				el.value = v;
 			})
 		}
 		async function getData() {
@@ -67,18 +72,20 @@ if (isset($_GET['id'])) {
 				echo "Error. Values in database are as shown below.";
 				break;
 		}
-	} 
-	if(isset($_GET['timeout'])){
-		echo "Try again in ".$_GET['timeout']." seconds";
-	}?>
+	}
+	if (isset($_GET['timeout'])) {
+		echo "Try again in " . $_GET['timeout'] . " seconds";
+	} ?>
 	<form method="post" action="/editformactionpage.php">
 		<p>Clear an input to be blank to have it be deleted</p>
-		<label>Password: <input type="password" required/></label>
+		<label>Password: <input type="password" required /></label>
 		<textarea name="field" hidden><?php echo $_GET['field'] ?></textarea>
 		<textarea name="id" hidden><?php echo $_GET['id'] ?></textarea>
 		<fieldset id="datafieldset"></fieldset>
 		<button onclick="addValue()">Add Value</button>
 		<button type="submit">Submit</button>
 	</form>
-	<script>getData()</script>
+	<script>
+		getData()
+	</script>
 </body>
