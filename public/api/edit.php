@@ -82,11 +82,11 @@ if (isset($_GET['id'])) {
 	} ?>
 	<form method="post" action="editformactionpage.php">
 		<p>Clear an input to be blank to have it be deleted</p>
-		<label>Password: <input type="password" required /></label>
+		<label>Password: <input name="password" type="password" required /></label>
 		<textarea name="field" hidden><?php echo $_GET['field'] ?></textarea>
 		<textarea name="id" hidden><?php echo $_GET['id'] ?></textarea>
 		<fieldset id="datafieldset"></fieldset>
-		<button onclick="addValue()">Add Value</button>
+		<button type="button" onclick="addValue()">Add Value</button>
 		<button type="submit">Submit</button>
 	</form>
 	<script>
