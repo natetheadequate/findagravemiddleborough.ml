@@ -44,8 +44,7 @@ if (isset($_GET['id'])) {
 				const field = Object.keys(data[id])[0];
 				data[id][field].forEach(v, i => {
 					addValue(i, v);
-					nexti++
-				})
+				});
 			} catch (e) {
 				root.innerHTML = '<p>Error processing data</p><p>' + rawdata + '</p>';
 				return;
