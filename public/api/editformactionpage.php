@@ -50,8 +50,8 @@ if (!is_int($timeout) || !is_string($password)) {
                                     //DONT DELETE FROM THE DICTIONARY EVER--- there might be other tables using the dictionary. better safe than sorry.
                                     $dictColumn = null;
                                     foreach ($dataTables as $possibleDictionary) {
-                                        if ($possibleDictionary['type'] === 'dictionary' && $possibleDictionary['name'] === $dataTable->dictionary) {
-                                            $dictColumn = $possibleDictionary['columnName'];
+                                        if ($possibleDictionary->type === 'dictionary' && $possibleDictionary->name === $dataTable->dictionary) {
+                                            $dictColumn = $possibleDictionary->columnName;
                                         }
                                     }
                                     foreach ($_POST['values'] as $value) {
