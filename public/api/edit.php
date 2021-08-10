@@ -37,6 +37,7 @@ if (isset($_GET['id'])) {
 
 		function displayData(rawdata) {
 			let data;
+			const root = document.getElementById('datafieldset');
 			try {
 				data = JSON.parse(rawdata);
 				const id = Object.keys(data)[0];
