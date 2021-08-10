@@ -42,8 +42,8 @@ if (isset($_GET['id'])) {
 				data = JSON.parse(rawdata);
 				const id = Object.keys(data)[0];
 				const field = Object.keys(data[id])[0];
-				data[id][field].forEach((v, i) => {
-					addValue(i, v);
+				data[id][field].forEach(v => {
+					addValue(v);
 				});
 			} catch (e) {
 				root.innerHTML = '<p>Error processing data</p><p>' + rawdata + '</p>';
