@@ -47,6 +47,7 @@ if (isset($_GET['id'])) {
 				});
 			} catch (e) {
 				root.innerHTML = '<p>Error processing data</p><p>' + rawdata + '</p>';
+				console.log(e)
 				return;
 			}
 		}
