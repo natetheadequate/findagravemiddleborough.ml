@@ -5,7 +5,7 @@ if (!isset($_POST['field'], $_POST['id'], $_POST['values'], $_POST['password']))
     echo "Error. Password, field or record was not provided";
     exit(1);
 }
-$problem="none";
+$problem = "none";
 try {
     try {
         include '../password.php';
@@ -49,9 +49,11 @@ try {
                     
                 */
                 if (is_array($dataTables)) {
+                    $found = false;
                     foreach ($dataTables as $dataTable) {
-                        if (is_object($dataTable) && property_exists($dataTable, "name") && property_exists($dataTable, "type"))
+                        if (is_object($dataTable) && property_exists($dataTable, "name") && property_exists($dataTable, "type")) {
                             if ($_POST['field'] === $dataTable->name || ("join_" . $_POST['field']) === $dataTable->name) {
+                                $found = true;
                                 if (!is_array($_POST['values'])) {
                                     $_POST['values'] = [$_POST['values']];
                                 };
@@ -95,12 +97,10 @@ try {
                                                 } else {
                                                     $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . $d[0][1] . ');';
                                                 }
-                                                $good=$DB->query($sql);
-                                                if($good===false){
+                                                if ($DB->query($sql) === false) {
                                                     throw new Exception("final sql failed");
                                                 }
                                                 file_put_contents('../manualeditlog.txt', $sql, FILE_APPEND);
-                                                $successful=true;
                                             } else {
                                                 throw new Exception("Failure in getting i from dictionary");
                                             }
@@ -110,6 +110,10 @@ try {
                                         throw new Exception("type property not set for $ dataTable :" . $dataTable);
                                 }
                             }
+                        }
+                    }
+                    if (!$found) {
+                        throw new Exception("field not found in $ datatables");
                     }
                 } else {
                     throw new Exception("../data/info/dataTables.json doesn't return valid json");
@@ -118,12 +122,12 @@ try {
                 throw new Exception("DB.php doesn't set $ DB variable");
             }
         } else {
-            throw new Exception("password",2);
+            throw new Exception("password", 2);
         }
     } else {
-        throw new Exception($timeout - time(),1);
+        throw new Exception($timeout - time(), 1);
     }
 } catch (Exception $e) {
-    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&error=" . $e->getCode()===1?"timeout&timeout=".$e->getMessage():$e->getMessage());
+    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&error=" . $e->getCode() === 1 ? "timeout&timeout=" . $e->getMessage() : $e->getMessage());
 }
 header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
