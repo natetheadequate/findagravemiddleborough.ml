@@ -70,21 +70,20 @@ if (isset($_GET['id'])) {
 </head>
 
 <body>
-	<?php if (isset($_GET['successful'])) {
-		switch ($_GET['successful']) {
-			case "true":
-				echo "Data modified to values shown below. ";
-				break;
+	<?php if (isset($_GET['error'])) {
+		switch ($_GET['error']) {
 			case "password":
 				echo "Password was wrong. ";
 				break;
 			case "timeout":
 				echo "Timeout error. ";
 				break;
-			case "false":
+			default:
 				echo "Error. Values in database are as shown below.";
 				break;
 		}
+	}else{
+		echo "Data modified to values shown below";
 	}
 	if (isset($_GET['timeout'])) {
 		echo "Try again in " . $_GET['timeout'] . " seconds";
