@@ -1,20 +1,42 @@
 <?php
+/*this is dealt with first because in this case, I don't know where to even redirect the error message to. 
+Nobody coming from edit.php should get this message */
 if (!isset($_POST['field'], $_POST['id'], $_POST['values'], $_POST['password'])) {
     echo "Error. Password, field or record was not provided";
     exit(1);
 }
-include '../password.php';
-include '../timeout.php';
-$timeouturlstring = "";
-if (!is_int($timeout) || !is_string($password)) {
-    $successful = "false";
-} else {
-    if (time() > $timeout) {
-        file_put_contents('../timeout.php', '<?php $timeout=' . (time() + 15).';');
+$successful = "false";
+try {
+    try {
+        include '../password.php';
+    } catch (Error $e) {
+        throw new Exception("../password.php not on server");
+    }
+    try {
+        include '../timeout.php';
+    } catch (Error $e) {
+        throw new Exception("../timeout.php not on server");
+    }
+    if (!is_int($timeout)) {
+        throw new Exception("timeout is not int, timeout is: " . $timeout);
+    }
+    if (!is_string($password)) {
+        throw new Exception("password is not string, password is: " . $password);
+    }
+    if (time() > $timeout) { //check for timeout first, so that a person can't spam false passwords and know they are bad by a password error message
+        file_put_contents('../timeout.php', '<?php $timeout=' . (time() + 15) . ';');
         if ($password === $_POST['password']) {
-            include '../DB.php';
+            try {
+                include '../DB.php';
+            } catch (Error $e) {
+                throw new Exception("../DB.php doesn't exist on server.");
+            }
             if (isset($DB)) {
-                $dataTables = json_decode(file_get_contents('../data/info/dataTables.json'));
+                try {
+                    $dataTables = json_decode(file_get_contents('../data/info/dataTables.json'));
+                } catch (Error $e) {
+                    throw new Exception("../data/info/dataTables.json doesn't exist");
+                }
                 /*
                     dataTables is an array of json objects representing the metadata about a table in the database.
                     These tables fall into three "types": dictionary, independent, and join. 
@@ -26,68 +48,74 @@ if (!is_int($timeout) || !is_string($password)) {
                     Multiple join table may reference a singular dictionary, for example, the "names" dictionary services first_name, last_name, and middle_name. 
                     
                 */
-                if (isset($dataTables) && $dataTables !== false) {
+                if (is_array($dataTables)) {
                     foreach ($dataTables as $dataTable) {
-                        if ($_POST['field'] === $dataTable->name || ("join_" . $_POST['field']) === $dataTable->name) {
-                            if (!is_array($_POST['values'])) {
-                                $_POST['values'] = [$_POST['values']];
-                            };
-                            switch ($dataTable->type) {
-                                case "independent":
-                                    $sql = 'DELETE FROM ' . $dataTable->name . ' WHERE `id`=' . $_POST['id'] . ';';
-                                    foreach ($_POST['values'] as $value) {
-                                        $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . $value . ');';
-                                    }
-                                    if ($DB->query($sql) !== false) {
-                                        file_put_contents('../manualeditlog.txt', $sql, FILE_APPEND);
-                                        $successful = "true";
-                                    } else {
-                                        $successful = "false";
-                                    };
-                                    break 2;
-                                case "join":
-                                    $sql = 'DELETE FROM ' . $dataTable->name . ' WHERE `id`=' . $_POST['id'] . ';';
-                                    //DONT DELETE FROM THE DICTIONARY EVER--- there might be other tables using the dictionary. better safe than sorry.
-                                    $dictColumn = null;
-                                    foreach ($dataTables as $possibleDictionary) {
-                                        if ($possibleDictionary->type === 'dictionary' && $possibleDictionary->name === $dataTable->dictionary) {
-                                            $dictColumn = $possibleDictionary->columnName;
+                        if (is_object($dataTable) && property_exists($dataTable, "name") && property_exists($dataTable, "type"))
+                            if ($_POST['field'] === $dataTable->name || ("join_" . $_POST['field']) === $dataTable->name) {
+                                if (!is_array($_POST['values'])) {
+                                    $_POST['values'] = [$_POST['values']];
+                                };
+                                switch ($dataTable->type) {
+                                    case "independent":
+                                        $sql = 'DELETE FROM ' . $dataTable->name . ' WHERE `id`=' . $_POST['id'] . ';';
+                                        foreach ($_POST['values'] as $value) {
+                                            $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . $value . ');';
                                         }
-                                    }
-                                    foreach ($_POST['values'] as $value) {
-                                        $df = $DB->query('SELECT `i` FROM ' . $dataTable->dictionary . ' WHERE ' . $dictColumn . '=' . $value);
-                                        if ($df !== false) {
-                                            $i = null;
-                                            $d = $df->fetch_array();
-                                            if (!isset($d[0][1])) {
-                                                try {
+                                        if ($DB->query($sql) !== false) {
+                                            file_put_contents('../manualeditlog.txt', $sql, FILE_APPEND);
+                                            $successful = "true";
+                                        } else {
+                                            throw new Exception("Failed to INSERT INTO independent datatable");
+                                        }
+                                        break 2;
+                                    case "join":
+                                        $sql = 'DELETE FROM ' . $dataTable->name . ' WHERE `id`=' . $_POST['id'] . ';';
+                                        //DONT DELETE FROM THE DICTIONARY EVER--- there might be other tables using the dictionary. better safe than sorry.
+                                        $dictColumn = null;
+                                        foreach ($dataTables as $possibleDictionary) {
+                                            if ($possibleDictionary->type === 'dictionary' && $possibleDictionary->name === $dataTable->dictionary) {
+                                                $dictColumn = $possibleDictionary->columnName;
+                                                break;
+                                            }
+                                        }
+                                        if (!is_string($dictColumn)) {
+                                            throw new Exception("couldn't find dictionary for $ dataTable: " . $dataTable . " as indicated by its dictionary column that had a string property columnName");
+                                        }
+                                        foreach ($_POST['values'] as $value) {
+                                            $df = $DB->query('SELECT `i` FROM ' . $dataTable->dictionary . ' WHERE ' . $dictColumn . '=' . $value);
+                                            if ($df !== false) {
+                                                $i = null;
+                                                $d = $df->fetch_array();
+                                                if (!isset($d[0][1])) {
                                                     $max = $DB->query('SELECT MAX(`i`) FROM ' . $dataTable->dictionary)->fetch_array()[0][1];
+                                                    if ($max === false) {
+                                                        throw new Error("Couldn't get max value of dictionary");
+                                                    }
                                                     $sql += 'INSERT INTO ' . $dataTable->dictionary . ' VALUES (' . ($max + 1) . ',' . $value . ');';
                                                     $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . ($max + 1) . ');';
-                                                } catch (Exception $e) {
-                                                    $successful = "false";
+                                                } else {
+                                                    $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . $d[0][1] . ');';
                                                 }
+                                                $good=$DB->query($sql);
+                                                if($good===false){
+                                                    throw new Exception("final sql failed");
+                                                }
+                                                file_put_contents('../manualeditlog.txt', $sql, FILE_APPEND);
+                                            } else {
+                                                throw new Exception("Failure in getting i from dictionary");
                                             }
-                                            if (isset($d[0][1])) {
-                                                $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . $d[0][1] . ');';
-                                            }
-                                        } else {
-                                            $successful = "false";
-                                            break 3;
                                         }
-                                    } 
-                                    break 2;
-                                case "dictionary":
-                                    //this shouldn't ever match; I made the names of dictionaries plural and all the fields singular but jic
-                                    break;
+                                        break 2;
+                                    default:
+                                        throw new Exception("type property not set for $ dataTable :" . $dataTable);
+                                }
                             }
-                        }
                     }
                 } else {
-                    $successful = "false";
+                    throw new Exception("../data/info/dataTables.json doesn't return valid json");
                 }
             } else {
-                $successful = "false";
+                throw new Exception("DB.php doesn't set $ DB variable");
             }
         } else {
             $successful = "password";
@@ -96,5 +124,7 @@ if (!is_int($timeout) || !is_string($password)) {
         $successful = "timeout";
         $timeouturlstring = "&timeout=" . ($timeout - time());
     }
+} catch (Exception $e) {
+    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&successful=false&error=" . $e->getMessage());
 }
 header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&successful=" . $successful . $timeouturlstring);
