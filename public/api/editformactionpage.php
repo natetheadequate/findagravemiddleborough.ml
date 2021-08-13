@@ -5,7 +5,7 @@ if (!isset($_POST['field'], $_POST['id'], $_POST['values'], $_POST['password']))
     echo "Error. Password, field or record was not provided";
     exit(1);
 }
-$successful = "false";
+$problem="none";
 try {
     try {
         include '../password.php';
@@ -63,7 +63,6 @@ try {
                                         }
                                         if ($DB->query($sql) !== false) {
                                             file_put_contents('../manualeditlog.txt', $sql, FILE_APPEND);
-                                            $successful = "true";
                                         } else {
                                             throw new Exception("Failed to INSERT INTO independent datatable");
                                         }
@@ -101,6 +100,7 @@ try {
                                                     throw new Exception("final sql failed");
                                                 }
                                                 file_put_contents('../manualeditlog.txt', $sql, FILE_APPEND);
+                                                $successful=true;
                                             } else {
                                                 throw new Exception("Failure in getting i from dictionary");
                                             }
@@ -118,13 +118,12 @@ try {
                 throw new Exception("DB.php doesn't set $ DB variable");
             }
         } else {
-            $successful = "password";
+            throw new Exception("password",2);
         }
     } else {
-        $successful = "timeout";
-        $timeouturlstring = "&timeout=" . ($timeout - time());
+        throw new Exception($timeout - time(),1);
     }
 } catch (Exception $e) {
-    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&successful=false&error=" . $e->getMessage());
+    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&error=" . $e->getCode()===1?"timeout&timeout=".$e->getMessage():$e->getMessage());
 }
-header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&successful=" . $successful . $timeouturlstring);
+header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
