@@ -127,8 +127,10 @@ try {
     } else {
         throw new Exception($timeout - time(), 1);
     }
+header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
+exit();
 } catch (Throwable $e) {
-    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&error=" . $e->getCode() === 1 ? "timeout&timeout=" . $e->getMessage() : $e->getMessage());
+    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&error=" . ($e->getCode() === 1 ? "timeout&timeout=" . $e->getMessage() : $e->getMessage()));
     exit();
 }
-header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
+
