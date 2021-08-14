@@ -9,12 +9,12 @@ $problem = "none";
 try {
     try {
         include '../password.php';
-    } catch (Error $e) {
+    } catch (Throwable $e) {
         throw new Exception("../password.php not on server");
     }
     try {
         include '../timeout.php';
-    } catch (Error $e) {
+    } catch (Throwable $e) {
         throw new Exception("../timeout.php not on server");
     }
     if (!is_int($timeout)) {
@@ -28,13 +28,13 @@ try {
         if ($password === $_POST['password']) {
             try {
                 include '../DB.php';
-            } catch (Error $e) {
+            } catch (Throwable $e) {
                 throw new Exception("../DB.php doesn't exist on server.");
             }
             if (isset($DB)) {
                 try {
                     $dataTables = json_decode(file_get_contents('../data/info/dataTables.json'));
-                } catch (Error $e) {
+                } catch (Throwable $e) {
                     throw new Exception("../data/info/dataTables.json doesn't exist");
                 }
                 /*
@@ -127,7 +127,7 @@ try {
     } else {
         throw new Exception($timeout - time(), 1);
     }
-} catch (Exception $e) {
+} catch (Throwable $e) {
     header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&error=" . $e->getCode() === 1 ? "timeout&timeout=" . $e->getMessage() : $e->getMessage());
 }
 header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
