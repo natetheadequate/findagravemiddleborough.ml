@@ -89,7 +89,7 @@ try {
     function execute($mysqlistmt, $errmsg, $stmtsql, $values = [])
     {
         if ($mysqlistmt->execute() === false) {
-            throw new Exception($errmsg);
+            throw new Exception($errmsg."SQL:".$stmtsql."  -- Values:".$values."  json_encoded is ".json_encode($values));
         } else {
             sqllog($stmtsql, $values);
         };
