@@ -56,9 +56,11 @@ try {
     if (!is_array($dataTables)) {
         throw new Exception("../data/info/dataTables.json doesn't return valid json");
     }
+    $nonfatalerror="";
     //the next three functions are wrappers for when im modifying the database. I use the prebuilt ones for select queries
     function sqllog($sql, $values = [])
     {
+        global $nonfatalerror;
         $sqlarr = str_split($sql);
         //this for loop won't run if $values is empty
         for ($i = 0, $j = 0; $j < count($values), $i < count($sqlarr); $i++) {
@@ -69,7 +71,7 @@ try {
         }
         $sqlwithparameters = implode("", $sqlarr);
         if (file_put_contents('../../manualeditlog.txt', $sqlwithparameters, FILE_APPEND) === false) {
-            throw new Exception("Error writing data to log while doing " . $sql);
+            $nonfatalerror="Error writing data to log while doing " . $sql;
         }
         return $sqlwithparameters;
     }
@@ -162,6 +164,9 @@ try {
     }
     if (!$found) {
         throw new Exception("field not found in \$dataTables");
+    }
+    if($nonfatalerror!==""){
+        throw new Exception($nonfatalerror);
     }
     header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
     exit();
