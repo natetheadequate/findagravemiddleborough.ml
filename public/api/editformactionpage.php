@@ -157,7 +157,7 @@ try {
                                     throw new Exception("can't get max i of \$dataTable->dictionary, \$dataTable is ".json_encode($dataTable));
                                 }
                                 $maxd=$maxraw->fetch_all();
-                                if (!isset($maxraw[0][1])) {
+                                if (!isset($maxd[0][1])) {
                                     throw new Exception("Couldn't get max value of dictionary");
                                 }
                                 $max=$maxd[0][1];
