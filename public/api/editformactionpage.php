@@ -124,6 +124,9 @@ try {
                     case "join":
                         //DONT DELETE FROM THE DICTIONARY EVER--- there might be other tables using the dictionary. better safe than sorry.
                         $dictColumn = null;
+                        if(!property_exists($dataTable,'dictionary')){
+                            throw new Exception("\$dataTable doesn't have a dictionary property: ".json_encode($dataTable));
+                        }
                         foreach ($dataTables as $possibleDictionary) {
                             if ($possibleDictionary->type === 'dictionary' && $possibleDictionary->name === $dataTable->dictionary) {
                                 $dictColumn = $possibleDictionary->columnName;
@@ -149,10 +152,15 @@ try {
                             $i = null;
                             $d = $df->fetch_all();
                             if (!isset($d[0][1])) {
-                                $max = $DB->query('SELECT MAX(`i`) FROM `' . $dataTable->dictionary)->fetch_array()[0][1] . "`;";
-                                if ($max === false) {
+                                $maxraw = $DB->query('SELECT MAX(`i`) FROM `' . $dataTable->dictionary.'`;');
+                                if($maxraw===false){
+                                    throw new Exception("can't get max i of \$dataTable->dictionary, \$dataTable is ".json_encode($dataTable));
+                                }
+                                $maxd=$maxraw->fetch_all();
+                                if (!isset($maxraw[0][1])) {
                                     throw new Exception("Couldn't get max value of dictionary");
                                 }
+                                $max=$maxd[0][1];
                                 execute($stmt3, "Failed to input into dictionary $value", $stmt3sql, [$value]);
                                 query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . ($max + 1) . ');', "Error adding value to join table");
                             } else {
