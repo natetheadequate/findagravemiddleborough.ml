@@ -6,4 +6,4 @@ Export as csv/json option
 
 I'm not using autoincrement for the `i` column of dictionaries. The odds of race conditions are practically zero since I am assuming there is just one admin human, and also, since the `i`column is primary key, a duplicate value couldn't be entered anyways. What manually finding the next i value and then inserting the i value and the entry to the dictionary together does is that it ensures that i have the correct correlation betweeen the two. Since I need the i value for adding the entry to the join table, if there was a race condition between the time I pushed the new dictionary entry and the time I got the auto_increment value, I would have the wrong i value. 
 
-Lets have a filter that only displays defined array elements for the conditions array in App.js
+
