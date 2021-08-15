@@ -31,24 +31,26 @@ if (isset($_GET['id'])) {
 			deletebutton.type = "button";
 			deletebutton.innerHTML = "❌"; //this is a red x emoji
 			deletebutton.onclick = () => el.remove();
-			root.insertAdjacentHTML('beforeend','<br />')
+			root.insertAdjacentHTML('beforeend', '<br />')
 
 		}
 
 		function displayData(rawdata) {
 			let data;
 			const root = document.getElementById('datafieldset');
-			try {
-				data = JSON.parse(rawdata);
-				const id = Object.keys(data)[0];
-				const field = Object.keys(data[id])[0];
-				data[id][field].forEach(v => {
-					addValue(v);
-				});
-			} catch (e) {
-				root.innerHTML = '<p>Error processing data</p><p>' + rawdata + '</p>';
-				console.log(e)
-				return;
+			if (rawdata !== "{}") {
+				try {
+					data = JSON.parse(rawdata);
+					const id = Object.keys(data)[0];
+					const field = Object.keys(data[id])[0];
+					data[id][field].forEach(v => {
+						addValue(v);
+					});
+				} catch (e) {
+					root.innerHTML = '<p>Error processing data</p><p>' + rawdata + '</p>';
+					console.log(e)
+					return;
+				}
 			}
 		}
 		async function getData() {
@@ -82,7 +84,7 @@ if (isset($_GET['id'])) {
 				echo "Error. Values in database are as shown below.";
 				break;
 		}
-	}else{
+	} else {
 		echo "Data modified to values shown below";
 	}
 	if (isset($_GET['timeout'])) {
