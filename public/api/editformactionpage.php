@@ -100,9 +100,9 @@ try {
                     $_POST['values'] = [$_POST['values']];
                 };
                 $idwithonlynumerals;
-                preg_match('/[0-9]+', $_POST['id'], $idwithonlynumerals);
+                preg_match('/[0-9]+/', $_POST['id'], $idwithonlynumerals);
                 if ($_POST['id'] !== $idwithonlynumerals[0]) { //$idwithonlynumerals[0] refers to the whole match
-                    throw new Exception("id should be composed of only numerals 0-9");
+                    throw new Exception("id should be composed of only numerals 0-9.");
                 }
                 //no (accidental since we already through password check) injection risk, since we know dataTable['name'] is a valid field, and post id is just numerals.
                 query('DELETE FROM `' . $dataTable->name . '` WHERE `id`=' . $_POST['id'] . ';', "Error deleting old records");
