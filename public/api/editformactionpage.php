@@ -140,8 +140,9 @@ try {
                         $stmt3 = $DB->prepare($stmt3sql);
                         $stmt3->bind_param('s', $value);
                         foreach ($_POST['values'] as $value) {
-                            $df = $stmt2->execute();
+                            $stmt2->execute();
                             //since stmt2 doesnt modify the db, i dont use my wrapper functions to log changeslike i do for stmt3
+                            $df=$stmt2->get_result();
                             if ($df === false) {
                                 throw new Exception("Failure in getting i from dictionary");
                             }
