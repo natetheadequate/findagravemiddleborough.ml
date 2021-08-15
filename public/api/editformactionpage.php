@@ -57,57 +57,73 @@ try {
                                 if (!is_array($_POST['values'])) {
                                     $_POST['values'] = [$_POST['values']];
                                 };
-                                switch ($dataTable->type) {
-                                    case "independent":
-                                        $sql = 'DELETE FROM ' . $dataTable->name . ' WHERE `id`=' . $_POST['id'] . ';';
-                                        foreach ($_POST['values'] as $value) {
-                                            $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . $value . ');';
-                                        }
-                                        if ($DB->query($sql) !== false) {
-                                            file_put_contents('../manualeditlog.txt', $sql, FILE_APPEND);
-                                        } else {
-                                            throw new Exception("Failed to INSERT INTO independent datatable");
-                                        }
-                                        break 2;
-                                    case "join":
-                                        $sql = 'DELETE FROM ' . $dataTable->name . ' WHERE `id`=' . $_POST['id'] . ';';
-                                        //DONT DELETE FROM THE DICTIONARY EVER--- there might be other tables using the dictionary. better safe than sorry.
-                                        $dictColumn = null;
-                                        foreach ($dataTables as $possibleDictionary) {
-                                            if ($possibleDictionary->type === 'dictionary' && $possibleDictionary->name === $dataTable->dictionary) {
-                                                $dictColumn = $possibleDictionary->columnName;
+                                $idwithonlynumerals;
+                                preg_match('/[0-9]+', $_POST['id'], $idwithonlynumerals);
+                                if ($_POST['id'] === $idwithonlynumerals[0]) {
+                                    //DONT DELETE FROM THE DICTIONARY EVER--- there might be other tables using the dictionary. better safe than sorry.
+                                    //no (accidental since we already through password check) injection risk, since we know dataTable['name'] is a valid field, and post id is just numerals.
+                                    if ($DB->query('DELETE FROM `' . $dataTable->name . '` WHERE `id`=' . $_POST['id'] . ';') !== false) {
+                                        switch ($dataTable->type) {
+                                            case "independent":
+                                                $stmt = $DB->prepare('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ', ? );');
+                                                $mysqlitype=(($dataTable->mysqlitype)==="i"?"i":"s");
+                                                $stmt->bind_param($mysqlitype,$value);//this and the foreach loop is how php documentation says to do it, seems pretty hacky but *shrug*
+                                                foreach($_POST['values'] as $value) {
+                                                    if($stmt->execute()===false){
+                                                        throw new Exception("Failed to input $value");
+                                                    };
+                                                }
                                                 break;
-                                            }
-                                        }
-                                        if (!is_string($dictColumn)) {
-                                            throw new Exception("couldn't find dictionary for $ dataTable: " . $dataTable . " as indicated by its dictionary column that had a string property columnName");
-                                        }
-                                        foreach ($_POST['values'] as $value) {
-                                            $df = $DB->query('SELECT `i` FROM ' . $dataTable->dictionary . ' WHERE ' . $dictColumn . '=' . $value);
-                                            if ($df !== false) {
-                                                $i = null;
-                                                $d = $df->fetch_array();
-                                                if (!isset($d[0][1])) {
-                                                    $max = $DB->query('SELECT MAX(`i`) FROM ' . $dataTable->dictionary)->fetch_array()[0][1];
-                                                    if ($max === false) {
-                                                        throw new Error("Couldn't get max value of dictionary");
+                                            case "join":
+                                                $dictColumn = null;
+                                                foreach ($dataTables as $possibleDictionary) {
+                                                    if ($possibleDictionary->type === 'dictionary' && $possibleDictionary->name === $dataTable->dictionary) {
+                                                        $dictColumn = $possibleDictionary->columnName;
+                                                        break;
                                                     }
-                                                    $sql += 'INSERT INTO ' . $dataTable->dictionary . ' VALUES (' . ($max + 1) . ',' . $value . ');';
-                                                    $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . ($max + 1) . ');';
-                                                } else {
-                                                    $sql += 'INSERT INTO ' . $dataTable->name . ' VALUES(' . $_POST['id'] . ',' . $d[0][1] . ');';
                                                 }
-                                                if ($DB->query($sql) === false) {
-                                                    throw new Exception("final sql failed");
+                                                if (!is_string($dictColumn)) {
+                                                    throw new Exception("couldn't find dictionary for $ dataTable: " . $dataTable . " as indicated by its dictionary column that had a string property columnName");
                                                 }
-                                                file_put_contents('../manualeditlog.txt', $sql, FILE_APPEND);
-                                            } else {
-                                                throw new Exception("Failure in getting i from dictionary");
-                                            }
+                                                $stmt2 = $DB->prepare('SELECT `i` FROM `' . $dataTable->dictionary . '` WHERE `' . $dictColumn . '`=?;');
+                                                $stmt2->bind_param('s',$value);
+                                                $stmt3=$DB->prepare('INSERT INTO `' . $dataTable->dictionary . '` VALUES (' . ($max + 1) . ',?);');
+                                                $stmt3->bind_param('s',$value);
+                                                foreach ($_POST['values'] as $value) {
+                                                    $df=$stmt2->execute();
+                                                    if ($df !== false) {
+                                                        $i = null;
+                                                        $d = $df->fetch_array();
+                                                        if (!isset($d[0][1])) {
+                                                            $max = $DB->query('SELECT MAX(`i`) FROM `' . $dataTable->dictionary)->fetch_array()[0][1] . "`;";
+                                                            if ($max === false) {
+                                                                throw new Error("Couldn't get max value of dictionary");
+                                                            }
+                                                            if($stmt3->execute()===false){
+                                                                throw new Exception("Error adding value to dictionary $value");
+                                                            }
+                                                            if($DB->query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . ($max + 1) . ');')===false){
+                                                                throw new Exception("Error adding value to join table");
+                                                            }
+                                                        } else {
+                                                            if($DB->query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . $d[0][1] . ');')===false){
+                                                                throw new Exception("Error on insertion of existing i to join");
+                                                            };
+                                                        }
+                                                        if ($DB->query($sql) === false) {
+                                                            throw new Exception("final sql failed");
+                                                        }
+                                                    } else {
+                                                        throw new Exception("Failure in getting i from dictionary");
+                                                    }
+                                                }
+                                                break;
+                                            default:
+                                                throw new Exception("type property not set for $ dataTable :" . $dataTable);
                                         }
-                                        break 2;
-                                    default:
-                                        throw new Exception("type property not set for $ dataTable :" . $dataTable);
+                                    } else {
+                                                throw new Exception("Error deleting old records from database");
+                                    }                                      
                                 }
                             }
                         }
@@ -127,10 +143,9 @@ try {
     } else {
         throw new Exception($timeout - time(), 1);
     }
-header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
-exit();
+    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
+    exit();
 } catch (Throwable $e) {
     header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&error=" . ($e->getCode() === 1 ? "timeout&timeout=" . $e->getMessage() : $e->getMessage()));
     exit();
 }
-

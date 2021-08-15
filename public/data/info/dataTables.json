@@ -113,139 +113,164 @@
         "name": "birth_day",
         "inputType":"number",
         "type": "independent",
-        "datatype": "tinyint UNSIGNED"
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "birth_month",
         "inputType":"number",
         "type": "independent",
-        "datatype": "tinyint UNSIGNED"
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "birth_year",
         "inputType":"number",
         "type": "independent",
-        "datatype": "smallint UNSIGNED"
+        "datatype": "smallint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "death_day",
         "inputType":"number",
         "type": "independent",
-        "datatype": "tinyint UNSIGNED"
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "death_month",
         "inputType":"number",
         "type": "independent",
-        "datatype": "tinyint UNSIGNED"
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "death_year",
         "inputType":"number",
         "type": "independent",
-        "datatype": "smallint UNSIGNED"
+        "datatype": "smallint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "entry_day",
         "inputType":"number",
         "type": "independent",
-        "datatype": "tinyint UNSIGNED"
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "entry_month",
         "type": "independent",
         "inputType":"number",
-        "datatype": "tinyint UNSIGNED"
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "entry_year",
         "type": "independent",
         "inputType":"number",
-        "datatype": "smallint UNSIGNED"
+        "datatype": "smallint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "exit_day",
         "type": "independent",
         "inputType":"number",
-        "datatype": "tinyint UNSIGNED"
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "exit_month",
         "inputType":"number",
         "type": "independent",
-        "datatype": "tinyint UNSIGNED"
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "exit_year",
         "inputType":"number",
         "type": "independent",
-        "datatype": "smallint UNSIGNED"
+        "datatype": "smallint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "unit",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
     },
     {
         "name": "service_number",
         "type": "independent",
-        "datatype": "int UNSIGNED"
+        "datatype": "int UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "veteran_status_verified",
         "type": "independent",
-        "datatype": "tinyint(1)"
+        "datatype": "tinyint(1)",
+        "mysqlitype": "i"
     },
     {
         "name": "location_in_cemetery",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
     },
     {
         "name": "find_a_grave_memorial_number",
         "type": "independent",
-        "datatype": "int UNSIGNED"
+        "datatype": "int UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "cenotaphs",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
     },
     {
         "name": "notes",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
     },
     {
         "name": "father_name",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
     },
     {
         "name": "mother_name",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
     },
     {
         "name": "spouse_name",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
     },
     {
         "name": "count",
         "type": "independent",
         "inputType":"number",
-        "datatype": "smallint UNSIGNED"
+        "datatype": "smallint UNSIGNED",
+        "mysqlitype": "i"
     },
     {
         "name": "records_checked",
         "type": "independent",
         "inputType":"boolean",
-        "datatype": "tinyint(1)"
+        "datatype": "tinyint(1)",
+        "mysqlitype": "i"
     },
     {
         "name": "resident_id",
         "type": "independent",
-        "datatype": "varchar(255)"
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
     }
 ]
