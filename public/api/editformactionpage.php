@@ -73,7 +73,7 @@ try {
             }
         }
         $sqlwithparameters = implode("", $sqlarr);
-        if (file_put_contents('../../manualeditlog.txt', $sqlwithparameters, FILE_APPEND) === false) {
+        if (file_put_contents('manualeditlog.txt', $sqlwithparameters, FILE_APPEND) === false) {
             $nonfatalerror="Error writing data to log while doing " . $sql;
         }
         return $sqlwithparameters;
