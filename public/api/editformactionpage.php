@@ -1,9 +1,12 @@
 <?php
 /*this is dealt with first because in this case, I don't know where to even redirect the error message to. 
 Nobody coming from edit.php should get this message, since the form ensures all these are sent*/
-if (!isset($_POST['field'], $_POST['id'], $_POST['values'], $_POST['password'])) {
-    echo "Error. Password, field or record was not provided";
+if (!isset($_POST['field'], $_POST['id'], $_POST['password'])) {
+    echo "Error. Field, id, or password was not provided";
     exit(1);
+}
+if(!isset($_POST['values'])){
+    $_POST['values']=[];
 }
 try {
     try {
