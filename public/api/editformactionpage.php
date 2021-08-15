@@ -151,16 +151,16 @@ try {
                             }
                             $i = null;
                             $d = $df->fetch_all();
-                            if (!isset($d[0][1])) {
+                            if (!isset($d[0][0])) {
                                 $maxraw = $DB->query('SELECT MAX(`i`) FROM `' . $dataTable->dictionary.'`;');
                                 if($maxraw===false){
                                     throw new Exception("can't get max i of \$dataTable->dictionary, \$dataTable is ".json_encode($dataTable));
                                 }
                                 $maxd=$maxraw->fetch_all();
-                                if (!isset($maxd[0][1])) {
+                                if (!isset($maxd[0][0])) {
                                     throw new Exception("Couldn't get max value of dictionary");
                                 }
-                                $max=$maxd[0][1];
+                                $max=$maxd[0][0];
                                 execute($stmt3, "Failed to input into dictionary $value", $stmt3sql, [$value]);
                                 query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . ($max + 1) . ');', "Error adding value to join table");
                             } else {
