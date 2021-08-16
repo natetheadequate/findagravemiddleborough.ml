@@ -38,12 +38,12 @@ if (isset($_GET['id'])) {
 		function displayData(rawdata) {
 			let data;
 			const root = document.getElementById('datafieldset');
+			root.innerHTML="";
 			if (rawdata !== "{}") {
 				try {
 					data = JSON.parse(rawdata);
 					const id = Object.keys(data)[0];
 					const field = Object.keys(data[id])[0];
-					root.innerHTML="";
 					data[id][field].forEach(v => {
 						addValue(v);
 					});
@@ -52,6 +52,8 @@ if (isset($_GET['id'])) {
 					console.log(e)
 					return;
 				}
+			}else{
+				root.innerHTML="[Blank]";
 			}
 		}
 		async function getData() {
