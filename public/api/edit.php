@@ -79,7 +79,7 @@ if (isset($_GET['id'])) {
 				Object.values(data).forEach(row => {
 					Object.values(row).forEach(cell => {
 						cell.forEach(option => {
-							if (selectOptions.indexOf(option) !== -1) {
+							if (selectOptions.indexOf(option) === -1) {
 								selectOptions.push(option);
 							}
 						})
