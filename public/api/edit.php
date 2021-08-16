@@ -30,8 +30,8 @@ if (isset($_GET['id'])) {
 			el.list="options";
 			let deletebutton = root.insertAdjacentElement('beforeend', document.createElement('button'));
 			deletebutton.type = "button";
-			deletebutton.innerHTML = "❌"; //this is a red x emoji
-			deletebutton.onclick = () => el.remove();
+			deletebutton.innerHTML = "Remove";
+			deletebutton.onclick = () => {deletebutton.remove();el.remove();}
 			root.insertAdjacentHTML('beforeend', '<br />')
 
 		}
