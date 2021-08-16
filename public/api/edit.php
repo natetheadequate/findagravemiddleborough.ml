@@ -43,6 +43,7 @@ if (isset($_GET['id'])) {
 					data = JSON.parse(rawdata);
 					const id = Object.keys(data)[0];
 					const field = Object.keys(data[id])[0];
+					root.innerHTML="";
 					data[id][field].forEach(v => {
 						addValue(v);
 					});
@@ -94,7 +95,7 @@ if (isset($_GET['id'])) {
 		<label>Password: <input name="password" type="password" required /></label>
 		<textarea name="field" hidden><?php echo $_GET['field'] ?></textarea>
 		<textarea name="id" hidden><?php echo $_GET['id'] ?></textarea>
-		<fieldset id="datafieldset"></fieldset>
+		<fieldset id="datafieldset">Loading</fieldset>
 		<button type="button" onclick="addValue()">Add Value</button>
 		<button type="submit">Submit</button>
 	</form>
