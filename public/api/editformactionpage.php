@@ -152,7 +152,6 @@ try {
                             if ($df === false) {
                                 throw new Exception("Failure in getting i from dictionary");
                             }
-                            $i = null;
                             $d = $df->fetch_all();
                             if (!isset($d[0][0])) {
                                 $maxraw = $DB->query('SELECT MAX(`i`) FROM `' . $dataTable->dictionary.'`;');
