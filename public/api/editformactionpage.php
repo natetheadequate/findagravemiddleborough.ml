@@ -5,8 +5,8 @@ if (!isset($_POST['field'], $_POST['id'], $_POST['password'])) {
     echo "Error. Field, id, or password was not provided";
     exit(1);
 }
-if(!isset($_POST['values'])){
-    $_POST['values']=[];
+if (!isset($_POST['values'])) {
+    $_POST['values'] = [];
 }
 try {
     try {
@@ -59,7 +59,7 @@ try {
     if (!is_array($dataTables)) {
         throw new Exception("../data/info/dataTables.json doesn't return valid json");
     }
-    $nonfatalerror="";
+    $nonfatalerror = "";
     //the next three functions are wrappers for when im modifying the database. I use the prebuilt ones for select queries
     function sqllog($sql, $values = [])
     {
@@ -74,10 +74,10 @@ try {
         }
         $sqlwithparameters = implode("", $sqlarr);
         if (file_put_contents('manualeditlog.txt', $sqlwithparameters, FILE_APPEND) === false) {
-            $nonfatalerror.="Error writing data to log while doing " . $sql;
+            $nonfatalerror .= "Error writing data to log while doing " . $sql;
         }
-        if($sql==""){
-            $nonfatalerror.="A blank sql query was sent";
+        if ($sql == "") {
+            $nonfatalerror .= "A blank sql query was sent";
         }
         return $sqlwithparameters;
     }
@@ -92,7 +92,7 @@ try {
     function execute($mysqlistmt, $errmsg, $stmtsql, $values)
     {
         if ($mysqlistmt->execute() === false) {
-            throw new Exception($errmsg." SQL:".$stmtsql." -- Value:".$values." json_encoded: ".json_encode($values));
+            throw new Exception($errmsg . " SQL:" . $stmtsql . " -- Value:" . $values . " json_encoded: " . json_encode($values));
         } else {
             sqllog($stmtsql, $values);
         };
@@ -127,8 +127,8 @@ try {
                     case "join":
                         //DONT DELETE FROM THE DICTIONARY EVER--- there might be other tables using the dictionary. better safe than sorry.
                         $dictColumn = null;
-                        if(!property_exists($dataTable,'dictionary')){
-                            throw new Exception("\$dataTable doesn't have a dictionary property: ".json_encode($dataTable));
+                        if (!property_exists($dataTable, 'dictionary')) {
+                            throw new Exception("\$dataTable doesn't have a dictionary property: " . json_encode($dataTable));
                         }
                         foreach ($dataTables as $possibleDictionary) {
                             if ($possibleDictionary->type === 'dictionary' && $possibleDictionary->name === $dataTable->dictionary) {
@@ -144,27 +144,27 @@ try {
                         $stmt2->bind_param('s', $value);
                         $stmt3sql = 'INSERT INTO `' . $dataTable->dictionary . '` VALUES (?,?);';
                         $stmt3 = $DB->prepare($stmt3sql);
-                        $stmt3->bind_param('is', $next, $value);//this binds the value of $value when and where execute is called, NOT its current value here
+                        $stmt3->bind_param('is', $next, $value); //this binds the value of $value when and where execute is called, NOT its current value here
                         foreach ($_POST['values'] as $value) {
                             $stmt2->execute();
                             //since stmt2 doesnt modify the db, i dont use my wrapper functions to log changeslike i do for stmt3
-                            $df=$stmt2->get_result();
+                            $df = $stmt2->get_result();
                             if ($df === false) {
                                 throw new Exception("Failure in getting i from dictionary");
                             }
                             $d = $df->fetch_all();
                             if (!isset($d[0][0])) {
-                                $maxraw = $DB->query('SELECT MAX(`i`) FROM `' . $dataTable->dictionary.'`;');
-                                if($maxraw===false){
-                                    throw new Exception("can't get max i of \$dataTable->dictionary, \$dataTable is ".json_encode($dataTable));
+                                $maxraw = $DB->query('SELECT MAX(`i`) FROM `' . $dataTable->dictionary . '`;');
+                                if ($maxraw === false) {
+                                    throw new Exception("can't get max i of \$dataTable->dictionary, \$dataTable is " . json_encode($dataTable));
                                 }
-                                $maxd=$maxraw->fetch_all();
+                                $maxd = $maxraw->fetch_all();
                                 if (!isset($maxd[0][0])) {
                                     throw new Exception("Couldn't get max value of dictionary");
                                 }
-                                $max=$maxd[0][0];
-                                $next=$max+1;
-                                execute($stmt3, "Failed to input into dictionary $value", $stmt3sql, [$next,$value]);
+                                $max = $maxd[0][0];
+                                $next = $max + 1;
+                                execute($stmt3, "Failed to input into dictionary $value", $stmt3sql, [$next, $value]);
                                 query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . $next . ');', "Error adding value to join table");
                             } else {
                                 query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . $d[0][0] . ');', "Error on insertion of existing i to join");
@@ -180,7 +180,7 @@ try {
     if (!$found) {
         throw new Exception("field not found in \$dataTables");
     }
-    if($nonfatalerror!==""){
+    if ($nonfatalerror !== "") {
         throw new Exception($nonfatalerror);
     }
     header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
