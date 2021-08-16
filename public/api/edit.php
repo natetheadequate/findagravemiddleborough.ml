@@ -87,7 +87,9 @@ if (isset($_GET['id'])) {
 
 				})
 				document.getElementById('options').innerHTML=selectOptions.map(v=>'<option>'+v+'</option>');
-			} catch (e) {}
+			} catch (e) {
+				console.error(e);
+			}
 		}
 		async function getExistingFieldValues() {
 			const body = {
@@ -132,6 +134,7 @@ if (isset($_GET['id'])) {
 	</form>
 	<datalist id="options"></datalist>
 	<script>
-		getData()
+		getData();
+		getExistingFieldValues();
 	</script>
 </body>
