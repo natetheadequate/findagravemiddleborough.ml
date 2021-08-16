@@ -25,9 +25,9 @@ if (isset($_GET['id'])) {
 			let el = root.insertAdjacentElement('beforeend', document.createElement('input'));
 			el.type = "text";
 			el.name = "values[]";
-			el.minlength = "1";
+			el.setAttribute(minlength,"1");
 			el.value = value;
-			el.list="options";
+			el.setAttribute("list","options");
 			let deletebutton = root.insertAdjacentElement('beforeend', document.createElement('button'));
 			deletebutton.type = "button";
 			deletebutton.innerHTML = "Remove";
