@@ -24,7 +24,7 @@ if (isset($_GET['id'])) {
 			const root = document.getElementById('datafieldset');
 			let el = root.insertAdjacentElement('beforeend', document.createElement('input'));
 			el.type = "text";
-			el.name = "values";
+			el.name = "values[]";
 			el.minlength = "1";
 			el.value = value;
 			let deletebutton = root.insertAdjacentElement('beforeend', document.createElement('button'));
