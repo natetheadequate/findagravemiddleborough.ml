@@ -118,7 +118,7 @@ try {
                         $mysqlitype = (($dataTable->mysqlitype) === "i" ? "i" : "s");
                         $stmt->bind_param($mysqlitype, $value); //this and the foreach loop is how php documentation says to do it, seems pretty hacky but *shrug*
                         foreach ($_POST['values'] as $value) {
-                            execute($stmt, "Failed to input $value", $stmtsql, $value);
+                            execute($stmt, "Failed to input $value", $stmtsql, [$value]);
                         }
                         break;
                     case "join":
@@ -163,9 +163,9 @@ try {
                                 $max=$maxd[0][0];
                                 $next=$max+1;
                                 execute($stmt3, "Failed to input into dictionary $value", $stmt3sql, [$next,$value]);
-                                query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . ($max + 1) . ');', "Error adding value to join table");
+                                query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . $next . ');', "Error adding value to join table");
                             } else {
-                                query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . $d[0][1] . ');', "Error on insertion of existing i to join");
+                                query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . $d[0][0] . ');', "Error on insertion of existing i to join");
                             }
                         }
                         break;
