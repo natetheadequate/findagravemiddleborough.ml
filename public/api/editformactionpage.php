@@ -20,7 +20,7 @@ try {
     if ($timeout > time()) { //check for timeout first, so that a person can't spam false passwords and know they are bad by a password error message
         throw new Exception($timeout - time(), 1);
     }
-    file_put_contents('../timeout.php', '<?php $timeout=' . (time() + 15) . ';'); //before password check to ensure a wrong password attempt will set timeout too
+    file_put_contents('../timeout.php', '<?php $timeout=' . (time() + 3) . ';'); //before password check to ensure a wrong password attempt will set timeout too
     try {
         include '../password.php';
     } catch (Throwable $e) {
