@@ -27,6 +27,7 @@ if (isset($_GET['id'])) {
 			el.name = "values[]";
 			el.minlength = "1";
 			el.value = value;
+			el.list="options";
 			let deletebutton = root.insertAdjacentElement('beforeend', document.createElement('button'));
 			deletebutton.type = "button";
 			deletebutton.innerHTML = "❌"; //this is a red x emoji
@@ -38,7 +39,7 @@ if (isset($_GET['id'])) {
 		function displayData(rawdata) {
 			let data;
 			const root = document.getElementById('datafieldset');
-			root.innerHTML="";
+			root.innerHTML = "";
 			if (rawdata !== "{}") {
 				try {
 					data = JSON.parse(rawdata);
@@ -52,8 +53,8 @@ if (isset($_GET['id'])) {
 					console.log(e)
 					return;
 				}
-			}else{
-				root.innerHTML="[Blank]<br />";
+			} else {
+				root.innerHTML = "[Blank]<br />";
 			}
 		}
 		async function getData() {
@@ -70,6 +71,34 @@ if (isset($_GET['id'])) {
 				})
 				.then(res => res.text())
 				.then(data => displayData(data));
+		}
+		function setSelectOptions(rawdata) {
+			try {
+				let selectOptions=[];
+				data = JSON.parse(rawdata);
+				Object.values(data).forEach(row => {
+					Object.values(row).forEach(cell => {
+						cell.forEach(option => {
+							if (selectOptions.indexOf(option) !== -1) {
+								selectOptions.push(option);
+							}
+						})
+					})
+
+				})
+				document.getElementById('options').innerHTML=selectOptions.map(v=>'<option>'+v+'</option>');
+			} catch (e) {}
+		}
+		async function getExistingFieldValues() {
+			const body = {
+				select: <?php echo '"' . $_GET['field'] . '"' ?>
+			}
+			await fetch('/api/getData.php', {
+					method: 'POST',
+					body: JSON.stringify(body)
+				})
+				.then(res => res.text())
+				.then(data => setSelectOptions(data));
 		}
 	</script>
 </head>
@@ -101,6 +130,7 @@ if (isset($_GET['id'])) {
 		<button type="button" onclick="addValue()">Add Value</button>
 		<button type="submit">Submit</button>
 	</form>
+	<datalist id="options"></datalist>
 	<script>
 		getData()
 	</script>
