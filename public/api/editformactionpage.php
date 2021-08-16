@@ -183,7 +183,7 @@ try {
     if ($nonfatalerror !== "") {
         throw new Exception($nonfatalerror);
     }
-    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']);
+    header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field']."&successful=true");
     exit();
 } catch (Throwable $e) {
     header('Location: edit.php?id=' . $_POST['id'] . "&field=" . $_POST['field'] . "&error=" . ($e->getCode() === 1 ? "timeout&timeout=" . $e->getMessage() : $e->getMessage()));

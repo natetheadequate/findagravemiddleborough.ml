@@ -116,7 +116,7 @@ if (isset($_GET['id'])) {
 				echo "Error. Values in database are as shown below.";
 				break;
 		}
-	} else {
+	} else if(isset($_GET['successful'])){
 		echo "Data modified to values shown below";
 	}
 	if (isset($_GET['timeout'])) {
