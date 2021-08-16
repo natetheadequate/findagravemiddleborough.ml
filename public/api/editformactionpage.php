@@ -86,12 +86,12 @@ try {
         }
         sqllog($sql);
     }
-    function execute($mysqlistmt, $errmsg, $stmtsql, $value)//we need to pass $value because it needs to be in closure when stmt is executed
+    function execute($mysqlistmt, $errmsg, $stmtsql, $values)
     {
         if ($mysqlistmt->execute() === false) {
-            throw new Exception($errmsg."SQL:".$stmtsql."  -- Values:".$value."  json_encoded is ".json_encode($value));
+            throw new Exception($errmsg." SQL:".$stmtsql." -- Value:".$values." json_encoded: ".json_encode($values));
         } else {
-            sqllog($stmtsql, $value);
+            sqllog($stmtsql, $values);
         };
     }
     $found = false;
@@ -139,9 +139,9 @@ try {
                         $stmt2sql = 'SELECT `i` FROM `' . $dataTable->dictionary . '` WHERE `' . $dictColumn . '`=?;';
                         $stmt2 = $DB->prepare($stmt2sql);
                         $stmt2->bind_param('s', $value);
-                        $stmt3sql = 'INSERT INTO `' . $dataTable->dictionary . '` VALUES (' . ($max + 1) . ',?);';
+                        $stmt3sql = 'INSERT INTO `' . $dataTable->dictionary . '` VALUES (?,?);';
                         $stmt3 = $DB->prepare($stmt3sql);
-                        $stmt3->bind_param('s', $value);//this binds the value of $value when and where execute is called, NOT its current value here
+                        $stmt3->bind_param('is', $next, $value);//this binds the value of $value when and where execute is called, NOT its current value here
                         foreach ($_POST['values'] as $value) {
                             $stmt2->execute();
                             //since stmt2 doesnt modify the db, i dont use my wrapper functions to log changeslike i do for stmt3
@@ -161,7 +161,8 @@ try {
                                     throw new Exception("Couldn't get max value of dictionary");
                                 }
                                 $max=$maxd[0][0];
-                                execute($stmt3, "Failed to input into dictionary $value", $stmt3sql, $value);
+                                $next=$max+1;
+                                execute($stmt3, "Failed to input into dictionary $value", $stmt3sql, [$next,$value]);
                                 query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . ($max + 1) . ');', "Error adding value to join table");
                             } else {
                                 query('INSERT INTO `' . $dataTable->name . '` VALUES(' . $_POST['id'] . ',' . $d[0][1] . ');', "Error on insertion of existing i to join");
