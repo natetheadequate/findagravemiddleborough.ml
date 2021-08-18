@@ -31,6 +31,7 @@ function App({ fields, edit = false }) {
 	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(fieldNames);
 	const [sortBy, setSortBy] = useState('join_last_name');
 	const [sortOrder, setSortOrder] = useState('ASC');
+	//conditions is an array of objects with keys field (eg join_last_name), operator (eg =), and query (eg Allen)
 	const [conditions, dispatchConditions] = useReducer((state, action) => {
 		switch (action.type) {
 			case 'delete':
@@ -66,13 +67,9 @@ function App({ fields, edit = false }) {
 		}
 	}
 	async function submitForm() {
-		const body = {
-			select: fieldsToBeRetrieved,
-			sortBy,
-			sortOrder,
-			conditions
-		}
-		await fetch('/api/getData.php', { method: 'POST', body: JSON.stringify(body) })
+		let selectstr=fieldsToBeRetrieved.map(v=>'select[]='+encodeURIComponent(v)).join('&');
+		let conditionsstr=conditions.map(v=>'conditions[]='+encodeURIComponent(JSON.stringify(v))).join('&');
+		await fetch('/api/getData.php?'+[selectstr,conditionsstr].join('&'))
 			.then(res => res.text())
 			.then(data => setResponse(data));
 	}

@@ -58,17 +58,11 @@ if (isset($_GET['id'])) {
 			}
 		}
 		async function getData() {
-			const body = {
-				select: <?php echo '"' . $_GET['field'] . '"' ?>,
-				conditions: [{
+			const condition={
 					field: "id",
 					query: <?php echo '"' . $_GET['id'] . '"' ?>
-				}]
-			}
-			await fetch('/api/getData.php', {
-					method: 'POST',
-					body: JSON.stringify(body)
-				})
+				}
+			await fetch('/api/getData.php?select=<?php echo $_GET['field'] ?>&conditions='+json_encode(condition))
 				.then(res => res.text())
 				.then(data => displayData(data));
 		}
@@ -92,13 +86,7 @@ if (isset($_GET['id'])) {
 			}
 		}
 		async function getExistingFieldValues() {
-			const body = {
-				select: <?php echo '"' . $_GET['field'] . '"' ?>
-			}
-			await fetch('/api/getData.php', {
-					method: 'POST',
-					body: JSON.stringify(body)
-				})
+			await fetch('/api/getData.php?select=<?php echo $_GET['field'] ?>')
 				.then(res => res.text())
 				.then(data => setSelectOptions(data));
 		}
