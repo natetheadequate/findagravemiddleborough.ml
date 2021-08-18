@@ -62,7 +62,7 @@ if (isset($_GET['id'])) {
 					field: "id",
 					query: <?php echo '"' . $_GET['id'] . '"' ?>
 				}
-			await fetch('/api/getData.php?select=<?php echo $_GET['field'] ?>&conditions='+json_encode(condition))
+			await fetch('/api/getData.php?select=<?php echo $_GET['field'] ?>&conditions='+JSON.stringify(condition))
 				.then(res => res.text())
 				.then(data => displayData(data));
 		}
