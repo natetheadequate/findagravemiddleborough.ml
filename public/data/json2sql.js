@@ -2,6 +2,7 @@ module.exports = (data, dataTables, prefixOrSuffix, existingDictionaries = {}) =
 	/*
 		prefixOrSuffix is an object rather than two arrays so that nothing can be simultaneously be listed a prefix and a suffix.
 	*/
+	//this script generates the sql to make the meat of the database. generatesql calls this function after making the sql for the skeleton.
 	const logger = require("node-color-log");
 	function titleCase(str) {
 		//Cases Strings Like This

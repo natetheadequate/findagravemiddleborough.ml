@@ -1,5 +1,6 @@
 import App from './App';
 import React, { useState, useEffect } from "react";
+import { BrowserRouter,Route, Switch } from 'react-router-dom';
 
 const useFields = () => {
 	const [fields, setFields] = useState(null);
@@ -31,9 +32,17 @@ const useFields = () => {
 function AppWrapper() {
 	const fields = useFields();
 	return (
-		<>
-			{Array.isArray(fields) && <App fields={fields} />}
-		</>
+		<BrowserRouter>
+			<Switch>
+				{/* it is necessary to check that fields is an array because in the first paint it isn't, and throws an error. */}
+				<Route exact path="/edit">
+					{Array.isArray(fields) && <App fields={fields} edit/>}
+				</Route>
+				<Route exact path='/'>
+					{Array.isArray(fields) && <App fields={fields} />}
+				</Route>
+			</Switch> 
+		</BrowserRouter>
 	);
 }
 
