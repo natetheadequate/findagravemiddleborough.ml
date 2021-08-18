@@ -84,7 +84,7 @@ if (isset($_GET['conditions'])) {
     }
     $conditions = [];
     foreach ($_GET['conditions'] as $rawcondition) {
-        array_push($conditions, json_decode($rawcondition));
+        array_push($conditions, json_decode($rawcondition,true));
     }
     foreach ($conditions as $condition) {
         if (validCondition($condition, $fields) && $ids !== []) {
