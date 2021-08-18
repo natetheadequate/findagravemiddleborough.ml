@@ -1,0 +1,20 @@
+.htaccess must include this to prevent infinityfree from sending a 404 when /edit is attempted to be accesssed
+
+RewriteEngine On
+RewriteRule ^edit$ index.html
+
+
+password.php must exist in the root directory and contain the password for admin
+
+<?php $password=*******;
+
+timeout.php must exist in the root directory. It contains the time at which another edit to the database will be permitted.
+Set to 0 at the beginning, each edit to a record causes it to be rewritten to have $timeout be set to 10 ahead of current time.
+
+<?php $timeout=0;
+
+DB.php must exist in the root directory.
+
+<?php
+$DB=new mysqli(*************);
+$DB->set_charset("utf8");
