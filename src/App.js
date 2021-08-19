@@ -141,6 +141,7 @@ function App({ fields, edit = false }) {
 										// selectDistinct is imported with a script tag in index.html. The code can be found at /public/api/selectDistinct.js
 										// eslint-disable-next-line no-undef
 										options={selectDistinct(conditions[i].field)}
+										freeSolo
 										renderInput={(params)=>(<TextField {...params} style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />)}
 									>
 									</Autocomplete>
