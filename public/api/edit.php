@@ -19,6 +19,7 @@ if (isset($_GET['id'])) {
 ?>
 
 <head>
+	<script src="selectDistinct.js"></script>
 	<script>
 		function addValue(value = "") {
 			const root = document.getElementById('datafieldset');
@@ -66,21 +67,9 @@ if (isset($_GET['id'])) {
 				.then(res => res.text())
 				.then(data => displayData(data));
 		}
-		function setSelectOptions(rawdata) {
+		function setSelectOptions(uniqueOptionsArr) {
 			try {
-				let selectOptions=[];
-				data = JSON.parse(rawdata);
-				Object.values(data).forEach(row => {
-					Object.values(row).forEach(cell => {
-						cell.forEach(option => {
-							if (selectOptions.indexOf(option) === -1) {
-								selectOptions.push(option);
-							}
-						})
-					})
-
-				})
-				document.getElementById('options').innerHTML=selectOptions.map(v=>'<option>'+v+'</option>');
+				document.getElementById('options').innerHTML=selectDistinct(uniqueOptionsArr).map(v=>'<option>'+v+'</option>');
 			} catch (e) {
 				console.error(e);
 			}
@@ -123,6 +112,6 @@ if (isset($_GET['id'])) {
 	<datalist id="options"></datalist>
 	<script>
 		getData();
-		getExistingFieldValues();
+		selectDistinct(<?php echo '"'.$_GET['field'].'"'?>,setSelectOptions);
 	</script>
 </body>
