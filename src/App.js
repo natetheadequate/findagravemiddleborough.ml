@@ -1,4 +1,4 @@
-import { FormControl, Button, InputLabel, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody, Tabs, Tab } from "@material-ui/core";
+import { FormControl, Button, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody, Tabs, Tab } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import React, { useReducer, useState } from "react";
 import OperatorSelect from "./OperatorSelect";
@@ -29,24 +29,34 @@ const clean = (str) => {
 function App({ fields, edit = false }) {
 	const fieldNames = fields.map(v => v.name);
 	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(fieldNames);
-	const [sortBy, setSortBy] = useState('join_last_name');
-	const [sortOrder, setSortOrder] = useState('ASC');
+	const [distinctValues, setDistinctValues] = useState({});
+	const selectDistinct = field => {
+		fetch('selectDistinct.php?field=' + field)
+		.then(res => res.json())
+		.then(json => setDistinctValues({ ...distinctValues, [field]: Array.from(json) }))
+		.catch(e=>setDistinctValues({...distinctValues,[field]:"Error"}))
+	}
+	/* const [sortBy, setSortBy] = useState('join_last_name');
+	const [sortOrder, setSortOrder] = useState('ASC'); */
+	const [conditionKey, incrementConditionKey] = useReducer((state, _) => state + 1, -1);
 	//conditions is an array of objects with keys field (eg join_last_name), operator (eg =), and query (eg Allen)
 	const [conditions, dispatchConditions] = useReducer((state, action) => {
 		switch (action.type) {
 			case 'delete':
-				document.activeElement.blur(); 
+				document.activeElement.blur();
 				/* that line causes a ForwardRef error, but its necessary to keep the next autocomplete from getting focus.
 				If I didn't have it, the next autocomplete would be cleared and focused when you delete the one before it.
 				I don't give the autocompletes any permanance, they rerender every time one is deleted and have no id or key.
 				*/
-				return state.filter((v,i)=>i!==action.payload.i);
+				return state.filter(v => v.key !== action.payload.keyInArr);
 			case 'edit':
-				let x=[...state];
-				x.splice(action.payload.i,1,{ ...state[action.payload.i], [action.payload.key]: action.payload.newValue });
+				const x=[...state];
+				const i=state.find(v=>v.key=action.payload.keyInArr);
+				x.splice(i, 1, { ...state[i], [action.payload.editedkey]: action.payload.newValue });
 				return x;
 			case 'add':
-				return [ ...state, { field: 'join_last_name', operator: '=', query: '' } ]
+				incrementConditionKey();
+				return [...state, { key: conditionKey, field: 'join_last_name', operator: '=', query: '' }]
 			default://okay FINE! if it makes you happy eslint 
 		}
 	}, [])
@@ -67,9 +77,9 @@ function App({ fields, edit = false }) {
 		}
 	}
 	async function submitForm() {
-		let selectstr=fieldsToBeRetrieved.map(v=>'select[]='+encodeURIComponent(v)).join('&');
-		let conditionsstr=conditions.map(v=>'conditions[]='+encodeURIComponent(JSON.stringify(v))).join('&');
-		await fetch('/api/getData.php?'+[selectstr,conditionsstr].join('&'))
+		let selectstr = fieldsToBeRetrieved.map(v => 'select[]=' + encodeURIComponent(v)).join('&');
+		let conditionsstr = conditions.map(v => 'conditions[]=' + encodeURIComponent(JSON.stringify(v))).join('&');
+		await fetch('/api/getData.php?' + [selectstr, conditionsstr].join('&'))
 			.then(res => res.text())
 			.then(data => setResponse(data));
 	}
@@ -102,19 +112,19 @@ function App({ fields, edit = false }) {
 				<fieldset style={{ marginTop: spacing }}>
 					<legend>Filter</legend>
 					<div>
-						{conditions.map((v,i) => {
+						{conditions.map(v => {
 							return (
-								<FormGroup row={true} style={{ margin: "10px 0px" }}>
+								<FormGroup key={v.key} row={true} style={{ margin: "10px 0px" }}>
 									<FormControl>
 										<Autocomplete
 											style={{ width: '300px' }}
 											options={fieldNames}
 											getOptionLabel={clean}
-											value={conditions[i]['field']}
+											value={v.field}
 											onChange={(e, v, eventType) => {
 												switch (eventType) {
-													case "clear": dispatchConditions({ type: 'delete', payload: { i } }); break;
-													default: dispatchConditions({ type: 'edit', payload: { i, key: 'field', newValue: v } })
+													case "clear": dispatchConditions({ type: 'delete', payload: { keyInArr: v.key } }); break;
+													default: dispatchConditions({ type: 'edit', payload: { keyInArr: v.key, editedKey: 'field', newValue: v } })
 												}
 											}
 											}
@@ -129,22 +139,27 @@ function App({ fields, edit = false }) {
 									</FormControl>
 									<FormControl>
 										<OperatorSelect
-											i={i}
-											value={conditions[i].operator}
-											fieldObject={Object.values(fields).find((v) => v.name === conditions[i]['field'])}
+											i={v.key}
+											value={v.operator}
+											fieldObject={Object.values(fields).find((v) => v.name === v.field)}
 											setOperator={(newValue) =>
-												dispatchConditions({ type: 'edit', payload: { i, key: 'operator', newValue } })
+												dispatchConditions({ type: 'edit', payload: { keyInArr: v.key, editedKey: 'operator', newValue } })
 											} />
 									</FormControl>
 									<FormControl>
-									<Autocomplete
-										// selectDistinct is imported with a script tag in index.html. The code can be found at /public/api/selectDistinct.js
-										// eslint-disable-next-line no-undef
-										options={selectDistinct(conditions[i].field)}
-										freeSolo
-										renderInput={(params)=>(<TextField {...params} style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />)}
-									>
-									</Autocomplete>
+										<Autocomplete
+											options={(() => {
+												if (v.field in distinctValues) {
+													return v.field;
+												} else {
+													selectDistinct(v.field);
+													return ["Loading..."];
+												}
+											})()}
+											freeSolo
+											renderInput={(params) => (<TextField {...params} style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { keyInArr:v.key, editedKey: 'query', newValue: e.target.value } })} value={v.query} />)}
+										>
+										</Autocomplete>
 									</FormControl>
 								</FormGroup>
 							)
@@ -168,7 +183,7 @@ function App({ fields, edit = false }) {
 				<Table>
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
-						{Object.entries(responseobj).map(([id,record]) => (
+						{Object.entries(responseobj).map(([id, record]) => (
 							<TableRow>
 								{fieldsToBeRetrieved.map(field => {
 									if (field in record) {
