@@ -141,7 +141,7 @@ function App({ fields, edit = false }) {
 										<OperatorSelect
 											i={v.key}
 											value={v.operator}
-											fieldObject={Object.values(fields).find((v) => v.name === v.field)}
+											fieldObject={Object.values(fields).find((fieldobj) => fieldobj.name === v.field)}
 											setOperator={(newValue) =>
 												dispatchConditions({ type: 'edit', payload: { keyInArr: v.key, editedKey: 'operator', newValue } })
 											} />
