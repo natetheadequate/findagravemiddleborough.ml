@@ -32,9 +32,9 @@ function App({ fields, edit = false }) {
 	const [distinctValues, setDistinctValues] = useState({});
 	const selectDistinct = field => {
 		fetch('selectDistinct.php?field=' + field)
-		.then(res => res.json())
-		.then(json => setDistinctValues({ ...distinctValues, [field]: Array.from(json) }))
-		.catch(e=>setDistinctValues({...distinctValues,[field]:"Error"}))
+			.then(res => res.json())
+			.then(json => setDistinctValues({ ...distinctValues, [field]: Array.from(json) }))
+			.catch(e => setDistinctValues({ ...distinctValues, [field]: "Error" }))
 	}
 	/* const [sortBy, setSortBy] = useState('join_last_name');
 	const [sortOrder, setSortOrder] = useState('ASC'); */
@@ -50,8 +50,8 @@ function App({ fields, edit = false }) {
 				*/
 				return state.filter(v => v.key !== action.payload.keyInArr);
 			case 'edit':
-				const x=[...state];
-				const i=state.find(v=>v.key=action.payload.keyInArr);
+				const x = [...state];
+				const i = state.find(v => v.key = action.payload.keyInArr);
 				x.splice(i, 1, { ...state[i], [action.payload.editedkey]: action.payload.newValue });
 				return x;
 			case 'add':
@@ -147,19 +147,18 @@ function App({ fields, edit = false }) {
 											} />
 									</FormControl>
 									<FormControl>
-										<Autocomplete
-											options={(() => {
-												if (v.field in distinctValues) {
-													return v.field;
-												} else {
-													selectDistinct(v.field);
-													return ["Loading..."];
-												}
-											})()}
-											freeSolo
-											renderInput={(params) => (<TextField {...params} style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { keyInArr:v.key, editedKey: 'query', newValue: e.target.value } })} value={v.query} />)}
-										>
-										</Autocomplete>
+										<TextField list={"datalist_" + v.field} style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { keyInArr: v.key, editedKey: 'query', newValue: e.target.value } })} value={v.query} />
+										<datalist id={"datalist_" + v.field}>
+											{
+												(() => {
+													if (!(v.field in distinctValues)) {
+														selectDistinct(v.field);
+														distinctValues[v.field] = ["Loading..."];
+													}
+													return v.field.map(v => (<option>{v}</option>));
+												})()
+											}
+										</datalist>
 									</FormControl>
 								</FormGroup>
 							)
