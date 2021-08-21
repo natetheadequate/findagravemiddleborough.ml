@@ -112,15 +112,15 @@ function App({ fields, edit = false }) {
 				<fieldset style={{ marginTop: spacing }}>
 					<legend>Filter</legend>
 					<div>
-						{conditions.map(v => {
+						{conditions.map(condition => {
 							return (
-								<FormGroup key={v.key} row={true} style={{ margin: "10px 0px" }}>
+								<FormGroup key={condition.key} row={true} style={{ margin: "10px 0px" }}>
 									<FormControl>
 										<Autocomplete
 											style={{ width: '300px' }}
 											options={fieldNames}
 											getOptionLabel={clean}
-											value={v.field}
+											value={condition.field}
 											onChange={(e, v, eventType) => {
 												switch (eventType) {
 													case "clear": dispatchConditions({ type: 'delete', payload: { keyInArr: v.key } }); break;
@@ -139,23 +139,23 @@ function App({ fields, edit = false }) {
 									</FormControl>
 									<FormControl>
 										<OperatorSelect
-											i={v.key}
-											value={v.operator}
-											fieldObject={Object.values(fields).find((fieldobj) => fieldobj.name === v.field)}
+											i={condition.key}
+											value={condition.operator}
+											fieldObject={fields.find(fieldobj => fieldobj.name === condition.field) || { key: conditionKey, field: 'join_last_name', operator: '=', query: '' }}
 											setOperator={(newValue) =>
-												dispatchConditions({ type: 'edit', payload: { keyInArr: v.key, editedKey: 'operator', newValue } })
+												dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue } })
 											} />
 									</FormControl>
 									<FormControl>
-										<TextField list={"datalist_" + v.field} style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { keyInArr: v.key, editedKey: 'query', newValue: e.target.value } })} value={v.query} />
-										<datalist id={"datalist_" + v.field}>
+										<TextField list={"datalist_" + condition.field} style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'query', newValue: e.target.value } })} value={condition.query} />
+										<datalist id={"datalist_" + condition.field}>
 											{
 												(() => {
-													if (!(v.field in distinctValues)) {
-														selectDistinct(v.field);
-														distinctValues[v.field] = ["Loading..."];
+													if (!(condition.field in distinctValues)) {
+														selectDistinct(condition.field);
+														distinctValues[condition.field] = ["Loading..."];
 													}
-													return distinctValues[v.field].map(v => (<option>{v}</option>));
+													return distinctValues[condition.field].map(v => (<option>{v}</option>));
 												})()
 											}
 										</datalist>
