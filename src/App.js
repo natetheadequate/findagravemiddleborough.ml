@@ -33,8 +33,8 @@ function App({ fields, edit = false }) {
 	const selectDistinct = field => {
 		fetch('selectDistinct.php?field=' + field)
 			.then(res => res.json())
-			.then(json => setDistinctValues({ ...distinctValues, [field]: Array.from(json) }))
-			.catch(e => setDistinctValues({ ...distinctValues, [field]: "Error" }))
+			.then(json => setDistinctValues({ ...distinctValues, [field]: Array.from(JSON.parse(json)) }))
+			.catch(e => setDistinctValues({ ...distinctValues, [field]: ["Error"] }))
 	}
 	/* const [sortBy, setSortBy] = useState('join_last_name');
 	const [sortOrder, setSortOrder] = useState('ASC'); */
@@ -51,7 +51,7 @@ function App({ fields, edit = false }) {
 				return state.filter(v => v.key !== action.payload.keyInArr);
 			case 'edit':
 				const x = [...state];
-				const i = state.find(v => v.key = action.payload.keyInArr);
+				const i = state.find(v => v.key === action.payload.keyInArr);
 				x.splice(i, 1, { ...state[i], [action.payload.editedkey]: action.payload.newValue });
 				return x;
 			case 'add':
@@ -141,7 +141,7 @@ function App({ fields, edit = false }) {
 										<OperatorSelect
 											i={v.key}
 											value={v.operator}
-											fieldObject={Object.values(fields).find((fieldobj) => fieldobj.name === v.field)}
+											fieldObject={Object.values(fields).find(fieldobj => fieldobj.name === v.field)}
 											setOperator={(newValue) =>
 												dispatchConditions({ type: 'edit', payload: { keyInArr: v.key, editedKey: 'operator', newValue } })
 											} />
@@ -155,7 +155,7 @@ function App({ fields, edit = false }) {
 														selectDistinct(v.field);
 														distinctValues[v.field] = ["Loading..."];
 													}
-													return distinctValues[v.field].map(v => (<option>{v}</option>));
+													return distinctValues[v.field].map((v,i) => (<option key={i}>{v}</option>));
 												})()
 											}
 										</datalist>
