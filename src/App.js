@@ -1,49 +1,12 @@
 import { FormControl, MenuItem, Select, Button, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody, Tabs, Tab } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import React, { useReducer, useState } from "react";
+import React, { useMemo, useReducer, useState } from "react";
+import clean from "./clean";
 
-const titleCase = (str) => {
-	//Cases Strings Like This
-	let capitalizenextletter = true;
-	let strarr = str.split("");
-	let newstr = "";
-	strarr.forEach((c, i) => {
-		if (capitalizenextletter) {
-			newstr += c.toUpperCase();
-		} else {
-			newstr += c.toLowerCase();
-		}
-		if (c === " " || c === "/") {
-			capitalizenextletter = true;
-		} else {
-			capitalizenextletter = false;
-		}
-	});
-	return newstr;
-};
-const clean = (str) => {
-	return titleCase((' ' + str).replace('join_', '').replaceAll('_', ' '))
-}
-
-function App({ fields, edit = false }) {
+function App({ fields, operators, edit = false }) {
 	const fieldNames = fields.map(v => v.name);
 	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(fieldNames);
 	const [distinctValues, setDistinctValues] = useState({});
-	const selectDistinct = field => {
-		fetch('/api/selectDistinct.php?field=' + field)
-			.then(res => res.json())
-			.then(json => {
-				if (Array.isArray(json)) {
-					return json;
-				} else {
-					throw new Error("selectDistinct.php didn't return an array");
-				}
-			})
-			.then(json => setDistinctValues({ ...distinctValues, [field]: json }))
-			.catch(e => setDistinctValues({ ...distinctValues, [field]: ["Error"] }))
-	}
-	/* const [sortBy, setSortBy] = useState('join_last_name');
-	const [sortOrder, setSortOrder] = useState('ASC'); */
 	//conditions is an array of objects with keys field (eg join_last_name), operator (eg =), and query (eg Allen)
 	const [conditions, dispatchConditions] = useReducer((state, action) => {
 		switch (action.type) {
@@ -69,47 +32,64 @@ function App({ fields, edit = false }) {
 	}, [])
 	const [response, setResponse] = useState(null);
 	const [resultFormat, setResultFormat] = useState("table");
-	const operators = {
-		date: [
-			{ value: "=", displayValue: "on" },
-			{ value: "<=", displayValue: "on or before" },
-			{ value: ">=", displayValue: "on or after" },
-			{ value: "<", displayValue: "before" },
-			{ value: ">", displayValue: "after" },
-		],
-		number: [
-			{ value: "=", displayValue: "=" },
-			{ value: "<=", displayValue: "<=" },
-			{ value: ">=", displayValue: ">=" },
-			{ value: "<", displayValue: "<" },
-			{ value: ">", displayValue: ">" },
-		],
-		default: [
-			{ value: "=", displayValue: "Matches Exactly" },
-			{ value: "%LIKE%", displayValue: "Contains" },
-			{ value: "LIKE%", displayValue: "Starts With" },
-			{ value: "%LIKE", displayValue: "Ends With" }
-		]
+
+	async function selectDistinct(field) {
+		fetch('/api/selectDistinct.php?field=' + field)
+			.then(res => res.json())
+			.then(json => {
+				if (Array.isArray(json)) {
+					return json;
+				} else {
+					throw new Error("selectDistinct.php didn't return an array");
+				}
+			})
+			.then(json => setDistinctValues({ ...distinctValues, [field]: json }))
+			.catch(e => setDistinctValues({ ...distinctValues, [field]: ["Error"] }))
 	}
+	/* const [sortBy, setSortBy] = useState('join_last_name');
+	const [sortOrder, setSortOrder] = useState('ASC'); */
 	conditions.forEach(condition => {
 		if (!(condition.field in distinctValues)) {
 			selectDistinct(condition.field);
 			distinctValues[condition.field] = ["Loading..."];
 		}
 	})
-	let responseobj = {};
-	let responsestr = '';
-	if (response !== null) {
-		try {
-			responseobj = JSON.parse(response);
-		} catch (e) {
-			if (!(e instanceof SyntaxError)) {
-				responsestr = "There was an error parsing the data.";//this should never happen
-			} else {
-				responsestr = response;//these are the error messsages, like no results found and invalid query
+	const [responseobj, errorstr] = useMemo(() => {
+		if (response !== null) {
+			let obj = {};
+			let err = "";
+			try {
+				obj = JSON.parse(response);
+			} catch (e) {
+				if (!(e instanceof SyntaxError)) {
+					err = "There was an error parsing the data.";//this should never happen
+				} else {
+					err = response;//these are the error messsages, like no results found and invalid query
+				}
+			} finally {
+				return [obj, err];
 			}
 		}
-	}
+	}, [response]);
+	const responseAsCsv = useMemo(() => {
+		let headers1 = ['id', ...fieldsToBeRetrieved];
+		let headers2 = ['id', ...fieldsToBeRetrieved.map(clean)];
+		let body = [];
+		let responseobjwithids = [];
+		Object.entries(responseobj).forEach(([id, rowobj]) => {
+			responseobjwithids.push({ id, ...rowobj });
+		})
+		responseobjwithids.forEach(rowobj => {
+			let bodyrow = [];
+			Object.entries(rowobj).forEach(([field, valuearr]) => {
+				bodyrow[headers1.indexOf(field)] = valuearr.join(' ; ');
+			})
+			body.push(bodyrow);
+		})
+		let format = arr => arr.map(JSON.stringify).join(',');
+		return [format(headers1), format(headers2), ...body.map(format)].join('\n');
+
+	}, [fieldsToBeRetrieved, responseobj])
 	async function submitForm() {
 		let selectstr = fieldsToBeRetrieved.map(v => 'select[]=' + encodeURIComponent(v)).join('&');
 		let conditionsstr = conditions.map(v => 'conditions[]=' + encodeURIComponent(JSON.stringify(v))).join('&');
@@ -220,8 +200,10 @@ function App({ fields, edit = false }) {
 			<Tabs value={resultFormat} onChange={(e, n) => setResultFormat(n)}>
 				<Tab label="Table" value="table" />
 				<Tab label="JSON" value="json" />
+				<Tab label="CSV (Import to Excel)" value="csv" />
 			</Tabs>
-			{responsestr || ((resultFormat === "table") && (<>
+			{errorstr}
+			{((resultFormat === "table") && (<>
 				{edit && <p>Click on the data to edit it.</p>}
 				<Table>
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
@@ -243,7 +225,7 @@ function App({ fields, edit = false }) {
 				</Table>
 			</>)) || ((resultFormat === "json") &&
 				JSON.stringify(responseobj)
-				)
+				) || ((resultFormat === "csv") && <p id="csvresults">{responseAsCsv}</p>)
 			}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >

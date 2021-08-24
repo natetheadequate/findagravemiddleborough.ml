@@ -31,15 +31,37 @@ const useFields = () => {
 
 function AppWrapper() {
 	const fields = useFields();
+	const operators = {
+		date: [
+			{ value: "=", displayValue: "on" },
+			{ value: "<=", displayValue: "on or before" },
+			{ value: ">=", displayValue: "on or after" },
+			{ value: "<", displayValue: "before" },
+			{ value: ">", displayValue: "after" },
+		],
+		number: [
+			{ value: "=", displayValue: "=" },
+			{ value: "<=", displayValue: "<=" },
+			{ value: ">=", displayValue: ">=" },
+			{ value: "<", displayValue: "<" },
+			{ value: ">", displayValue: ">" },
+		],
+		default: [
+			{ value: "=", displayValue: "Matches Exactly" },
+			{ value: "%LIKE%", displayValue: "Contains" },
+			{ value: "LIKE%", displayValue: "Starts With" },
+			{ value: "%LIKE", displayValue: "Ends With" }
+		]
+	}
 	return (
 		<BrowserRouter>
 			<Switch>
 				{/* it is necessary to check that fields is an array because in the first paint it isn't, and throws an error. */}
 				<Route exact path="/edit">
-					{Array.isArray(fields) && <App fields={fields} edit/>}
+					{Array.isArray(fields) && <App fields={fields} operators={operators} edit/>}
 				</Route>
 				<Route exact path='/'>
-					{Array.isArray(fields) && <App fields={fields} />}
+					{Array.isArray(fields) && <App fields={fields} operators={operators}/>}
 				</Route>
 			</Switch> 
 		</BrowserRouter>
