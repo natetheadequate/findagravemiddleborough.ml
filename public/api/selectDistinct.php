@@ -1,7 +1,7 @@
 <?php
 $_GET = ['select' => $_GET['field']];
-$keepraw = true;
-include 'getData.php';
+$returndontecho = true;
+$results = include 'getData.php';
 $uniqueValues = [];
 foreach ($results as $key => $row) {
     foreach ($row as $field => $valuearr) {
