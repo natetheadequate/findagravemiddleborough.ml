@@ -30,7 +30,7 @@ function App({ fields, edit = false }) {
 	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(fieldNames);
 	const [distinctValues, setDistinctValues] = useState({});
 	const selectDistinct = field => {
-		fetch('selectDistinct.php?field=' + field)
+		fetch('/api/selectDistinct.php?field=' + field)
 			.then(res => res.json())
 			.then(json => setDistinctValues({ ...distinctValues, [field]: ["i", json + ""] }))
 			.catch(e => setDistinctValues({ ...distinctValues, [field]: ["Error"] }))
