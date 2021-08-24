@@ -32,7 +32,14 @@ function App({ fields, edit = false }) {
 	const selectDistinct = field => {
 		fetch('/api/selectDistinct.php?field=' + field)
 			.then(res => res.json())
-			.then(json => setDistinctValues({ ...distinctValues, [field]: ["i", json + ""] }))
+			.then(json => {
+				if (Array.isArray(json)) {
+					return json;
+				} else {
+					throw new Error("selectDistinct.php didn't return an array");
+				}
+			})
+			.then(json => setDistinctValues({ ...distinctValues, [field]: json }))
 			.catch(e => setDistinctValues({ ...distinctValues, [field]: ["Error"] }))
 	}
 	/* const [sortBy, setSortBy] = useState('join_last_name');
@@ -64,24 +71,24 @@ function App({ fields, edit = false }) {
 	const [resultFormat, setResultFormat] = useState("table");
 	const operators = {
 		date: [
-			{ value: "=", displayValue:"on"},
-			{ value:"<=", displayValue:"on or before" },
-			{ value:">=", displayValue:"on or after" },
-			{ value:"<", displayValue:"before" },
-			{ value:">", displayValue:"after" },
+			{ value: "=", displayValue: "on" },
+			{ value: "<=", displayValue: "on or before" },
+			{ value: ">=", displayValue: "on or after" },
+			{ value: "<", displayValue: "before" },
+			{ value: ">", displayValue: "after" },
 		],
 		number: [
-			{ value: "=", displayValue:"="},
-			{ value:"<=", displayValue:"<=" },
-			{ value:">=", displayValue:">=" },
-			{ value:"<", displayValue:"<" },
-			{ value:">", displayValue:">" },
+			{ value: "=", displayValue: "=" },
+			{ value: "<=", displayValue: "<=" },
+			{ value: ">=", displayValue: ">=" },
+			{ value: "<", displayValue: "<" },
+			{ value: ">", displayValue: ">" },
 		],
-		default:[
-			{value:"=",displayValue:"Matches Exactly"},
-			{value:"%LIKE%",displayValue:"Contains"},
-			{value:"LIKE%",displayValue:"Starts With"},
-			{value:"%LIKE",displayValue:"Ends With"}
+		default: [
+			{ value: "=", displayValue: "Matches Exactly" },
+			{ value: "%LIKE%", displayValue: "Contains" },
+			{ value: "LIKE%", displayValue: "Starts With" },
+			{ value: "%LIKE", displayValue: "Ends With" }
 		]
 	}
 	conditions.forEach(condition => {
@@ -167,10 +174,10 @@ function App({ fields, edit = false }) {
 											id={'condition' + condition.key + 'operator'}
 											value={condition.operator}
 											style={{ width: "300px", margin: "auto 5px 0 5px" }}
-											onChange={event => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue:event.target.value } })}>
+											onChange={event => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue: event.target.value } })}>
 											{(() => {
 												const fieldObject = fields.find(fieldobj => fieldobj.name === condition.field);
-												const inputType=(fieldObject.hasOwnProperty('inputType') && operators.hasOwnProperty(fieldObject.inputType) && fieldObject.inputType) || 'default';
+												const inputType = (fieldObject.hasOwnProperty('inputType') && operators.hasOwnProperty(fieldObject.inputType) && fieldObject.inputType) || 'default';
 												return operators[inputType].map(v => (<MenuItem value={v.value}>{v.displayValue}</MenuItem>))
 											})()}
 										</Select>
@@ -179,7 +186,7 @@ function App({ fields, edit = false }) {
 										<Autocomplete
 											id={"query_autocomplete_" + condition.key}
 											freeSolo
-											style={{width:'300px',marginTop:"auto"}}
+											style={{ width: '300px', marginTop: "auto" }}
 											options={distinctValues[condition.field]}
 											renderInput={params => (<TextField {...params} placeholder="Enter search term here..." id="query" onChange={(e, v) => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'query', newValue: v } })} value={condition.query} />)}
 										/>
