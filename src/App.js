@@ -1,7 +1,6 @@
-import { FormControl, Button, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody, Tabs, Tab } from "@material-ui/core";
+import { FormControl, MenuItem, Select, Button, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody, Tabs, Tab } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import React, { useReducer, useState } from "react";
-import OperatorSelect from "./OperatorSelect";
 
 const titleCase = (str) => {
 	//Cases Strings Like This
@@ -33,12 +32,11 @@ function App({ fields, edit = false }) {
 	const selectDistinct = field => {
 		fetch('selectDistinct.php?field=' + field)
 			.then(res => res.json())
-			.then(json => setDistinctValues({ ...distinctValues, [field]: Array.from(json) }))
-			.catch(e => setDistinctValues({ ...distinctValues, [field]: "Error" }))
+			.then(json => setDistinctValues({ ...distinctValues, [field]: ["i", json + ""] }))
+			.catch(e => setDistinctValues({ ...distinctValues, [field]: ["Error"] }))
 	}
 	/* const [sortBy, setSortBy] = useState('join_last_name');
 	const [sortOrder, setSortOrder] = useState('ASC'); */
-	const [conditionKey, incrementConditionKey] = useReducer((state, _) => state + 1, -1);
 	//conditions is an array of objects with keys field (eg join_last_name), operator (eg =), and query (eg Allen)
 	const [conditions, dispatchConditions] = useReducer((state, action) => {
 		switch (action.type) {
@@ -51,18 +49,47 @@ function App({ fields, edit = false }) {
 				return state.filter(v => v.key !== action.payload.keyInArr);
 			case 'edit':
 				const x = [...state];
-				const i = state.find(v => v.key === action.payload.keyInArr);
-				x.splice(i, 1, { ...state[i], [action.payload.editedkey]: action.payload.newValue });
+				const i = state.findIndex(v => v.key === action.payload.keyInArr);
+				x.splice(i, 1, { ...state[i], [action.payload.editedKey]: action.payload.newValue });
 				return x;
 			case 'add':
-				incrementConditionKey();
-				return [...state, { key: conditionKey, field: 'join_last_name', operator: '=', query: '' }]
+				let highestKey = -1;
+				state.forEach(v => { if (v.key > highestKey) highestKey = v.key });
+				const nextKey = highestKey + 1;
+				return [...state, { key: nextKey, field: 'join_last_name', operator: '=', query: '' }]
 			default://okay FINE! if it makes you happy eslint 
 		}
 	}, [])
-	const spacing = "5px";
 	const [response, setResponse] = useState(null);
 	const [resultFormat, setResultFormat] = useState("table");
+	const operators = {
+		date: [
+			{ value: "=", displayValue:"on"},
+			{ value:"<=", displayValue:"on or before" },
+			{ value:">=", displayValue:"on or after" },
+			{ value:"<", displayValue:"before" },
+			{ value:">", displayValue:"after" },
+		],
+		number: [
+			{ value: "=", displayValue:"="},
+			{ value:"<=", displayValue:"<=" },
+			{ value:">=", displayValue:">=" },
+			{ value:"<", displayValue:"<" },
+			{ value:">", displayValue:">" },
+		],
+		default:[
+			{value:"=",displayValue:"Matches Exactly"},
+			{value:"%LIKE%",displayValue:"Contains"},
+			{value:"LIKE%",displayValue:"Starts With"},
+			{value:"%LIKE",displayValue:"Ends With"}
+		]
+	}
+	conditions.forEach(condition => {
+		if (!(condition.field in distinctValues)) {
+			selectDistinct(condition.field);
+			distinctValues[condition.field] = ["Loading..."];
+		}
+	})
 	let responseobj = {};
 	let responsestr = '';
 	if (response !== null) {
@@ -109,56 +136,53 @@ function App({ fields, edit = false }) {
 				</FormControl>
 				<br />
 				<br />
-				<fieldset style={{ marginTop: spacing }}>
+				<fieldset>
 					<legend>Filter</legend>
 					<div>
 						{conditions.map(condition => {
 							return (
-								<FormGroup key={condition.key} row={true} style={{ margin: "10px 0px" }}>
+								<FormGroup key={condition.key} row={true} style={{ margin: "15px" }}>
 									<FormControl>
 										<Autocomplete
 											style={{ width: '300px' }}
 											options={fieldNames}
 											getOptionLabel={clean}
 											value={condition.field}
-											onChange={(e, v, eventType) => {
+											onChange={(_, v, eventType) => {
 												switch (eventType) {
-													case "clear": dispatchConditions({ type: 'delete', payload: { keyInArr: v.key } }); break;
-													default: dispatchConditions({ type: 'edit', payload: { keyInArr: v.key, editedKey: 'field', newValue: v } })
+													case "clear": dispatchConditions({ type: 'delete', payload: { keyInArr: condition.key } }); break;
+													default: dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'field', newValue: v } })
 												}
 											}
 											}
 											renderInput={(v) =>
 												<TextField
 													{...v}
-													variant="outlined"
-													label="Field"
 												/>
 											}
 										/>
 									</FormControl>
 									<FormControl>
-										<OperatorSelect
-											i={condition.key}
+										<Select
+											id={'condition' + condition.key + 'operator'}
 											value={condition.operator}
-											fieldObject={fields.find(fieldobj => fieldobj.name === condition.field) || { key: conditionKey, field: 'join_last_name', operator: '=', query: '' }}
-											setOperator={(newValue) =>
-												dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue } })
-											} />
+											style={{ width: "300px", margin: "auto 5px 0 5px" }}
+											onChange={event => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue:event.target.value } })}>
+											{(() => {
+												const fieldObject = fields.find(fieldobj => fieldobj.name === condition.field);
+												const inputType=(fieldObject.hasOwnProperty('inputType') && operators.hasOwnProperty(fieldObject.inputType) && fieldObject.inputType) || 'default';
+												return operators[inputType].map(v => (<MenuItem value={v.value}>{v.displayValue}</MenuItem>))
+											})()}
+										</Select>
 									</FormControl>
 									<FormControl>
-										<TextField list={"datalist_" + condition.field} style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'query', newValue: e.target.value } })} value={condition.query} />
-										<datalist id={"datalist_" + condition.field}>
-											{
-												(() => {
-													if (!(condition.field in distinctValues)) {
-														selectDistinct(condition.field);
-														distinctValues[condition.field] = ["Loading..."];
-													}
-													return distinctValues[condition.field].map(v => (<option>{v}</option>));
-												})()
-											}
-										</datalist>
+										<Autocomplete
+											id={"query_autocomplete_" + condition.key}
+											freeSolo
+											style={{width:'300px',marginTop:"auto"}}
+											options={distinctValues[condition.field]}
+											renderInput={params => (<TextField {...params} placeholder="Enter search term here..." id="query" onChange={(e, v) => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'query', newValue: v } })} value={condition.query} />)}
+										/>
 									</FormControl>
 								</FormGroup>
 							)
