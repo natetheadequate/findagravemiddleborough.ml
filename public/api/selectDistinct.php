@@ -6,7 +6,7 @@ $uniqueValues = [];
 foreach ($results as $key => $row) {
     foreach ($row as $field => $valuearr) {
         foreach ($valuearr as $value) {
-            if (array_search($uniqueValues, $value) === false) {
+            if (array_search($value,$uniqueValues) === false) {
                 array_push($uniqueValues, $value);
             }
         }
