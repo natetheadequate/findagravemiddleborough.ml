@@ -174,7 +174,7 @@ function App({ fields, edit = false }) {
 											id={'condition' + condition.key + 'operator'}
 											value={condition.operator}
 											style={{ width: "300px", margin: "auto 5px 0 5px" }}
-											onChange={(_, newValue) => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue } })}>
+											onChange={event => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue: event.target.value } })}>
 											{(() => {
 												const fieldObject = fields.find(fieldobj => fieldobj.name === condition.field);
 												const inputType = (fieldObject.hasOwnProperty('inputType') && operators.hasOwnProperty(fieldObject.inputType) && fieldObject.inputType) || 'default';
