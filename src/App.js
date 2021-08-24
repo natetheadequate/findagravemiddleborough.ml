@@ -174,7 +174,7 @@ function App({ fields, edit = false }) {
 											id={'condition' + condition.key + 'operator'}
 											value={condition.operator}
 											style={{ width: "300px", margin: "auto 5px 0 5px" }}
-											onChange={(_,newValue) => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue } })}>
+											onChange={(_, newValue) => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue } })}>
 											{(() => {
 												const fieldObject = fields.find(fieldobj => fieldobj.name === condition.field);
 												const inputType = (fieldObject.hasOwnProperty('inputType') && operators.hasOwnProperty(fieldObject.inputType) && fieldObject.inputType) || 'default';
@@ -186,9 +186,22 @@ function App({ fields, edit = false }) {
 										<Autocomplete
 											id={"query_autocomplete_" + condition.key}
 											freeSolo
+											autoSelect
 											style={{ width: '300px', marginTop: "auto" }}
 											options={distinctValues[condition.field]}
-											renderInput={params => (<TextField {...params} placeholder="Enter search term here..." id="query" onChange={(e, v) => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'query', newValue: v } })} value={condition.query} />)}
+											onChange={(_, newValue) => dispatchConditions(
+												{
+													type: 'edit',
+													payload: { keyInArr: condition.key, editedKey: 'query', newValue }
+												}
+											)}
+											renderInput={params => (<TextField
+												{...params}
+												placeholder="Enter search term here..."
+												id="query"
+												value={condition.query}
+											/>)
+											}
 										/>
 									</FormControl>
 								</FormGroup>
