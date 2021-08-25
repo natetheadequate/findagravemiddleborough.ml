@@ -1,75 +1,100 @@
-import { FormControl, Button, InputLabel, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody, Tabs, Tab } from "@material-ui/core";
+import { FormControl, MenuItem, Select, Button, TextField, FormGroup, Typography, ButtonGroup, Table, TableHead, TableRow, TableCell, TableBody, Tabs, Tab } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import React, { useReducer, useState } from "react";
-import OperatorSelect from "./OperatorSelect";
+import React, { useMemo, useReducer, useState } from "react";
+import clean from "./clean";
+import DataDisplayer from "./DataDisplayer";
 
-const titleCase = (str) => {
-	//Cases Strings Like This
-	let capitalizenextletter = true;
-	let strarr = str.split("");
-	let newstr = "";
-	strarr.forEach((c, i) => {
-		if (capitalizenextletter) {
-			newstr += c.toUpperCase();
-		} else {
-			newstr += c.toLowerCase();
-		}
-		if (c === " " || c === "/") {
-			capitalizenextletter = true;
-		} else {
-			capitalizenextletter = false;
-		}
-	});
-	return newstr;
-};
-const clean = (str) => {
-	return titleCase((' ' + str).replace('join_', '').replaceAll('_', ' '))
-}
-
-function App({ fields, edit = false }) {
+function App({ fields, operators, edit = false }) {
 	const fieldNames = fields.map(v => v.name);
 	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(fieldNames);
-	const [sortBy, setSortBy] = useState('join_last_name');
-	const [sortOrder, setSortOrder] = useState('ASC');
+	const [distinctValues, setDistinctValues] = useState({});
 	//conditions is an array of objects with keys field (eg join_last_name), operator (eg =), and query (eg Allen)
 	const [conditions, dispatchConditions] = useReducer((state, action) => {
 		switch (action.type) {
 			case 'delete':
-				document.activeElement.blur(); 
+				document.activeElement.blur();
 				/* that line causes a ForwardRef error, but its necessary to keep the next autocomplete from getting focus.
 				If I didn't have it, the next autocomplete would be cleared and focused when you delete the one before it.
 				I don't give the autocompletes any permanance, they rerender every time one is deleted and have no id or key.
 				*/
-				return state.filter((v,i)=>i!==action.payload.i);
+				return state.filter(v => v.key !== action.payload.keyInArr);
 			case 'edit':
-				let x=[...state];
-				x.splice(action.payload.i,1,{ ...state[action.payload.i], [action.payload.key]: action.payload.newValue });
+				const x = [...state];
+				const i = state.findIndex(v => v.key === action.payload.keyInArr);
+				x.splice(i, 1, { ...state[i], [action.payload.editedKey]: action.payload.newValue });
 				return x;
 			case 'add':
-				return [ ...state, { field: 'join_last_name', operator: '=', query: '' } ]
+				let highestKey = -1;
+				state.forEach(v => { if (v.key > highestKey) highestKey = v.key });
+				const nextKey = highestKey + 1;
+				return [...state, { key: nextKey, field: 'join_last_name', operator: '=', query: '' }]
 			default://okay FINE! if it makes you happy eslint 
 		}
 	}, [])
-	const spacing = "5px";
 	const [response, setResponse] = useState(null);
 	const [resultFormat, setResultFormat] = useState("table");
-	let responseobj = {};
-	let responsestr = '';
-	if (response !== null) {
+
+	async function selectDistinct(field) {
+		fetch('/api/selectDistinct.php?field=' + field)
+			.then(res => res.json())
+			.then(json => {
+				if (Array.isArray(json)) {
+					return json;
+				} else {
+					throw new Error("selectDistinct.php didn't return an array");
+				}
+			})
+			.then(json => setDistinctValues({ ...distinctValues, [field]: json }))
+			.catch(e => setDistinctValues({ ...distinctValues, [field]: ["Error"] }))
+	}
+	/* const [sortBy, setSortBy] = useState('join_last_name');
+	const [sortOrder, setSortOrder] = useState('ASC'); */
+	conditions.forEach(condition => {
+		if (!(condition.field in distinctValues)) {
+			selectDistinct(condition.field);
+			distinctValues[condition.field] = ["Loading..."];
+		}
+	})
+	const [responseobj, errorstr] = useMemo(() => {
+		let obj = {};
+		let err = "";
 		try {
-			responseobj = JSON.parse(response);
+			if (response !== null) {
+				obj = JSON.parse(response);
+			}
 		} catch (e) {
 			if (!(e instanceof SyntaxError)) {
-				responsestr = "There was an error parsing the data.";//this should never happen
+				err = "There was an error parsing the data.";//this should never happen
 			} else {
-				responsestr = response;//these are the error messsages, like no results found and invalid query
+				err = response;//these are the error messsages, like no results found and invalid query
 			}
+		} finally {
+			return [obj, err];
 		}
-	}
+	}, [response]);
+	const responseAsCsv = useMemo(() => {
+		let headers1 = ['id', ...fieldsToBeRetrieved];
+		let headers2 = ['id', ...fieldsToBeRetrieved.map(clean)];
+		let body = [];
+		let responseobjwithids = [];
+		Object.entries(responseobj).forEach(([id, rowobj]) => {
+			responseobjwithids.push({ id, ...rowobj });
+		})
+		responseobjwithids.forEach(rowobj => {
+			let bodyrow = [];
+			Object.entries(rowobj).forEach(([field, valuearr]) => {
+				bodyrow[headers1.indexOf(field)] = valuearr.toString();
+			})
+			body.push(bodyrow);
+		})
+		let format = arr => arr.map(JSON.stringify).join(',');
+		return [format(headers1), format(headers2), ...body.map(format)].join('\n');
+
+	}, [fieldsToBeRetrieved, responseobj])
 	async function submitForm() {
-		let selectstr=fieldsToBeRetrieved.map(v=>'select[]='+encodeURIComponent(v)).join('&');
-		let conditionsstr=conditions.map(v=>'conditions[]='+encodeURIComponent(JSON.stringify(v))).join('&');
-		await fetch('/api/getData.php?'+[selectstr,conditionsstr].join('&'))
+		let selectstr = fieldsToBeRetrieved.map(v => 'select[]=' + encodeURIComponent(v)).join('&');
+		let conditionsstr = conditions.map(v => 'conditions[]=' + encodeURIComponent(JSON.stringify(v))).join('&');
+		await fetch('/api/getData.php?' + [selectstr, conditionsstr].join('&'))
 			.then(res => res.text())
 			.then(data => setResponse(data));
 	}
@@ -99,45 +124,65 @@ function App({ fields, edit = false }) {
 				</FormControl>
 				<br />
 				<br />
-				<fieldset style={{ marginTop: spacing }}>
+				<fieldset>
 					<legend>Filter</legend>
 					<div>
-						{conditions.map((v,i) => {
+						{conditions.map(condition => {
 							return (
-								<FormGroup row={true} style={{ margin: "10px 0px" }}>
+								<FormGroup key={condition.key} row={true} style={{ margin: "15px" }}>
 									<FormControl>
 										<Autocomplete
 											style={{ width: '300px' }}
 											options={fieldNames}
 											getOptionLabel={clean}
-											value={conditions[i]['field']}
-											onChange={(e, v, eventType) => {
+											value={condition.field}
+											onChange={(_, v, eventType) => {
 												switch (eventType) {
-													case "clear": dispatchConditions({ type: 'delete', payload: { i } }); break;
-													default: dispatchConditions({ type: 'edit', payload: { i, key: 'field', newValue: v } })
+													case "clear": dispatchConditions({ type: 'delete', payload: { keyInArr: condition.key } }); break;
+													default: dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'field', newValue: v } })
 												}
 											}
 											}
 											renderInput={(v) =>
 												<TextField
 													{...v}
-													variant="outlined"
-													label="Field"
 												/>
 											}
 										/>
 									</FormControl>
 									<FormControl>
-										<OperatorSelect
-											i={i}
-											value={conditions[i].operator}
-											fieldObject={Object.values(fields).find((v) => v.name === conditions[i]['field'])}
-											setOperator={(newValue) =>
-												dispatchConditions({ type: 'edit', payload: { i, key: 'operator', newValue } })
-											} />
+										<Select
+											id={'condition' + condition.key + 'operator'}
+											value={condition.operator}
+											style={{ width: "300px", margin: "auto 5px 0 5px" }}
+											onChange={event => dispatchConditions({ type: 'edit', payload: { keyInArr: condition.key, editedKey: 'operator', newValue: event.target.value } })}>
+											{(() => {
+												const fieldObject = fields.find(fieldobj => fieldobj.name === condition.field);
+												const inputType = (fieldObject.hasOwnProperty('inputType') && operators.hasOwnProperty(fieldObject.inputType) && fieldObject.inputType) || 'default';
+												return operators[inputType].map(v => (<MenuItem value={v.value}>{v.displayValue}</MenuItem>))
+											})()}
+										</Select>
 									</FormControl>
 									<FormControl>
-										<TextField style={{ margin: 'auto 5px' }} placeholder="Enter search term here..." id="query" onChange={e => dispatchConditions({ type: 'edit', payload: { i, key: 'query', newValue: e.target.value } })} value={conditions[i].query} />
+										<Autocomplete
+											id={"query_autocomplete_" + condition.key}
+											freeSolo
+											style={{ width: '300px', marginTop: "auto" }}
+											options={distinctValues[condition.field]}
+											onChange={(_, newValue) => dispatchConditions(
+												{
+													type: 'edit',
+													payload: { keyInArr: condition.key, editedKey: 'query', newValue }
+												}
+											)}
+											renderInput={params => (<TextField
+												{...params}
+												placeholder="Enter search term here..."
+												id="query"
+												value={condition.query}
+											/>)
+											}
+										/>
 									</FormControl>
 								</FormGroup>
 							)
@@ -155,13 +200,15 @@ function App({ fields, edit = false }) {
 			<Tabs value={resultFormat} onChange={(e, n) => setResultFormat(n)}>
 				<Tab label="Table" value="table" />
 				<Tab label="JSON" value="json" />
+				<Tab label="CSV (Import to Excel)" value="csv" />
 			</Tabs>
-			{responsestr || ((resultFormat === "table") && (<>
+			{errorstr}
+			{resultFormat === "table" && <>
 				{edit && <p>Click on the data to edit it.</p>}
 				<Table>
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
 					<TableBody>
-						{Object.entries(responseobj).map(([id,record]) => (
+						{Object.entries(responseobj).map(([id, record]) => (
 							<TableRow>
 								{fieldsToBeRetrieved.map(field => {
 									if (field in record) {
@@ -176,10 +223,9 @@ function App({ fields, edit = false }) {
 						))}
 					</TableBody>
 				</Table>
-			</>)) || ((resultFormat === "json") &&
-				JSON.stringify(responseobj)
-				)
-			}
+			</>}
+			{resultFormat === "csv" && <DataDisplayer extension="csv" dataMimeType="text/csv" data={responseAsCsv} />}
+			{resultFormat === "json" && <DataDisplayer extension="json" dataMimeType="application/json" data={JSON.stringify(responseobj)} />}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>

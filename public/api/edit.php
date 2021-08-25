@@ -19,19 +19,23 @@ if (isset($_GET['id'])) {
 ?>
 
 <head>
+	<script src="selectDistinct.js"></script>
 	<script>
 		function addValue(value = "") {
 			const root = document.getElementById('datafieldset');
 			let el = root.insertAdjacentElement('beforeend', document.createElement('input'));
 			el.type = "text";
 			el.name = "values[]";
-			el.setAttribute("minlength","1");
+			el.setAttribute("minlength", "1");
 			el.value = value;
-			el.setAttribute("list","options");
+			el.setAttribute("list", "options");
 			let deletebutton = root.insertAdjacentElement('beforeend', document.createElement('button'));
 			deletebutton.type = "button";
 			deletebutton.innerHTML = "Remove";
-			deletebutton.onclick = () => {deletebutton.remove();el.remove();}
+			deletebutton.onclick = () => {
+				deletebutton.remove();
+				el.remove();
+			}
 			root.insertAdjacentHTML('beforeend', '<br />')
 
 		}
@@ -58,37 +62,13 @@ if (isset($_GET['id'])) {
 			}
 		}
 		async function getData() {
-			const condition={
-					field: "id",
-					query: <?php echo '"' . $_GET['id'] . '"' ?>
-				}
-			await fetch('/api/getData.php?select=<?php echo $_GET['field'] ?>&conditions='+JSON.stringify(condition))
+			const condition = {
+				field: "id",
+				query: <?php echo '"' . $_GET['id'] . '"' ?>
+			}
+			await fetch('/api/getData.php?select=<?php echo $_GET['field'] ?>&conditions=' + JSON.stringify(condition))
 				.then(res => res.text())
 				.then(data => displayData(data));
-		}
-		function setSelectOptions(rawdata) {
-			try {
-				let selectOptions=[];
-				data = JSON.parse(rawdata);
-				Object.values(data).forEach(row => {
-					Object.values(row).forEach(cell => {
-						cell.forEach(option => {
-							if (selectOptions.indexOf(option) === -1) {
-								selectOptions.push(option);
-							}
-						})
-					})
-
-				})
-				document.getElementById('options').innerHTML=selectOptions.map(v=>'<option>'+v+'</option>');
-			} catch (e) {
-				console.error(e);
-			}
-		}
-		async function getExistingFieldValues() {
-			await fetch('/api/getData.php?select=<?php echo $_GET['field'] ?>')
-				.then(res => res.text())
-				.then(data => setSelectOptions(data));
 		}
 	</script>
 </head>
@@ -106,7 +86,7 @@ if (isset($_GET['id'])) {
 				echo "Error. Values in database are as shown below.";
 				break;
 		}
-	} else if(isset($_GET['successful'])){
+	} else if (isset($_GET['successful'])) {
 		echo "Data modified to values shown below";
 	}
 	if (isset($_GET['timeout'])) {
@@ -123,6 +103,8 @@ if (isset($_GET['id'])) {
 	<datalist id="options"></datalist>
 	<script>
 		getData();
-		getExistingFieldValues();
+		fetch('selectDistinct.php?field=<?php echo $_GET['field'] ?>').then(data =>
+			document.getElementById('options').innerHTML = data.map(v => '<option>' + v + '</option>')
+		);
 	</script>
 </body>

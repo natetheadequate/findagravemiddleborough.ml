@@ -6,7 +6,9 @@ Pass via GET:
     field: the field you are searching
     operator: (optional) defaults to "=". Can also be <,>,>=,<=,%LIKE%,LIKE%, and %LIKE
     query: the search value
-  
+  If you are including this from another php file, set the variable $returndontecho=true
+  if the variable $returndontecho isn't set to true, returns stringified json object which contains keys corresponding to the internal id of the record and values which are objects with keys corresponding to fields (join_last_name,birth_day,...) and value of an array of all the entries for that internal id and field tuple
+  If the variable $returndontecho is set to true, returns associative array of the same structure as the json described above.
 */
 header("Access-Control-Allow-Origin: *");
 include '../DB.php';
@@ -84,7 +86,7 @@ if (isset($_GET['conditions'])) {
     }
     $conditions = [];
     foreach ($_GET['conditions'] as $rawcondition) {
-        array_push($conditions, json_decode($rawcondition,true));
+        array_push($conditions, json_decode($rawcondition, true));
     }
     foreach ($conditions as $condition) {
         if (validCondition($condition, $fields) && $ids !== []) {
@@ -187,4 +189,8 @@ foreach ($_GET['select'] as $col) {
         }
     }
 }
-echo json_encode((object) $results);
+if (isset($returndontecho) && $returndontecho) {
+    return $results;
+} else {
+    echo json_encode((object) $results);
+}
