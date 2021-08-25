@@ -167,7 +167,6 @@ function App({ fields, operators, edit = false }) {
 										<Autocomplete
 											id={"query_autocomplete_" + condition.key}
 											freeSolo
-											autoSelect
 											style={{ width: '300px', marginTop: "auto" }}
 											options={distinctValues[condition.field]}
 											onChange={(_, newValue) => dispatchConditions(
