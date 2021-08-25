@@ -83,7 +83,7 @@ function App({ fields, operators, edit = false }) {
 		responseobjwithids.forEach(rowobj => {
 			let bodyrow = [];
 			Object.entries(rowobj).forEach(([field, valuearr]) => {
-				bodyrow[headers1.indexOf(field)] = valuearr.join(' ; ');
+				bodyrow[headers1.indexOf(field)] = valuearr.toString();
 			})
 			body.push(bodyrow);
 		})
