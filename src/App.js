@@ -2,6 +2,7 @@ import { FormControl, MenuItem, Select, Button, TextField, FormGroup, Typography
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import React, { useMemo, useReducer, useState } from "react";
 import clean from "./clean";
+import DataDisplayer from "./DataDisplayer";
 
 function App({ fields, operators, edit = false }) {
 	const fieldNames = fields.map(v => v.name);
@@ -55,20 +56,20 @@ function App({ fields, operators, edit = false }) {
 		}
 	})
 	const [responseobj, errorstr] = useMemo(() => {
-		if (response !== null) {
-			let obj = {};
-			let err = "";
-			try {
+		let obj = {};
+		let err = "";
+		try {
+			if (response !== null) {
 				obj = JSON.parse(response);
-			} catch (e) {
-				if (!(e instanceof SyntaxError)) {
-					err = "There was an error parsing the data.";//this should never happen
-				} else {
-					err = response;//these are the error messsages, like no results found and invalid query
-				}
-			} finally {
-				return [obj, err];
 			}
+		} catch (e) {
+			if (!(e instanceof SyntaxError)) {
+				err = "There was an error parsing the data.";//this should never happen
+			} else {
+				err = response;//these are the error messsages, like no results found and invalid query
+			}
+		} finally {
+			return [obj, err];
 		}
 	}, [response]);
 	const responseAsCsv = useMemo(() => {
@@ -203,7 +204,7 @@ function App({ fields, operators, edit = false }) {
 				<Tab label="CSV (Import to Excel)" value="csv" />
 			</Tabs>
 			{errorstr}
-			{((resultFormat === "table") && (<>
+			{resultFormat === "table" && <>
 				{edit && <p>Click on the data to edit it.</p>}
 				<Table>
 					<TableHead><TableRow>{fieldsToBeRetrieved.map(v => <TableCell>{clean(v)}</TableCell>)}</TableRow></TableHead>
@@ -223,10 +224,9 @@ function App({ fields, operators, edit = false }) {
 						))}
 					</TableBody>
 				</Table>
-			</>)) || ((resultFormat === "json") &&
-				JSON.stringify(responseobj)
-				) || ((resultFormat === "csv") && <p id="csvresults">{responseAsCsv}</p>)
-			}
+			</>}
+			{resultFormat === "csv" && <DataDisplayer extension="csv" dataMimeType="text/csv" data={responseAsCsv} />}
+			{resultFormat === "json" && <DataDisplayer extension="json" dataMimeType="application/json" data={JSON.stringify(responseobj)} />}
 			<footer style={{ position: 'absolute', bottom: '30px', display: "flex", alignItems: 'center', width: "100%" }}>
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
