@@ -165,11 +165,12 @@ function App({ fields, operators, edit = false }) {
 									</FormControl>
 									<FormControl>
 										<Autocomplete
+											value={condition.query}
 											id={"query_autocomplete_" + condition.key}
 											freeSolo
 											style={{ width: '300px', marginTop: "auto" }}
 											options={distinctValues[condition.field]}
-											onChange={(_, newValue) => dispatchConditions(
+											onInputChange={(_, newValue) => dispatchConditions(
 												{
 													type: 'edit',
 													payload: { keyInArr: condition.key, editedKey: 'query', newValue }
@@ -179,7 +180,6 @@ function App({ fields, operators, edit = false }) {
 												{...params}
 												placeholder="Enter search term here..."
 												id="query"
-												value={condition.query}
 											/>)
 											}
 										/>
