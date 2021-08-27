@@ -91,10 +91,13 @@ function App({ fields, operators, edit = false }) {
 		return [format(headers1), format(headers2), ...body.map(format)].join('\n');
 
 	}, [fieldsToBeRetrieved, responseobj])
+	const [dataLoading,setDataLoading]=useState(false);
 	async function submitForm() {
+		setDataLoading(true);
 		let selectstr = fieldsToBeRetrieved.map(v => 'select[]=' + encodeURIComponent(v)).join('&');
 		let conditionsstr = conditions.map(v => 'conditions[]=' + encodeURIComponent(JSON.stringify(v))).join('&');
 		await fetch('/api/getData.php?' + [selectstr, conditionsstr].join('&'))
+			.then(r=>{setDataLoading(false);return r})
 			.then(res => res.text())
 			.then(data => setResponse(data));
 	}
@@ -195,7 +198,7 @@ function App({ fields, operators, edit = false }) {
 						}
 					</div>
 				</fieldset>
-				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>Go!</Button>
+				<Button type="submit" variant="contained" style={{ margin: "10px 0" }} onClick={() => { submitForm() }}>{dataLoading?"Loading...":"Go!"}</Button>
 			</form>
 			<Tabs value={resultFormat} onChange={(e, n) => setResultFormat(n)}>
 				<Tab label="Table" value="table" />
