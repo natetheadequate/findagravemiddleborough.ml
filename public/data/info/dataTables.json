@@ -111,49 +111,49 @@
     },
     {
         "name": "birth_day",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "tinyint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "birth_month",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "tinyint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "birth_year",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "smallint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "death_day",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "tinyint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "death_month",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "tinyint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "death_year",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "smallint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "entry_day",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "tinyint UNSIGNED",
         "mysqlitype": "i"
@@ -161,34 +161,34 @@
     {
         "name": "entry_month",
         "type": "independent",
-        "inputType":"number",
+        "inputType":"date",
         "datatype": "tinyint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "entry_year",
         "type": "independent",
-        "inputType":"number",
+        "inputType":"date",
         "datatype": "smallint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "exit_day",
         "type": "independent",
-        "inputType":"number",
+        "inputType":"date",
         "datatype": "tinyint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "exit_month",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "tinyint UNSIGNED",
         "mysqlitype": "i"
     },
     {
         "name": "exit_year",
-        "inputType":"number",
+        "inputType":"date",
         "type": "independent",
         "datatype": "smallint UNSIGNED",
         "mysqlitype": "i"
