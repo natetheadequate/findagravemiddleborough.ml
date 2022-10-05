@@ -6,7 +6,7 @@ import DataDisplayer from "./DataDisplayer";
 
 function App({ fields, operators, edit = false }) {
 	const fieldNames = fields.map(v => v.name);
-	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState([join_last_name,join_middle_name,join_last_name, birth_year,death_year]);
+	const [fieldsToBeRetrieved, setFieldsToBeRetrieved] = useState(['join_last_name','join_middle_name','join_last_name', 'birth_year','death_year']);
 	const [distinctValues, setDistinctValues] = useState({});
 	//conditions is an array of objects with keys field (eg join_last_name), operator (eg =), and query (eg Allen)
 	const [conditions, dispatchConditions] = useReducer((state, action) => {
