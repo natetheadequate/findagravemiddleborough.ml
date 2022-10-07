@@ -8,7 +8,7 @@ React
 PHP
 MySQL
 
-#Features
+# Features
 
 Multiple values for a single field of an entry, made possible by a database with join tables.
 Searching using various operators
@@ -21,7 +21,7 @@ Indexed on Google
 Brute force login attempt protection through timeouts
 
 
-#Design 
+# Design 
 
 There are two active paths, / and /edit. They both map to the same <App /> component, which is initialized with information about the fields from the same json file used to help convert the input xlsx to sql. However, when the edit path is accessed, there is an "edit" parameter which is passed to the App component as well, which renders all the data as links, which take you to a page where you can modify the data and then if the password you input along with it is correct, make changes to the database. Accessing the data is done through an asynchronous function which accesses the /getData.php endpoint with get paramaters of which fields.  
 
