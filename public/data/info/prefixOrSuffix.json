@@ -6,5 +6,6 @@
     "Jr., DVM":"suffix",
     "III":"suffix",
     "Rev.":"prefix",
-    "Deacon":"prefix"
+    "Deacon":"prefix",
+    "Capt.":"prefix"
 }

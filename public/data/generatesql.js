@@ -1,7 +1,7 @@
 /* eslint-disable no-multi-str */
 //all dictionaries are presumed to have a string as the value, otherwise, the sql generated will convert everything to a string in makeJoinTable()
-const data = require("./input/RockAtoPierce.json");
-const dataTables=require('./info/dataTables.json');
+const data = require(process.argv[3]);
+const dataTables=require(process.argv[2] === "preservation"? './info/preservationDataTables.json':'./info/dataTables.json');
 const prefixOrSuffix=require("./info/prefixOrSuffix.json");
 let sql='';
 let dictionaries=[];
@@ -30,4 +30,4 @@ dataTables.forEach(dataTable=>{
     }
 })
 sql+=(require('./json2sql.js'))(data, dataTables, prefixOrSuffix);
-writeFileSync("./output/freshsql.sql", sql); //this runs when the last dictionary has been added
+writeFileSync(__dirname+"/output/"+Date.now()+".sql", sql, {flag:"w"}); //this runs when the last dictionary has been added
