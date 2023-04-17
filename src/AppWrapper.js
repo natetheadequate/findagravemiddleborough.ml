@@ -5,7 +5,7 @@ import { BrowserRouter,Route, Switch } from 'react-router-dom';
 const useFields = () => {
 	const [fields, setFields] = useState(null);
 	async function retrieve() {
-		const res = await fetch(process.env.PUBLIC_URL + "data/info/"+(window.location.origin.startsWith("preservation")? "preservationDataTables.json":"dataTables.json"));
+		const res = await fetch(process.env.PUBLIC_URL + "data/info/"+(window.location.hostname.startsWith("preservation")? "preservationDataTables.json":"dataTables.json"));
 		const json = await res.json();
 		let temp = [];
 		json.forEach((v) => {
