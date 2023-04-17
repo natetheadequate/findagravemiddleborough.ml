@@ -233,7 +233,7 @@ function App({ fields, operators, edit = false }) {
 				<ButtonGroup style={{ maxWidth: 'max-content', margin: "auto" }} >
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org/contact-us.html'>Contact Friends of Middleborough Cemeteries</Button>
 					<Button href='http://www.friendsofmiddleboroughcemeteries.org'>Friends of Middleborough Cemeteries</Button>
-					<Button href='mailto:natetheadequate+fomc@outlook.com'>Contact Developer/Report Bug</Button>
+					<Button href='mailto:natewhite345+fomc@outlook.com'>Contact Developer/Report Bug</Button>
 				</ButtonGroup>
 			</footer>
 		</>
