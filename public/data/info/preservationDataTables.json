@@ -1,0 +1,156 @@
+[
+    {
+        "name": "names",
+        "type": "dictionary",
+        "columnName": "name"
+    },
+    {
+        "name": "prefixes",
+        "type": "dictionary",
+        "columnName": "prefix"
+    },
+    {
+        "name": "suffixes",
+        "type": "dictionary",
+        "columnName": "suffix"
+    },
+    {
+        "name": "places",
+        "type": "dictionary",
+        "columnName": "place"
+    },
+    {
+        "name": "cemeteries",
+        "type": "dictionary",
+        "columnName": "cemetery"
+    },
+    {
+        "name": "join_last_name",
+        "type": "join",
+        "dictionary": "names"
+    },
+    {
+        "name": "join_maiden_name",
+        "type": "join",
+        "dictionary": "names"
+    },
+    {
+        "name": "join_first_name",
+        "type": "join",
+        "dictionary": "names"
+    },
+    {
+        "name": "join_middle_name",
+        "type": "join",
+        "dictionary": "names"
+    },
+    {
+        "name": "join_prefix",
+        "type": "join",
+        "dictionary": "prefixes"
+    },
+    {
+        "name": "join_suffix",
+        "type": "join",
+        "dictionary": "suffixes"
+    },
+    {
+        "name": "join_birth_place",
+        "type": "join",
+        "dictionary": "places"
+    },
+    {
+        "name": "join_death_place",
+        "type": "join",
+        "dictionary": "places"
+    },
+    {
+        "name": "join_cemetery",
+        "type": "join",
+        "dictionary": "cemeteries"
+    },
+    {
+        "name": "birth_day",
+        "inputType":"number",
+        "type": "independent",
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
+    },
+    {
+        "name": "birth_month",
+        "inputType":"number",
+        "type": "independent",
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
+    },
+    {
+        "name": "birth_year",
+        "inputType":"number",
+        "type": "independent",
+        "datatype": "smallint UNSIGNED",
+        "mysqlitype": "i"
+    },
+    {
+        "name": "death_day",
+        "inputType":"number",
+        "type": "independent",
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
+    },
+    {
+        "name": "death_month",
+        "inputType":"number",
+        "type": "independent",
+        "datatype": "tinyint UNSIGNED",
+        "mysqlitype": "i"
+    },
+    {
+        "name": "death_year",
+        "inputType":"number",
+        "type": "independent",
+        "datatype": "smallint UNSIGNED",
+        "mysqlitype": "i"
+    },
+    {
+        "name":"military_stone_inscription",
+        "type":"independent",
+        "datatype":"varchar(255)",
+        "mysqlitype":"s"
+    },
+    {
+        "name": "location_in_cemetery",
+        "type": "independent",
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
+    },
+    {
+        "name": "cenotaphs",
+        "type": "independent",
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
+    },
+    {
+        "name": "notes",
+        "type": "independent",
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
+    },
+    {
+        "name": "father_name",
+        "type": "independent",
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
+    },
+    {
+        "name": "mother_name",
+        "type": "independent",
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
+    },
+    {
+        "name": "spouse_name",
+        "type": "independent",
+        "datatype": "varchar(255)",
+        "mysqlitype": "s"
+    }
+]
